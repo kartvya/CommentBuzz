@@ -19,12 +19,9 @@ export default function RootLayout() {
           <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
-            <Stack
-              screenOptions={{ headerShown: false }}
-              initialRouteName="(tabs)"
-            >
+            <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="+not-found" />
+              <Stack.Screen name="Welcome" />
             </Stack>
           </ThemeProvider>
         </PersistGate>

@@ -1,36 +1,11 @@
-import React, { useCallback, useRef, useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  ListRenderItemInfo,
-  Pressable,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  View,
-} from "react-native";
-import { replaceMentionValues } from "react-native-controlled-mentions";
-import ParsedText from "react-native-parsed-text";
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withSpring,
-} from "react-native-reanimated";
-import Carousel from "react-native-reanimated-carousel";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { useDispatch } from "react-redux";
-import DoubleTouchableOpacity from "../components/DoubleTouchableOpacity";
-import { MXicon } from "../components/Icons";
-import Paginator from "../components/Paginator";
+import { useCallback, useRef } from "react";
+import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native";
+import { RFPercentage } from "react-native-responsive-fontsize";
 import Wrapper from "../components/Wrapper";
 //@ts-ignore
 // import Video from "react-native-video";
-import { Colors } from "@/constants/Colors";
-import { ThemedText } from "@/components/ThemedText";
 import MemoizedPostView from "../components/MemoizedPostView";
+import ScreenWrapper from "../components/ScreenWrapper";
 
 const Feed = () => {
   // const userPost = useAppSelector(
@@ -64,7 +39,7 @@ const Feed = () => {
   ]);
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper>
       <Wrapper>
         <FlatList
           ref={flatlistRef}
@@ -78,18 +53,16 @@ const Feed = () => {
           viewabilityConfigCallbackPairs={
             viewabilityConfigCallbackPairs.current
           }
+          contentContainerStyle={{ paddingVertical: RFPercentage(2) }}
         />
       </Wrapper>
-    </View>
+    </ScreenWrapper>
   );
 };
 
 export default Feed;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   paginationDotStyle: {
     width: 9,
     height: 9,

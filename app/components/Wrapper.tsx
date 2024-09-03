@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import {
+  Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -12,15 +13,16 @@ import { useNavigation } from "@react-navigation/native";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Colors } from "@/constants/Colors";
+import { useRouter } from "expo-router";
 
 interface WrapperProps {
   children: ReactNode;
 }
 
 const Wrapper: React.FC<WrapperProps> = ({ children }) => {
-  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const navigation = useRouter();
   const onPressSpiral = () => {
-    navigation.navigate("uploadPost");
+    navigation.navigate("/Welcome");
   };
 
   return (
@@ -39,7 +41,7 @@ const Wrapper: React.FC<WrapperProps> = ({ children }) => {
           type="AntDesign"
           name={"plus"}
           color={Colors.dark.background}
-          size={RFPercentage(4)}
+          size={Platform.OS == "web" ? RFPercentage(2) : RFPercentage(4)}
         />
       </TouchableOpacity>
     </SafeAreaView>
@@ -55,8 +57,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     bottom: 20,
-    height: 70,
-    width: 70,
+    height: Platform.OS == "web" ? RFPercentage(4) : RFPercentage(8),
+    width: Platform.OS == "web" ? RFPercentage(4) : RFPercentage(8),
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",

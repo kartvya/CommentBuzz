@@ -1,8 +1,8 @@
-import {Alert} from 'react-native';
-import {ImagePayload} from '../../components/comunitymessage/ComunityFotter';
-import {ALLPOST} from '../../redux/actions/ActionType';
-import {endPoints} from '../ApiEndpoints';
-import backendBaseApi from '../BackendBaseApi';
+import { Alert } from "react-native";
+import { ImagePayload } from "../../components/comunitymessage/ComunityFotter";
+import { ALLPOST } from "../../redux/actions/ActionType";
+import { endPoints } from "../ApiEndpoints";
+import backendBaseApi from "../BackendBaseApi";
 
 interface UploadPayload {
   descriptionText: string;
@@ -41,24 +41,24 @@ export interface PostData {
 
 const CommunityApi = backendBaseApi.injectEndpoints({
   overrideExisting: true,
-  endpoints: build => ({
+  endpoints: (build) => ({
     getAllPost: build.query<CommonResponse<PostData>, void>({
       query: () => ({
         url: endPoints.getPost,
-        method: 'Get',
+        method: "Get",
       }),
       keepUnusedDataFor: 0,
-      async onQueryStarted(payload, {dispatch, queryFulfilled}) {
+      async onQueryStarted(payload, { dispatch, queryFulfilled }) {
         try {
-          const {data: postData} = await queryFulfilled;
+          const { data: postData } = await queryFulfilled;
 
           if (postData.result?.posts) {
-            dispatch({type: ALLPOST, payload: postData.result.posts});
+            dispatch({ type: ALLPOST, payload: postData.result.posts });
           } else {
-            console.log('Get post api error');
+            console.log("Get post api error");
           }
         } catch (error) {
-          console.log('error', error);
+          console.log("error", error);
         }
       },
     }),
@@ -66,34 +66,37 @@ const CommunityApi = backendBaseApi.injectEndpoints({
       CommonResponse<SuccesfullImageUploadPayload>,
       UploadPayload
     >({
-      query: ({descriptionText, file}) => {
+      query: ({ descriptionText, file }) => {
         const body = new FormData();
         const profilePhoto = {
           uri: file?.uri,
-          type: file?.type || 'image/jpeg',
-          name: file?.fileName || 'profile_photo.jpg',
+          type: file?.type || "image/jpeg",
+          name: file?.fileName || "profile_photo.jpg",
         };
-        body.append('description', descriptionText);
-        body.append('image', profilePhoto);
+        body.append("description", descriptionText);
+        body.append("image", profilePhoto);
         return {
           url: endPoints.uploadPost,
-          method: 'POST',
+          method: "POST",
           body,
           headers: {
-            'Content-Type': `multipart/form-data`,
+            "Content-Type": `multipart/form-data`,
           },
         };
       },
     }),
     likePost: build.mutation<CommonResponse<any>, PostActionPayload>({
-      query: payload => ({
+      query: (payload) => ({
         url: endPoints.likePost,
-        method: 'POST',
+        method: "POST",
         body: payload,
       }),
     }),
   }),
 });
 
-export const {useGetAllPostQuery, useUploadPostMutation, useLikePostMutation} =
-  CommunityApi;
+export const {
+  useGetAllPostQuery,
+  useUploadPostMutation,
+  useLikePostMutation,
+} = CommunityApi;

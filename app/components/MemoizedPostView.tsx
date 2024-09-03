@@ -1,11 +1,10 @@
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import React, { useCallback, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
   Pressable,
   StyleSheet,
+  Text,
   ToastAndroid,
   View,
 } from "react-native";
@@ -80,22 +79,17 @@ const MemoizedPostView: React.FC<any> = React.memo(({ item, isVisible }) => {
       console.log("No match found or invalid input format.");
     }
   };
-  console.log(userPost, "userPostuserPost");
+
   return (
-    <ThemedView style={styles.userContainer}>
-      <ThemedView style={{ flexDirection: "row", alignItems: "center" }}>
-        <ThemedView style={styles.profileImage}>
-          <Image
-            source={{ uri: item.userProfileImage }}
-            style={styles.profileImage}
-          />
-        </ThemedView>
-        <ThemedView style={styles.userNameContainer}>
-          <ThemedText>{item.username}</ThemedText>
-        </ThemedView>
-      </ThemedView>
-      {item.description && (
-        <ThemedView>
+    <View style={styles.userContainer}>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={styles.profileImage} />
+        <View style={styles.userNameContainer}>
+          <Text>textxtxt</Text>
+        </View>
+      </View>
+      {!item.description && (
+        <View>
           <ParsedText
             style={styles.descriptionText}
             parse={[
@@ -108,26 +102,29 @@ const MemoizedPostView: React.FC<any> = React.memo(({ item, isVisible }) => {
             ]}
             childrenProps={{ allowFontScaling: false }}
           >
-            {item?.description}
+            item?.description
           </ParsedText>
-        </ThemedView>
+        </View>
       )}
-      {/* {item.uploadedImages.length > 0 && ( */}
       <DoubleTouchableOpacity
         onPress={() => onSingleTap()}
         onDoublePress={() => onDoubleTap()}
         doublePressDelay={250}
       >
-        <ThemedView style={{ flex: 1, alignSelf: "center" }}>
+        <View
+          style={{
+            flex: 1,
+            alignSelf: "center",
+            justifyContent: "center",
+            marginVertical: RFPercentage(2),
+          }}
+        >
           <Carousel
-            width={width}
-            height={100}
+            width={width - RFPercentage(3)}
+            height={RFPercentage(40)}
             autoPlay={false}
-            data={item.uploadedImages}
+            data={[...new Array(6).keys()]}
             scrollAnimationDuration={1000}
-            style={{
-              marginTop: 10,
-            }}
             loop={false}
             panGestureHandlerProps={{
               activeOffsetX: [-10, 0],
@@ -140,82 +137,31 @@ const MemoizedPostView: React.FC<any> = React.memo(({ item, isVisible }) => {
                 runOnJS(setActiveIndex)(carouselIndex);
               }
             }}
-            renderItem={({ index, item: imageUrl }) => {
-              // const regex = /(?:\.([^.]+))?$/;
-              // const match = imageUrl.match(regex);
-              // const extension = match ? match[1] : undefined;
-              if (true) {
-                return (
-                  <ThemedView>
-                    {/* <Video
-                        source={{ uri: imageUrl }}
-                        ref={videoRef}
-                        onBuffer={() => console.log("buffring")}
-                        onError={() => console.log("error")}
-                        style={{ width: "100%", height: "100%" }}
-                        resizeMode="cover"
-                        repeat={true}
-                        useTextureView={false}
-                        onPlaybackError={(error: any) =>
-                          console.error("Video error:", error)
-                        }
-                        maxBitRate={700000}
-                        ignoreSilentSwitch="ignore"
-                        paused={
-                          !isVisible ||
-                          !(activeIndex === 0 || activeIndex === index) ||
-                          userPost.showImageModal
-                        }
-                        muted={isSoundOn}
-                        automaticallyWaitsToMinimizeStalling={false}
-                        hideShutterView={true}
-                        disableFocus={true}
-                      /> */}
-
-                    {/* <Image source={} /> */}
-                    <Pressable
-                      style={styles.soundBtnConatiner}
-                      onPress={() => setIsSoundOn(!isSoundOn)}
-                    >
-                      <MXicon
-                        type="Entypo"
-                        name={isSoundOn ? "sound-mute" : "sound"}
-                        color={"white"}
-                        size={RFPercentage(2.2)}
-                      />
-                    </Pressable>
-                  </ThemedView>
-                );
-              } else {
-                return (
-                  <ThemedView
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                    }}
-                  >
-                    <ThemedView style={{ width: "100%", height: "100%" }} />
-                    {/* <Image
-                        source={{ uri: imageUrl }}
-                        style={{ width: "100%", height: "100%" }}
-                        resizeMode="cover"
-                      /> */}
-                  </ThemedView>
-                );
-              }
-            }}
+            renderItem={({ index }) => (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                  borderWidth: 1,
+                  borderRadius: RFPercentage(2),
+                  marginHorizontal: RFPercentage(1),
+                }}
+              >
+                <Text>{index}</Text>
+              </View>
+            )}
           />
-        </ThemedView>
+        </View>
       </DoubleTouchableOpacity>
-      {/* )} */}
-      {false ? (
-        <ThemedView style={{ marginVertical: RFPercentage(2) }}>
-          <Paginator data={item.uploadedImages} scrollX={scrollX} />
-        </ThemedView>
+      {true ? (
+        <View style={{ marginVertical: RFPercentage(2) }}>
+          <Paginator data={[...new Array(6).keys()]} scrollX={scrollX} />
+        </View>
       ) : (
-        <ThemedView style={{ marginVertical: RFPercentage(1) }} />
+        <View style={{ marginVertical: RFPercentage(1) }} />
       )}
-      <ThemedView
+      {/* <View
         style={[
           StyleSheet.absoluteFillObject,
           { alignItems: "center", justifyContent: "center" },
@@ -234,7 +180,7 @@ const MemoizedPostView: React.FC<any> = React.memo(({ item, isVisible }) => {
             rStyle,
           ]}
         />
-      </ThemedView>
+      </View> */}
       <Pressable style={styles.pressebleIconConatiner} onPress={() => {}}>
         <MXicon
           type="FontAwesome"
@@ -242,11 +188,174 @@ const MemoizedPostView: React.FC<any> = React.memo(({ item, isVisible }) => {
           size={RFPercentage(2.5)}
           color={item.isLiked ? "pink" : "black"}
         />
-        <ThemedText style={{ marginHorizontal: RFPercentage(0.8) }}>
+        <Text style={{ marginHorizontal: RFPercentage(0.8) }}>
           {item.likeCount} Likes
-        </ThemedText>
+        </Text>
       </Pressable>
-    </ThemedView>
+    </View>
+    // <View style={styles.userContainer}>
+    //   <View style={{ flexDirection: "row", alignItems: "center" }}>
+    //     <View style={styles.profileImage}>
+    //       {/* <Image
+    //         source={{ uri: item.userProfileImage }}
+    //         style={styles.profileImage}
+    //       /> */}
+    //     </View>
+    //     <View style={styles.userNameContainer}>
+    //       <Text>{item.username}</Text>
+    //     </View>
+    //   </View>
+    //   {item.description && (
+    //     <View>
+    //       <ParsedText
+    //         style={styles.descriptionText}
+    //         parse={[
+    //           {
+    //             style: styles.username,
+    //             onPress: handleNamePress,
+    //             renderText: renderText,
+    //             pattern: /[@#]\S*/g,
+    //           },
+    //         ]}
+    //         childrenProps={{ allowFontScaling: false }}
+    //       >
+    //         {item?.description}
+    //       </ParsedText>
+    //     </View>
+    //   )}
+    //   {/* {item.uploadedImages.length > 0 && ( */}
+    //   <DoubleTouchableOpacity
+    //     onPress={() => onSingleTap()}
+    //     onDoublePress={() => onDoubleTap()}
+    //     doublePressDelay={250}
+    //   >
+    //     <View style={{ flex: 1, alignSelf: "center" }}>
+    //       <Carousel
+    //         width={width}
+    //         height={100}
+    //         autoPlay={false}
+    //         data={item.uploadedImages}
+    //         scrollAnimationDuration={1000}
+    //         style={{}}
+    //         loop={false}
+    //         panGestureHandlerProps={{
+    //           activeOffsetX: [-10, 0],
+    //         }}
+    //         onProgressChange={(_, absoluteProgress) => {
+    //           scrollX.value = absoluteProgress * width;
+    //         }}
+    //         onSnapToItem={(carouselIndex) => {
+    //           if (isVisible) {
+    //             runOnJS(setActiveIndex)(carouselIndex);
+    //           }
+    //         }}
+    //         renderItem={({ index, item: imageUrl }) => {
+    //           // const regex = /(?:\.([^.]+))?$/;
+    //           // const match = imageUrl.match(regex);
+    //           // const extension = match ? match[1] : undefined;
+    //           if (true) {
+    //             return (
+    //               <View>
+    //                 {/* <Video
+    //                     source={{ uri: imageUrl }}
+    //                     ref={videoRef}
+    //                     onBuffer={() => console.log("buffring")}
+    //                     onError={() => console.log("error")}
+    //                     style={{ width: "100%", height: "100%" }}
+    //                     resizeMode="cover"
+    //                     repeat={true}
+    //                     useTextureView={false}
+    //                     onPlaybackError={(error: any) =>
+    //                       console.error("Video error:", error)
+    //                     }
+    //                     maxBitRate={700000}
+    //                     ignoreSilentSwitch="ignore"
+    //                     paused={
+    //                       !isVisible ||
+    //                       !(activeIndex === 0 || activeIndex === index) ||
+    //                       userPost.showImageModal
+    //                     }
+    //                     muted={isSoundOn}
+    //                     automaticallyWaitsToMinimizeStalling={false}
+    //                     hideShutterView={true}
+    //                     disableFocus={true}
+    //                   /> */}
+
+    //                 {/* <Image source={} /> */}
+    //                 <Pressable
+    //                   style={styles.soundBtnConatiner}
+    //                   onPress={() => setIsSoundOn(!isSoundOn)}
+    //                 >
+    //                   <MXicon
+    //                     type="Entypo"
+    //                     name={isSoundOn ? "sound-mute" : "sound"}
+    //                     color={"white"}
+    //                     size={RFPercentage(2.2)}
+    //                   />
+    //                 </Pressable>
+    //               </View>
+    //             );
+    //           } else {
+    //             return (
+    //               <View
+    //                 style={{
+    //                   flex: 1,
+    //                   justifyContent: "center",
+    //                 }}
+    //               >
+    //                 <View style={{ width: "100%", height: "100%" }} />
+    //                 {/* <Image
+    //                     source={{ uri: imageUrl }}
+    //                     style={{ width: "100%", height: "100%" }}
+    //                     resizeMode="cover"
+    //                   /> */}
+    //               </View>
+    //             );
+    //           }
+    //         }}
+    //       />
+    //     </View>
+    //   </DoubleTouchableOpacity>
+    //   {/* )} */}
+    //   {false ? (
+    //     <View style={{ marginVertical: RFPercentage(2) }}>
+    //       <Paginator data={item.uploadedImages} scrollX={scrollX} />
+    //     </View>
+    //   ) : (
+    //     <View style={{ marginVertical: RFPercentage(1) }} />
+    //   )}
+    //   <View
+    //     style={[
+    //       StyleSheet.absoluteFillObject,
+    //       { alignItems: "center", justifyContent: "center" },
+    //     ]}
+    //   >
+    //     <AnimatedImage
+    //       source={require("../../assets/images/whiteHeart.png")}
+    //       tintColor={Colors.dark.background}
+    //       resizeMode={"contain"}
+    //       style={[
+    //         {
+    //           height: RFPercentage(10),
+    //           width: RFPercentage(10),
+    //           resizeMode: "contain",
+    //         },
+    //         rStyle,
+    //       ]}
+    //     />
+    //   </View>
+    //   <Pressable style={styles.pressebleIconConatiner} onPress={() => {}}>
+    //     <MXicon
+    //       type="FontAwesome"
+    //       name={item.isLiked ? "heart" : "heart-o"}
+    //       size={RFPercentage(2.5)}
+    //       color={item.isLiked ? "pink" : "black"}
+    //     />
+    //     <Text style={{ marginHorizontal: RFPercentage(0.8) }}>
+    //       {item.likeCount} Likes
+    //     </Text>
+    //   </Pressable>
+    // </View>
   );
 });
 
@@ -254,6 +363,17 @@ export default MemoizedPostView;
 const styles = StyleSheet.create({
   userContainer: {
     backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+    marginHorizontal: RFPercentage(1),
+    padding: RFPercentage(2),
+    borderRadius: 10,
   },
   profileImage: {
     height: 40,
@@ -287,7 +407,5 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: RFPercentage(1),
-    marginBottom: RFPercentage(1),
   },
 });
