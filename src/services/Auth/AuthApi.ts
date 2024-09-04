@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {endPoints} from '../ApiEndpoints';
-import backendBaseApi from '../BackendBaseApi';
-import {USERINFO} from '../../redux/actions/ActionType';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { endPoints } from "../ApiEndpoints";
+import backendBaseApi from "../BackendBaseApi";
+import { USERINFO } from "@/src/redux/actions/ActionType";
 
 interface LoginPayload {
   email: string;
@@ -31,18 +31,18 @@ interface UserData {
 
 const AuthApi = backendBaseApi.injectEndpoints({
   overrideExisting: true,
-  endpoints: build => ({
+  endpoints: (build) => ({
     login: build.mutation<CommonResponse<UserData>, LoginPayload>({
-      query: payload => ({
+      query: (payload) => ({
         url: endPoints.login,
-        method: 'POST',
+        method: "POST",
         body: payload,
       }),
-      async onQueryStarted(payload, {dispatch, queryFulfilled}) {
+      async onQueryStarted(payload, { dispatch, queryFulfilled }) {
         try {
-          const {data: userData} = await queryFulfilled;
+          const { data: userData } = await queryFulfilled;
           if (userData.result.token) {
-            await AsyncStorage.setItem('UserToken', userData.result.token);
+            await AsyncStorage.setItem("UserToken", userData.result.token);
             dispatch({
               type: USERINFO,
               payload: {
@@ -52,14 +52,14 @@ const AuthApi = backendBaseApi.injectEndpoints({
               },
             });
           } else {
-            console.log('Login api error');
+            console.log("Login api error");
           }
         } catch {
-          console.log('error');
+          console.log("error");
         }
       },
     }),
   }),
 });
 
-export const {useLoginMutation} = AuthApi;
+export const { useLoginMutation } = AuthApi;

@@ -1,11 +1,11 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/src/constants/Colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import { StyleSheet, useColorScheme } from "react-native";
 
 export default function TabLayout() {
   const theme = useColorScheme() ?? "light";
-  const activeColor = theme === "light" ? Colors.dark.primeColor : "#EF9337";
+  const activeColor = theme === "light" ? Colors.primeColor : "#EF9337";
 
   return (
     <Tabs

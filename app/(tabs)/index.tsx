@@ -1,11 +1,12 @@
 import { useCallback, useRef } from "react";
 import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
-import Wrapper from "../components/Wrapper";
+import Wrapper from "@/src/components/Wrapper";
 //@ts-ignore
 // import Video from "react-native-video";
-import MemoizedPostView from "../components/MemoizedPostView";
-import ScreenWrapper from "../components/ScreenWrapper";
+import MemoizedPostView from "@/src/components/MemoizedPostView";
+import ScreenWrapper from "@/src/components/ScreenWrapper";
+import { Colors } from "@/src/constants/Colors";
 
 const Feed = () => {
   // const userPost = useAppSelector(

@@ -8,7 +8,7 @@ import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { persistor, store } from "./redux/Store";
+import { persistor, store } from "@/src/redux/Store";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -19,10 +19,10 @@ export default function RootLayout() {
           <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="Welcome" />
-            </Stack>
+            <Stack
+              screenOptions={{ headerShown: false }}
+              initialRouteName="Welcome"
+            />
           </ThemeProvider>
         </PersistGate>
       </Provider>

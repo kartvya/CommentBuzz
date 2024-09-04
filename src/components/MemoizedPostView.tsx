@@ -12,7 +12,7 @@ import ParsedText from "react-native-parsed-text";
 import DoubleTouchableOpacity from "./DoubleTouchableOpacity";
 import Carousel from "react-native-reanimated-carousel";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/src/constants/Colors";
 import { replaceMentionValues } from "react-native-controlled-mentions";
 import Animated, {
   runOnJS,
@@ -22,7 +22,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useDispatch } from "react-redux";
-import { AppDispatch, useAppSelector } from "../redux/Store";
+import { AppDispatch, useAppSelector } from "@/src/redux/Store";
 import { MXicon } from "./Icons";
 import Paginator from "./Paginator";
 
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     marginHorizontal: RFPercentage(1),
   },
   descriptionText: {
-    color: Colors.dark.background,
+    color: Colors.white,
     marginVertical: RFPercentage(0.5),
     marginTop: RFPercentage(1),
     fontFamily: "ComicNeue-Regular",
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   },
   soundBtnConatiner: {
     position: "absolute",
-    backgroundColor: Colors.dark.background,
+    backgroundColor: Colors.white,
     padding: RFPercentage(1.3),
     borderRadius: 100,
     bottom: 10,

@@ -12,7 +12,7 @@ import { MXicon } from "./Icons";
 import { useNavigation } from "@react-navigation/native";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/src/constants/Colors";
 import { useRouter } from "expo-router";
 
 interface WrapperProps {
@@ -27,10 +27,7 @@ const Wrapper: React.FC<WrapperProps> = ({ children }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={Colors.dark.background}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.black} />
       {children}
       <TouchableOpacity
         onPress={onPressSpiral}
@@ -40,7 +37,7 @@ const Wrapper: React.FC<WrapperProps> = ({ children }) => {
         <MXicon
           type="AntDesign"
           name={"plus"}
-          color={Colors.dark.background}
+          color={Colors.black}
           size={Platform.OS == "web" ? RFPercentage(2) : RFPercentage(4)}
         />
       </TouchableOpacity>
@@ -51,7 +48,6 @@ const Wrapper: React.FC<WrapperProps> = ({ children }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.text,
   },
   spiralContainer: {
     position: "absolute",

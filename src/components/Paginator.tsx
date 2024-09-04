@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/src/constants/Colors";
 import React, { FunctionComponent } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, {
@@ -33,7 +33,7 @@ const Paginator: FunctionComponent<PaginatorProps> = ({ data, scrollX }) => {
             const backgroundColor = interpolateColor(
               scrollX.value,
               inputRange,
-              ["#DDDDDD", Colors.dark.primeColor, "#DDDDDD"]
+              ["#DDDDDD", Colors.primeColor, "#DDDDDD"]
             );
 
             return {

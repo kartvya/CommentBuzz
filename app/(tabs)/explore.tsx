@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import ScreenWrapper from "../components/ScreenWrapper";
+import ScreenWrapper from "@/src/components/ScreenWrapper";
 
 export default function TabTwoScreen() {
   return (
