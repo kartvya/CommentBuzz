@@ -16,7 +16,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="feedScreen"
         options={({ navigation, route }) => ({
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome

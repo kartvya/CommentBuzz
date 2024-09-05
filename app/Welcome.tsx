@@ -33,15 +33,16 @@ const Welcome = () => {
           <Button
             title="Let's explore"
             btnStyle={styles.primeBtn}
-            onPress={() => navigation.push("/(tabs)")}
+            onPress={() => navigation.push("/(tabs)/feedScreen")}
             textStyle={styles.exploreTxt}
           />
           <View style={styles.alreadyAccount}>
             <NormalText>Already have a account</NormalText>
-            <Pressable style={{ marginLeft: wp(1) }}>
-              <NormalText
-                style={{ color: Colors.primeColor, fontWeight: "bold" }}
-              >
+            <Pressable
+              style={{ marginLeft: wp(1) }}
+              onPress={() => navigation.push("/login")}
+            >
+              <NormalText style={{ color: Colors.primeColor }}>
                 Login
               </NormalText>
             </Pressable>
@@ -72,7 +73,6 @@ const styles = StyleSheet.create({
   },
   exploreTxt: {
     color: Colors.white,
-    fontWeight: "bold",
   },
   alreadyAccount: {
     flexDirection: "row",

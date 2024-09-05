@@ -388,11 +388,9 @@ const styles = StyleSheet.create({
     color: Colors.white,
     marginVertical: RFPercentage(0.5),
     marginTop: RFPercentage(1),
-    fontFamily: "ComicNeue-Regular",
   },
   username: {
     color: "#E90019",
-    fontFamily: "ComicNeue-Regular",
     fontSize: RFValue(12),
   },
   soundBtnConatiner: {

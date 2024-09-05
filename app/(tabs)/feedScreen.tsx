@@ -8,7 +8,7 @@ import MemoizedPostView from "@/src/components/MemoizedPostView";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import { Colors } from "@/src/constants/Colors";
 
-const Feed = () => {
+const FeedScreen = () => {
   // const userPost = useAppSelector(
   //   (state: { home: { posts: any } }) => state.home.posts
   // ) as Post[];
@@ -61,7 +61,7 @@ const Feed = () => {
   );
 };
 
-export default Feed;
+export default FeedScreen;
 
 const styles = StyleSheet.create({
   paginationDotStyle: {

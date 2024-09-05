@@ -22,12 +22,11 @@ interface WrapperProps {
 const Wrapper: React.FC<WrapperProps> = ({ children }) => {
   const navigation = useRouter();
   const onPressSpiral = () => {
-    navigation.navigate("/Welcome");
+    navigation.navigate("/welcome");
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.black} />
       {children}
       <TouchableOpacity
         onPress={onPressSpiral}
