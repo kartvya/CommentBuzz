@@ -25,6 +25,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, useAppSelector } from "@/src/redux/Store";
 import { MXicon } from "./Icons";
 import Paginator from "./Paginator";
+import { NormalText } from "./Text";
 
 const width = Dimensions.get("window").width;
 
@@ -85,7 +86,7 @@ const MemoizedPostView: React.FC<any> = React.memo(({ item, isVisible }) => {
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={styles.profileImage} />
         <View style={styles.userNameContainer}>
-          <Text>textxtxt</Text>
+          <NormalText>textxtxt</NormalText>
         </View>
       </View>
       {!item.description && (
@@ -188,9 +189,9 @@ const MemoizedPostView: React.FC<any> = React.memo(({ item, isVisible }) => {
           size={RFPercentage(2.5)}
           color={item.isLiked ? "pink" : "black"}
         />
-        <Text style={{ marginHorizontal: RFPercentage(0.8) }}>
+        <NormalText style={{ marginHorizontal: RFPercentage(0.8) }}>
           {item.likeCount} Likes
-        </Text>
+        </NormalText>
       </Pressable>
     </View>
     // <View style={styles.userContainer}>

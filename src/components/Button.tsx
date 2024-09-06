@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     height: hp(6),
     justifyContent: "center",
     borderRadius: wp(3),
+    alignItems: "center",
   },
   txt: {
     fontSize: RFValue(17),

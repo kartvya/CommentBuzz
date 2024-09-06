@@ -8,6 +8,7 @@ import { Colors } from "@/src/constants/Colors";
 import { NormalText, TitleText } from "@/src/components/Text";
 import { useRouter } from "expo-router";
 import Button from "@/src/components/Button";
+import Spacer from "@/src/components/Spacer";
 
 const Welcome = () => {
   const animation = useRef<LottieView>(null);
@@ -30,14 +31,16 @@ const Welcome = () => {
           <NormalText style={styles.punchLine}>
             Buzz with Comments, Earn with Impact!
           </NormalText>
+          <Spacer gap={wp(2)} />
           <Button
             title="Let's explore"
             btnStyle={styles.primeBtn}
-            onPress={() => navigation.push("/(tabs)/feedScreen")}
+            onPress={() => navigation.push("/signup")}
             textStyle={styles.exploreTxt}
           />
+          <Spacer gap={wp(2)} />
           <View style={styles.alreadyAccount}>
-            <NormalText>Already have a account</NormalText>
+            <NormalText>Already have an account</NormalText>
             <Pressable
               style={{ marginLeft: wp(1) }}
               onPress={() => navigation.push("/login")}
@@ -69,7 +72,6 @@ const styles = StyleSheet.create({
   primeBtn: {
     marginHorizontal: wp(5),
     alignItems: "center",
-    marginTop: hp(2),
   },
   exploreTxt: {
     color: Colors.white,
@@ -78,6 +80,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "center",
-    marginTop: wp(2),
   },
 });

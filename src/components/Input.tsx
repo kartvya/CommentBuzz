@@ -1,16 +1,23 @@
-import { StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle,
+} from "react-native";
 import React from "react";
 import { Colors } from "../constants/Colors";
 import { hp, wp } from "../helpers/comman";
 
-interface Iprops {
-  icon: any;
-  containerStyle: ViewStyle;
-  inputRef: any;
-  placeholderText: string;
+interface Iprops extends TextInputProps {
+  icon?: React.ReactNode;
+  containerStyle?: ViewStyle;
+  inputRef?: React.RefObject<TextInput>;
+  placeholderText?: string;
 }
 
-const Input = (props: Iprops) => {
+const Input: React.FC<Iprops> = (props) => {
   return (
     <View style={[styles.container, props.containerStyle]}>
       {props.icon && props.icon}
@@ -30,14 +37,6 @@ export default Input;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
     padding: wp(2),
     borderRadius: 10,
     height: hp(7),
@@ -50,5 +49,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "transparent", // Transparent background for TextInput
     paddingLeft: wp(2), // Ensure proper padding
+    fontFamily: "SpaceMono-Regular",
   },
 });

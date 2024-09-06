@@ -1,16 +1,14 @@
+import SvgIcon from "@/src/assets/icons";
+import Avatar from "@/src/components/Avatar";
 import { Colors } from "@/src/constants/Colors";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
-import { StyleSheet, useColorScheme } from "react-native";
+import { RFPercentage } from "react-native-responsive-fontsize";
 
 export default function TabLayout() {
-  const theme = useColorScheme() ?? "light";
-  const activeColor = theme === "light" ? Colors.primeColor : "#EF9337";
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: activeColor,
+        tabBarActiveTintColor: Colors.primeColor,
         headerShown: false,
         tabBarShowLabel: false,
       }}
@@ -19,22 +17,27 @@ export default function TabLayout() {
         name="feedScreen"
         options={({ navigation, route }) => ({
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome
-              size={28}
+            <SvgIcon
+              size={RFPercentage(3.4)}
               name="home"
-              color={focused ? activeColor : color}
+              color={focused ? Colors.primeColor : color}
+              strokeWidth="2"
             />
           ),
         })}
       />
       <Tabs.Screen
-        name="explore"
+        name="Profile"
         options={({ navigation, route }) => ({
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome
-              size={28}
-              name="cog"
-              color={focused ? activeColor : color}
+            <Avatar
+              uri=""
+              size={RFPercentage(3.8)}
+              borderRadius={100}
+              avatarImgStyle={{
+                borderWidth: 2,
+                borderColor: focused ? Colors.primeColor : color,
+              }}
             />
           ),
         })}
@@ -42,5 +45,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({});

@@ -1,20 +1,34 @@
-import { useCallback, useRef } from "react";
-import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native";
-import { RFPercentage } from "react-native-responsive-fontsize";
-import Wrapper from "@/src/components/Wrapper";
-//@ts-ignore
-// import Video from "react-native-video";
+import MyStatusBar from "@/src/components/CustomeStatusBar";
+import FeedHeader from "@/src/components/FeedHeader";
 import MemoizedPostView from "@/src/components/MemoizedPostView";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
+import Wrapper from "@/src/components/Wrapper";
 import { Colors } from "@/src/constants/Colors";
+import { wp } from "@/src/helpers/comman";
+import { useCallback, useRef, useState } from "react";
+import {
+  Animated,
+  ListRenderItemInfo,
+  Platform,
+  FlatList as RNFlatList,
+  StyleSheet,
+  View,
+} from "react-native";
+import { RefreshControl } from "react-native-gesture-handler";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+
+const AnimatedFlatList = Animated.createAnimatedComponent(RNFlatList);
 
 const FeedScreen = () => {
-  // const userPost = useAppSelector(
-  //   (state: { home: { posts: any } }) => state.home.posts
-  // ) as Post[];
-  // const dispatch = useDispatch<AppDispatch>();
-  const flatlistRef = useRef<FlatList>(null);
-  // const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
+  const insets = useSafeAreaInsets();
+  const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
+
+  const flatlistRef = useRef<RNFlatList>(null);
+  const [scrollY] = useState(new Animated.Value(0));
+  const [refreshing, setRefreshing] = useState(false);
 
   const onViewableItemsChanged = ({
     viewableItems,
@@ -27,9 +41,7 @@ const FeedScreen = () => {
   };
 
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<any>) => (
-      <MemoizedPostView item={item} />
-    ),
+    ({ item }: ListRenderItemInfo<any>) => <MemoizedPostView item={item} />,
     []
   );
 
@@ -39,10 +51,41 @@ const FeedScreen = () => {
     { viewabilityConfig, onViewableItemsChanged },
   ]);
 
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    { useNativeDriver: true }
+  );
+
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [0, -100],
+    extrapolate: "clamp",
+  });
+
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
   return (
-    <ScreenWrapper>
+    <>
+      <MyStatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <Animated.View
+        style={[
+          styles.headerContainer,
+          {
+            transform: [{ translateY: headerTranslateY }],
+            opacity: headerOpacity,
+            paddingTop: paddingTop,
+            paddingBottom: wp(3),
+          },
+        ]}
+      >
+        <FeedHeader />
+      </Animated.View>
       <Wrapper>
-        <FlatList
+        <AnimatedFlatList
           ref={flatlistRef}
           renderItem={renderItem}
           data={[...new Array(6).keys()]}
@@ -54,19 +97,42 @@ const FeedScreen = () => {
           viewabilityConfigCallbackPairs={
             viewabilityConfigCallbackPairs.current
           }
-          contentContainerStyle={{ paddingVertical: RFPercentage(2) }}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{
+            paddingTop: paddingTop + 5,
+            paddingVertical: RFPercentage(1),
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => console.log("On Refresh")}
+              progressViewOffset={paddingTop}
+            />
+          }
         />
       </Wrapper>
-    </ScreenWrapper>
+    </>
   );
 };
 
 export default FeedScreen;
 
 const styles = StyleSheet.create({
-  paginationDotStyle: {
-    width: 9,
-    height: 9,
-    borderRadius: 30,
+  headerContainer: {
+    zIndex: 1000,
+    backgroundColor: Colors.white,
+    position: "absolute",
+    left: 0,
+    right: 0,
+  },
+  headerSubContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: wp(3),
+    justifyContent: "space-between",
+  },
+  headerTitleText: {
+    fontSize: RFValue(20),
   },
 });
