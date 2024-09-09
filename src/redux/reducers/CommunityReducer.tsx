@@ -1,8 +1,7 @@
-import {PostInfo} from '../../services/Community/CommunityApi';
-import {ALLPOST, DISLIKEPOST, LIKEPOST, LOGOUT} from '../actions/ActionType';
+import { ALLPOST, DISLIKEPOST, LIKEPOST, LOGOUT } from "../actions/ActionType";
 
 export interface CommunityState {
-  Post: PostInfo[];
+  Post: any[];
 }
 
 export interface CommunityAction {
@@ -16,7 +15,7 @@ const initialState: CommunityState = {
 
 export const CommunityReducer = (
   state: CommunityState = initialState,
-  action: CommunityAction,
+  action: CommunityAction
 ) => {
   switch (action.type) {
     case ALLPOST:
@@ -27,19 +26,19 @@ export const CommunityReducer = (
     case LIKEPOST:
       return {
         ...state,
-        Post: state.Post.map(post =>
+        Post: state.Post.map((post) =>
           post.id === action.payload
-            ? {...post, likes: post.likes + 1, is_liked: true}
-            : post,
+            ? { ...post, likes: post.likes + 1, is_liked: true }
+            : post
         ),
       };
     case DISLIKEPOST:
       return {
         ...state,
-        Post: state.Post.map(post =>
+        Post: state.Post.map((post) =>
           post.id === action.payload
-            ? {...post, likes: post.likes - 1, is_liked: false}
-            : post,
+            ? { ...post, likes: post.likes - 1, is_liked: false }
+            : post
         ),
       };
     case LOGOUT:

@@ -17,6 +17,7 @@ const Avatar = (props: Iprops) => {
     <Image
       source={getUserImage(uri)}
       transition={100}
+      contentFit="contain"
       style={[
         styles.image,
         { height: size, width: size, borderRadius: borderRadius },
@@ -33,6 +34,5 @@ const styles = StyleSheet.create({
     height: RFPercentage(4),
     width: RFPercentage(4),
     overflow: "hidden",
-    resizeMode: "contain",
   },
 });

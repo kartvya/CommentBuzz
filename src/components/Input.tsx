@@ -9,26 +9,34 @@ import {
 import React from "react";
 import { Colors } from "../constants/Colors";
 import { hp, wp } from "../helpers/comman";
+import { NormalText } from "./Text";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface Iprops extends TextInputProps {
   icon?: React.ReactNode;
   containerStyle?: ViewStyle;
   inputRef?: React.RefObject<TextInput>;
   placeholderText?: string;
+  error?: string;
 }
 
 const Input: React.FC<Iprops> = (props) => {
   return (
-    <View style={[styles.container, props.containerStyle]}>
-      {props.icon && props.icon}
-      <TextInput
-        style={styles.input}
-        placeholder={props.placeholderText}
-        placeholderTextColor={Colors.icon}
-        ref={props.inputRef && props.inputRef}
-        {...props}
-      />
-    </View>
+    <>
+      <View style={[styles.container, props.containerStyle]}>
+        {props.icon && props.icon}
+        <TextInput
+          style={styles.input}
+          placeholder={props.placeholderText}
+          placeholderTextColor={Colors.icon}
+          ref={props.inputRef && props.inputRef}
+          {...props}
+        />
+      </View>
+      {props.error && (
+        <NormalText style={styles.errorText}>{props.error}</NormalText>
+      )}
+    </>
   );
 };
 
@@ -47,8 +55,12 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: "transparent", // Transparent background for TextInput
-    paddingLeft: wp(2), // Ensure proper padding
+    backgroundColor: "transparent",
+    paddingLeft: wp(2),
     fontFamily: "SpaceMono-Regular",
+  },
+  errorText: {
+    color: Colors.red,
+    fontSize: RFValue(10),
   },
 });

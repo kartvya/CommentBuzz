@@ -1,22 +1,20 @@
 // store.ts
-import {thunk, ThunkDispatch} from 'redux-thunk';
-import {AnyAction, combineReducers} from 'redux';
-import {persistStore, persistReducer} from 'redux-persist';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
-import {configureStore} from '@reduxjs/toolkit';
-import {setupListeners} from '@reduxjs/toolkit/query/react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { configureStore } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query/react";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { AnyAction, combineReducers } from "redux";
+import { persistReducer, persistStore } from "redux-persist";
+import { ThunkDispatch } from "redux-thunk";
 
-import RootReducer from './reducers/RootReducer';
-import backendBaseApi from '../services/BackendBaseApi';
+import RootReducer from "./reducers/RootReducer";
 
 const rootReducer = combineReducers({
-  [backendBaseApi.reducerPath]: backendBaseApi.reducer,
   root: RootReducer,
 });
 
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage: AsyncStorage,
 };
 
@@ -24,11 +22,13 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({serializableCheck: false}).concat(
-      backendBaseApi.middleware,
-      thunk,
-    ),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      thunk: {
+        extraArgument: {},
+      },
+      serializableCheck: false,
+    }),
 });
 
 const persistor = persistStore(store);
@@ -44,4 +44,4 @@ setupListeners(store.dispatch);
 export const useAppDispatch: DispatchFunc = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export {store, persistor};
+export { persistor, store };

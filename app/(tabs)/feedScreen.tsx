@@ -4,25 +4,27 @@ import MemoizedPostView from "@/src/components/MemoizedPostView";
 import Wrapper from "@/src/components/Wrapper";
 import { Colors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
+import { RootState } from "@/src/redux/Store";
+import { User } from "@supabase/supabase-js";
 import { useCallback, useRef, useState } from "react";
 import {
   Animated,
   ListRenderItemInfo,
-  Platform,
   FlatList as RNFlatList,
   StyleSheet,
   View,
 } from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(RNFlatList);
 
 const FeedScreen = () => {
+  const UserInfo = useSelector(
+    (state: RootState) => state.root?.authReducer?.userInfo
+  ) as User;
   const insets = useSafeAreaInsets();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
 

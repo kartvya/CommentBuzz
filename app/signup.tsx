@@ -1,5 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useRef } from "react";
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import React, { useRef, useState } from "react";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import { Colors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
@@ -10,12 +17,67 @@ import { NormalText, TitleText } from "@/src/components/Text";
 import Input from "@/src/components/Input";
 import Button from "@/src/components/Button";
 import { RFValue } from "react-native-responsive-fontsize";
+import { supabase } from "@/lib/supabase";
+import { useStoreRootState } from "expo-router/build/global-state/router-store";
+import { isEmailValid, isPasswordValid } from "@/src/helpers/validation";
 
 const Signup = () => {
   const navigation = useRouter();
-  const emailRef = useRef<TextInput>(null);
-  const userNameRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
+  const emailRef = useRef<string>("");
+  const userNameRef = useRef<string>("");
+  const passwordRef = useRef<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState<string>("");
+  const [userNameError, setUserNameError] = useState<string>("");
+  const [passwordError, serPasswordErrorr] = useState<string>("");
+
+  const onSignUp = async () => {
+    try {
+      let email = emailRef.current.trim();
+      let userName = userNameRef.current.trim();
+      let password = passwordRef.current.trim();
+      if (!email) {
+        setEmailError("This field is required.");
+      } else if (!isEmailValid(email)) {
+        setEmailError("Invalid email format.");
+      } else {
+        setEmailError("");
+      }
+      if (!userName) {
+        setUserNameError("This field is required.");
+      } else {
+        setUserNameError("");
+      }
+      if (!password) {
+        serPasswordErrorr("This field is required.");
+      } else if (!isPasswordValid(password)) {
+        serPasswordErrorr("Please select strong password!");
+      } else {
+        serPasswordErrorr("");
+      }
+      setIsLoading(true);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            name: userName,
+          },
+        },
+      });
+
+      setIsLoading(false);
+      navigation.navigate("/login");
+      // console.log("session", session);
+      // console.log("error", error);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <ScreenWrapper
       bg={Colors.white}
@@ -34,31 +96,35 @@ const Signup = () => {
       <NormalText>Please fill the details to create account.</NormalText>
       <Spacer gap={hp(1)} />
       <Input
-        inputRef={userNameRef}
         containerStyle={{}}
         icon={<SvgIcon name={"user"} size={26} color={Colors.icon} />}
         placeholderText="Enter your username"
+        onChangeText={(txt) => (userNameRef.current = txt)}
+        error={userNameError}
       />
-      <Spacer gap={wp(3)} />
+      <Spacer gap={userNameError ? wp(2) : wp(3)} />
       <Input
-        inputRef={emailRef}
         containerStyle={{}}
         icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
         placeholderText="Enter your email"
+        onChangeText={(txt) => (emailRef.current = txt)}
+        error={emailError}
       />
-      <Spacer gap={wp(3)} />
+      <Spacer gap={emailError ? wp(2) : wp(3)} />
       <Input
-        inputRef={passwordRef}
         containerStyle={{}}
         icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
         placeholderText="Enter your password"
         secureTextEntry={true}
+        onChangeText={(txt) => (passwordRef.current = txt)}
+        error={passwordError}
       />
-      <Spacer gap={wp(3)} />
+      <Spacer gap={passwordError ? wp(2) : wp(3)} />
       <Button
         title="Register"
         btnStyle={{ alignItems: "center" }}
-        onPress={() => console.log("Check")}
+        onPress={() => onSignUp()}
+        isLoading={isLoading}
       />
       <Spacer gap={wp(3)} />
       <View style={styles.alreadyAccount}>

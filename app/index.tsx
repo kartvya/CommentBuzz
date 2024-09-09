@@ -1,3 +1,4 @@
+import Loading from "@/src/components/Loading";
 import { TitleText } from "@/src/components/Text";
 import { useFonts } from "expo-font";
 import { useRouter } from "expo-router";
@@ -31,18 +32,7 @@ export default function Index() {
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      <Pressable onPress={() => navigation.push("/welcome")}>
-        <TitleText style={{ fontSize: 30 }}>Welcome screen</TitleText>
-      </Pressable>
-      <Pressable onPress={() => navigation.push("/login")}>
-        <TitleText style={{ fontSize: 30 }}>Login screen</TitleText>
-      </Pressable>
-      <Pressable onPress={() => navigation.push("/signup")}>
-        <TitleText style={{ fontSize: 30 }}>Signup screen</TitleText>
-      </Pressable>
-      <Pressable onPress={() => navigation.push("/(tabs)/feedScreen")}>
-        <TitleText style={{ fontSize: 30 }}>Tabs screen</TitleText>
-      </Pressable>
+      <Loading />
     </View>
   );
 }

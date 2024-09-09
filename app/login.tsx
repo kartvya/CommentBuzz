@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons/index";
 import Button from "@/src/components/Button";
 import Input from "@/src/components/Input";
@@ -7,21 +8,47 @@ import { NormalText, TitleText } from "@/src/components/Text";
 import { Colors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { useRouter } from "expo-router";
-import { useRef } from "react";
-import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { useRef, useState } from "react";
+import { Alert, Pressable, StyleSheet, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const Login = () => {
   const navigation = useRouter();
   const emailRef = useRef<string>("");
   const passwordRef = useRef<string>("");
+  const [emailError, setEmailError] = useState<string>("");
+  const [passwordError, serPasswordErrorr] = useState<string>("");
+  const [isLoading, setLoading] = useState<boolean>(false);
 
-  const onLogin = () => {
+  const onLogin = async () => {
     try {
-      if (!emailRef.current || !passwordRef.current) {
-        Alert.alert("Login", "Please fill all the fileds!");
+      let email = emailRef.current.trim();
+      let password = passwordRef.current.trim();
+      if (!email) {
+        setEmailError("This field is required.");
       } else {
-        navigation.navigate("/(tabs)/feedScreen");
+        setEmailError("");
+      }
+      if (!password) {
+        serPasswordErrorr("This field is required.");
+      } else {
+        serPasswordErrorr("");
+      }
+      if (email && password) {
+        setLoading(true);
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+        setLoading(false);
+        if (error) {
+          Alert.alert(error.message);
+        } else {
+          navigation.navigate("/(tabs)/feedScreen");
+        }
       }
     } catch (error) {
       console.log(error);
@@ -45,22 +72,22 @@ const Login = () => {
       <NormalText>Please login to continue</NormalText>
       <Spacer gap={hp(1)} />
       <Input
-        // inputRef={emailRef}
         containerStyle={{}}
         icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
         placeholderText="Enter your email"
         onChangeText={(txt) => (emailRef.current = txt)}
+        error={emailError}
       />
-      <Spacer gap={wp(3)} />
+      <Spacer gap={emailError ? wp(2) : wp(3)} />
       <Input
-        // inputRef={passwordRef}
         containerStyle={{}}
         icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
         placeholderText="Enter your password"
         secureTextEntry={true}
         onChangeText={(txt) => (passwordRef.current = txt)}
+        error={passwordError}
       />
-      <Spacer gap={wp(3)} />
+      <Spacer gap={passwordError ? wp(2) : wp(3)} />
       <NormalText style={styles.forgotPasswordText}>
         Forgot password?
       </NormalText>
@@ -69,6 +96,7 @@ const Login = () => {
         title="Login"
         btnStyle={{ alignItems: "center" }}
         onPress={() => onLogin()}
+        isLoading={isLoading}
       />
       <Spacer gap={wp(3)} />
       <View style={styles.alreadyAccount}>

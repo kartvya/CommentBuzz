@@ -10,4 +10,5 @@ export const Colors = {
   tabIconDefault: "#687076",
   tabIconSelected: tintColorLight,
   primeColor: "#106CC8",
+  red: "rgba(255,0,0,0.8)",
 };
