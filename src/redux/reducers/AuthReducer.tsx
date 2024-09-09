@@ -1,5 +1,16 @@
-import {LOGOUT, USERINFO} from '../actions/ActionType';
+import { LOGOUT, USERINFO } from "../actions/ActionType";
 
+export interface Users {
+  address: string;
+  bio: string;
+  collectedPoints: string;
+  created_at: string;
+  email: string;
+  id: string;
+  image: string;
+  name: string;
+  phonNumber: string;
+}
 export interface AuthState {
   hasToken: boolean;
   accessToken: string;
@@ -13,13 +24,13 @@ export interface AuthAction {
 
 const initialState = {
   hasToken: false,
-  accessToken: '',
-  userInfo: '',
+  accessToken: "",
+  userInfo: "",
 };
 
 export const authReducer = (
   state: AuthState = initialState,
-  action: AuthAction,
+  action: AuthAction
 ) => {
   switch (action.type) {
     case USERINFO:

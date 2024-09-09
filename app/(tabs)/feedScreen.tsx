@@ -22,9 +22,6 @@ import { useSelector } from "react-redux";
 const AnimatedFlatList = Animated.createAnimatedComponent(RNFlatList);
 
 const FeedScreen = () => {
-  const UserInfo = useSelector(
-    (state: RootState) => state.root?.authReducer?.userInfo
-  ) as User;
   const insets = useSafeAreaInsets();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
 
@@ -90,7 +87,7 @@ const FeedScreen = () => {
         <AnimatedFlatList
           ref={flatlistRef}
           renderItem={renderItem}
-          data={[...new Array(6).keys()]}
+          data={[...new Array(0).keys()]}
           keyExtractor={() => Math.random().toString()}
           ItemSeparatorComponent={() => (
             <View style={{ marginVertical: RFPercentage(1) }} />

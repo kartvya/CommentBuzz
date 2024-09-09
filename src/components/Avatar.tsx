@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
 import { Image, ImageStyle } from "expo-image";
+import { StyleSheet } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { getUserImage } from "../helpers/imageServices";
 
@@ -33,6 +32,5 @@ const styles = StyleSheet.create({
   image: {
     height: RFPercentage(4),
     width: RFPercentage(4),
-    overflow: "hidden",
   },
 });

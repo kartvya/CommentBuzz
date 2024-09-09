@@ -26,6 +26,19 @@ export default function TabLayout() {
           ),
         })}
       />
+      {/* <Tabs.Screen
+        name="Products"
+        options={({ navigation, route }) => ({
+          tabBarIcon: ({ color, focused }) => (
+            <SvgIcon
+              size={RFPercentage(3.4)}
+              name="threeDotsCircle"
+              color={focused ? Colors.primeColor : color}
+              strokeWidth="2"
+            />
+          ),
+        })}
+      /> */}
       <Tabs.Screen
         name="Profile"
         options={({ navigation, route }) => ({

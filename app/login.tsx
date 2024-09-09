@@ -10,6 +10,7 @@ import { hp, wp } from "@/src/helpers/comman";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const Login = () => {
@@ -59,55 +60,59 @@ const Login = () => {
       bg={Colors.white}
       conatinerStyle={{ paddingHorizontal: wp(4) }}
     >
-      <Pressable
-        style={styles.backIconConatiner}
-        onPress={() => navigation.back()}
-      >
-        <SvgIcon name={"arrowLeft"} />
-      </Pressable>
-      <Spacer gap={hp(3)} />
-      <TitleText style={styles.greetingText}>Hey,</TitleText>
-      <TitleText style={styles.greetingText}>Welcome Back</TitleText>
-      <Spacer gap={hp(3)} />
-      <NormalText>Please login to continue</NormalText>
-      <Spacer gap={hp(1)} />
-      <Input
-        containerStyle={{}}
-        icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
-        placeholderText="Enter your email"
-        onChangeText={(txt) => (emailRef.current = txt)}
-        error={emailError}
-      />
-      <Spacer gap={emailError ? wp(2) : wp(3)} />
-      <Input
-        containerStyle={{}}
-        icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
-        placeholderText="Enter your password"
-        secureTextEntry={true}
-        onChangeText={(txt) => (passwordRef.current = txt)}
-        error={passwordError}
-      />
-      <Spacer gap={passwordError ? wp(2) : wp(3)} />
-      <NormalText style={styles.forgotPasswordText}>
-        Forgot password?
-      </NormalText>
-      <Spacer gap={wp(3)} />
-      <Button
-        title="Login"
-        btnStyle={{ alignItems: "center" }}
-        onPress={() => onLogin()}
-        isLoading={isLoading}
-      />
-      <Spacer gap={wp(3)} />
-      <View style={styles.alreadyAccount}>
-        <NormalText>Don't have an account</NormalText>
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <Pressable
-          style={{ marginLeft: wp(1) }}
-          onPress={() => navigation.navigate("/signup")}
+          style={styles.backIconConatiner}
+          onPress={() => navigation.back()}
         >
-          <NormalText style={{ color: Colors.primeColor }}>Register</NormalText>
+          <SvgIcon name={"arrowLeft"} />
         </Pressable>
-      </View>
+        <Spacer gap={hp(3)} />
+        <TitleText style={styles.greetingText}>Hey,</TitleText>
+        <TitleText style={styles.greetingText}>Welcome Back</TitleText>
+        <Spacer gap={hp(3)} />
+        <NormalText>Please login to continue</NormalText>
+        <Spacer gap={hp(1)} />
+        <Input
+          containerStyle={{}}
+          icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
+          placeholderText="Enter your email"
+          onChangeText={(txt) => (emailRef.current = txt)}
+          error={emailError}
+        />
+        <Spacer gap={emailError ? wp(2) : wp(3)} />
+        <Input
+          containerStyle={{}}
+          icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
+          placeholderText="Enter your password"
+          secureTextEntry={true}
+          onChangeText={(txt) => (passwordRef.current = txt)}
+          error={passwordError}
+        />
+        <Spacer gap={passwordError ? wp(2) : wp(3)} />
+        <NormalText style={styles.forgotPasswordText}>
+          Forgot password?
+        </NormalText>
+        <Spacer gap={wp(3)} />
+        <Button
+          title="Login"
+          btnStyle={{ alignItems: "center" }}
+          onPress={() => onLogin()}
+          isLoading={isLoading}
+        />
+        <Spacer gap={wp(3)} />
+        <View style={styles.alreadyAccount}>
+          <NormalText>Don't have an account</NormalText>
+          <Pressable
+            style={{ marginLeft: wp(1) }}
+            onPress={() => navigation.navigate("/signup")}
+          >
+            <NormalText style={{ color: Colors.primeColor }}>
+              Register
+            </NormalText>
+          </Pressable>
+        </View>
+      </KeyboardAwareScrollView>
     </ScreenWrapper>
   );
 };
@@ -121,7 +126,7 @@ const styles = StyleSheet.create({
   backIconConatiner: {
     backgroundColor: "rgba(0,0,0,0.1)",
     alignSelf: "flex-start",
-    borderRadius: 5,
+    borderRadius: 10,
     height: wp(8),
     width: wp(8),
     alignItems: "center",
@@ -134,5 +139,8 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     textAlign: "right",
+  },
+  container: {
+    flex: 1,
   },
 });

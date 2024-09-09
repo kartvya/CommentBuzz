@@ -1,19 +1,101 @@
 import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
+import Avatar from "@/src/components/Avatar";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
-import { TitleText } from "@/src/components/Text";
+import Spacer from "@/src/components/Spacer";
+import { NormalText, TitleText } from "@/src/components/Text";
+import { Colors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
+import { Users } from "@/src/redux/reducers/AuthReducer";
+import { RootState } from "@/src/redux/Store";
 import { useRouter } from "expo-router";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { SceneMap, TabBar, TabView } from "react-native-tab-view";
+import { useSelector } from "react-redux";
+
+interface Routes {
+  key: string;
+  title: string;
+}
+
+const renderScene = SceneMap({
+  first: () => (
+    <View>
+      <NormalText>Posts</NormalText>
+    </View>
+  ),
+  second: () => (
+    <View>
+      <NormalText>Comments</NormalText>
+    </View>
+  ),
+  third: () => (
+    <View>
+      <NormalText>About</NormalText>
+    </View>
+  ),
+});
+
+const renderTabBar = (props: any) => (
+  <TabBar
+    {...props}
+    renderLabel={() => null}
+    renderIcon={({ route }: { route: any }) => (
+      <View
+        style={{
+          borderRadius: 20,
+        }}
+      >
+        <NormalText
+          style={{
+            color: Colors.black,
+            marginVertical: RFPercentage(1),
+            fontSize: RFValue(10),
+          }}
+          numberOfLines={1}
+        >
+          {route.title}
+        </NormalText>
+      </View>
+    )}
+    style={{ backgroundColor: Colors.white }}
+    labelStyle={{ fontSize: 12 }}
+    inactiveColor="gray"
+    indicatorStyle={{
+      backgroundColor: Colors.primeColor,
+    }}
+  />
+);
 
 const Profile = () => {
   const navigation = useRouter();
+  const layout = useWindowDimensions();
+
+  const UserInfo = useSelector(
+    (state: RootState) => state.root?.authReducer?.userInfo
+  ) as Users;
+
+  const [index, setIndex] = useState<number>(0);
+  const [routes] = useState<Routes[]>([
+    { key: "first", title: "Posts" },
+    { key: "second", title: "Comments" },
+    { key: "third", title: "About" },
+  ]);
+
   const onPressLogout = () => {
     try {
       Alert.alert(
-        "Wait!",
-        "Are you sure want to logout.",
+        "Confirm",
+        "Are you sure want to log out?",
         [
           { text: "Cancel", onPress: () => console.log("Cancel Pressed!") },
           { text: "OK", onPress: onLogoutYesBTN },
@@ -38,9 +120,10 @@ const Profile = () => {
       console.log(error);
     }
   };
+
   return (
     <>
-      <ScreenWrapper>
+      <ScreenWrapper bg={Colors.white}>
         <View style={styles.headerConatiner}>
           <TitleText>Profile</TitleText>
           <Pressable
@@ -50,12 +133,33 @@ const Profile = () => {
                 backgroundColor: "rgba(255,0,0,0.1)",
               },
             ]}
-            onPress={() => onPressLogout()}
+            onPress={onPressLogout}
           >
             <SvgIcon name={"logout"} />
           </Pressable>
         </View>
-        <Text>Profile</Text>
+        <Spacer gap={RFPercentage(0.7)} />
+        <View style={styles.avtarConatiner}>
+          <Avatar uri="" size={RFPercentage(13)} borderRadius={30} />
+          <Pressable
+            style={styles.editConatiner}
+            onPress={() => navigation.navigate("/(main)/editProfile")}
+          >
+            <SvgIcon name={"edit"} size={20} />
+          </Pressable>
+        </View>
+        <Spacer gap={RFPercentage(0.7)} />
+        <View style={{ alignItems: "center" }}>
+          <TitleText style={styles.userNameText}>{UserInfo?.name}</TitleText>
+        </View>
+        <Spacer gap={RFPercentage(1)} />
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{ width: layout.width }}
+          renderTabBar={renderTabBar}
+        />
       </ScreenWrapper>
     </>
   );
@@ -75,10 +179,46 @@ const styles = StyleSheet.create({
   backIconConatiner: {
     backgroundColor: "rgba(0,0,0,0.1)",
     alignSelf: "flex-start",
-    borderRadius: 5,
+    borderRadius: 10,
     height: wp(8),
     width: wp(8),
     alignItems: "center",
     justifyContent: "center",
+  },
+  avtarConatiner: {
+    alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+    backgroundColor: Colors.white,
+    borderRadius: 30,
+  },
+  editConatiner: {
+    backgroundColor: Colors.white,
+    borderRadius: 90,
+    position: "absolute",
+    bottom: -3,
+    right: -12,
+    padding: 7,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 999,
+  },
+  userNameText: {},
+  profileListItemConatiner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

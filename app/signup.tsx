@@ -20,6 +20,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { supabase } from "@/lib/supabase";
 import { useStoreRootState } from "expo-router/build/global-state/router-store";
 import { isEmailValid, isPasswordValid } from "@/src/helpers/validation";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const Signup = () => {
   const navigation = useRouter();
@@ -83,59 +84,61 @@ const Signup = () => {
       bg={Colors.white}
       conatinerStyle={{ paddingHorizontal: wp(4) }}
     >
-      <Pressable
-        style={styles.backIconConatiner}
-        onPress={() => navigation.navigate("/welcome")}
-      >
-        <SvgIcon name={"arrowLeft"} />
-      </Pressable>
-      <Spacer gap={hp(3)} />
-      <TitleText style={styles.greetingText}>Let's,</TitleText>
-      <TitleText style={styles.greetingText}>Get Started</TitleText>
-      <Spacer gap={hp(3)} />
-      <NormalText>Please fill the details to create account.</NormalText>
-      <Spacer gap={hp(1)} />
-      <Input
-        containerStyle={{}}
-        icon={<SvgIcon name={"user"} size={26} color={Colors.icon} />}
-        placeholderText="Enter your username"
-        onChangeText={(txt) => (userNameRef.current = txt)}
-        error={userNameError}
-      />
-      <Spacer gap={userNameError ? wp(2) : wp(3)} />
-      <Input
-        containerStyle={{}}
-        icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
-        placeholderText="Enter your email"
-        onChangeText={(txt) => (emailRef.current = txt)}
-        error={emailError}
-      />
-      <Spacer gap={emailError ? wp(2) : wp(3)} />
-      <Input
-        containerStyle={{}}
-        icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
-        placeholderText="Enter your password"
-        secureTextEntry={true}
-        onChangeText={(txt) => (passwordRef.current = txt)}
-        error={passwordError}
-      />
-      <Spacer gap={passwordError ? wp(2) : wp(3)} />
-      <Button
-        title="Register"
-        btnStyle={{ alignItems: "center" }}
-        onPress={() => onSignUp()}
-        isLoading={isLoading}
-      />
-      <Spacer gap={wp(3)} />
-      <View style={styles.alreadyAccount}>
-        <NormalText>Already have an account</NormalText>
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <Pressable
-          style={{ marginLeft: wp(1) }}
-          onPress={() => navigation.navigate("/login")}
+          style={styles.backIconConatiner}
+          onPress={() => navigation.navigate("/welcome")}
         >
-          <NormalText style={{ color: Colors.primeColor }}>Login</NormalText>
+          <SvgIcon name={"arrowLeft"} />
         </Pressable>
-      </View>
+        <Spacer gap={hp(3)} />
+        <TitleText style={styles.greetingText}>Let's,</TitleText>
+        <TitleText style={styles.greetingText}>Get Started</TitleText>
+        <Spacer gap={hp(3)} />
+        <NormalText>Please fill the details to create account.</NormalText>
+        <Spacer gap={hp(1)} />
+        <Input
+          containerStyle={{}}
+          icon={<SvgIcon name={"user"} size={26} color={Colors.icon} />}
+          placeholderText="Enter your username"
+          onChangeText={(txt) => (userNameRef.current = txt)}
+          error={userNameError}
+        />
+        <Spacer gap={userNameError ? wp(2) : wp(3)} />
+        <Input
+          containerStyle={{}}
+          icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
+          placeholderText="Enter your email"
+          onChangeText={(txt) => (emailRef.current = txt)}
+          error={emailError}
+        />
+        <Spacer gap={emailError ? wp(2) : wp(3)} />
+        <Input
+          containerStyle={{}}
+          icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
+          placeholderText="Enter your password"
+          secureTextEntry={true}
+          onChangeText={(txt) => (passwordRef.current = txt)}
+          error={passwordError}
+        />
+        <Spacer gap={passwordError ? wp(2) : wp(3)} />
+        <Button
+          title="Register"
+          btnStyle={{ alignItems: "center" }}
+          onPress={() => onSignUp()}
+          isLoading={isLoading}
+        />
+        <Spacer gap={wp(3)} />
+        <View style={styles.alreadyAccount}>
+          <NormalText>Already have an account</NormalText>
+          <Pressable
+            style={{ marginLeft: wp(1) }}
+            onPress={() => navigation.navigate("/login")}
+          >
+            <NormalText style={{ color: Colors.primeColor }}>Login</NormalText>
+          </Pressable>
+        </View>
+      </KeyboardAwareScrollView>
     </ScreenWrapper>
   );
 };
@@ -149,7 +152,7 @@ const styles = StyleSheet.create({
   backIconConatiner: {
     backgroundColor: "rgba(0,0,0,0.1)",
     alignSelf: "flex-start",
-    borderRadius: 5,
+    borderRadius: 10,
     height: wp(8),
     width: wp(8),
     alignItems: "center",

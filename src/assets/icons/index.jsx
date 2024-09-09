@@ -20,6 +20,7 @@ import ThreeDotsCircle from "./ThreeDotsCircle";
 import ThreeDotsHorizontal from "./ThreeDotsHorizontal";
 import User from "./User";
 import Video from "./Video";
+import RightArrow from "./RightArrow";
 
 const icons = {
   home: Home,
@@ -43,6 +44,7 @@ const icons = {
   logout: Logout,
   image: Image,
   video: Video,
+  rightArrow: RightArrow,
 };
 
 const SvgIcon = ({ name, ...props }) => {

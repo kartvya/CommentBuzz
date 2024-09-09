@@ -26,7 +26,7 @@ const Welcome = () => {
           }}
           source={require("../src/assets/images/welcomeAnimation.json")}
         />
-        <View style={{ marginBottom: hp(5) }}>
+        <View style={{ marginBottom: hp(5), marginHorizontal: wp(3) }}>
           <TitleText style={styles.appNameTextStyle}>CommentBuzz</TitleText>
           <NormalText style={styles.punchLine}>
             Buzz with Comments, Earn with Impact!
@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   primeBtn: {
-    marginHorizontal: wp(5),
     alignItems: "center",
   },
   exploreTxt: {
