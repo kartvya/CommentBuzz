@@ -19,6 +19,12 @@ const MainLayout = () => {
   useEffect(() => {
     supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
+        dispatch({
+          type: USERINFO,
+          payload: {
+            userInfo: session?.user,
+          },
+        });
         updateUserData(session?.user);
       } else {
         dispatch({
@@ -36,10 +42,14 @@ const MainLayout = () => {
     try {
       const res = await getUserData(userData?.id);
       if (res.success) {
+        const currentUserInfo = store.getState().root?.authReducer.userInfo;
         dispatch({
           type: USERINFO,
           payload: {
-            userInfo: res?.data,
+            userInfo: {
+              ...currentUserInfo,
+              ...res?.data,
+            },
           },
         });
         navigation.navigate("/(tabs)/feedScreen");
