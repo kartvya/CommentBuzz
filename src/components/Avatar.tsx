@@ -12,6 +12,7 @@ interface Iprops {
 
 const Avatar = (props: Iprops) => {
   const { size, borderRadius, avatarImgStyle, uri } = props;
+
   return (
     <Image
       source={getUserImage(uri)}

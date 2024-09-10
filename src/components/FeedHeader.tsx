@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SvgIcon from "../assets/icons";
@@ -6,9 +6,11 @@ import { wp } from "../helpers/comman";
 import Spacer from "./Spacer";
 import { TitleText } from "./Text";
 import { StatusBar } from "expo-status-bar";
+import { useRouter } from "expo-router";
 
 const FeedHeader = () => {
   const insets = useSafeAreaInsets();
+  const navigation = useRouter();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
   return (
     <>
@@ -17,7 +19,9 @@ const FeedHeader = () => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <SvgIcon name={"heart"} />
           <Spacer gap={wp(1)} />
-          <SvgIcon name={"plus"} />
+          <Pressable onPress={() => navigation.navigate("/uploadPost")}>
+            <SvgIcon name={"plus"} />
+          </Pressable>
         </View>
       </View>
     </>

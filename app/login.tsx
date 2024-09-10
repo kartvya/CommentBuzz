@@ -20,6 +20,7 @@ const Login = () => {
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, serPasswordErrorr] = useState<string>("");
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [showPass, sehShowPass] = useState<boolean>(false);
 
   const onLogin = async () => {
     try {
@@ -89,9 +90,18 @@ const Login = () => {
           containerStyle={{}}
           icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
           placeholderText="Enter your password"
-          secureTextEntry={true}
+          secureTextEntry={showPass ? false : true}
           onChangeText={(txt) => (passwordRef.current = txt)}
           error={passwordError}
+          rightIcon={
+            <Pressable onPress={() => sehShowPass(!showPass)}>
+              <SvgIcon
+                name={showPass ? "eye" : "closeEye"}
+                size={22}
+                color={Colors.icon}
+              />
+            </Pressable>
+          }
         />
         <Spacer gap={passwordError ? wp(2) : wp(3)} />
         <NormalText style={styles.forgotPasswordText}>

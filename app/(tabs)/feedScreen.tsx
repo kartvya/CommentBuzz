@@ -1,12 +1,16 @@
 import MyStatusBar from "@/src/components/CustomeStatusBar";
 import FeedHeader from "@/src/components/FeedHeader";
 import MemoizedPostView from "@/src/components/MemoizedPostView";
+import { TitleText } from "@/src/components/Text";
 import Wrapper from "@/src/components/Wrapper";
 import { Colors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { fetchPost } from "@/src/services/postServices";
 import { PostData } from "@/src/utility/types";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { RootState } from "@/src/redux/Store";
+import { User } from "@supabase/supabase-js";
+import LottieView from "lottie-react-native";
 import {
   Animated,
   FlatListProps,
@@ -101,7 +105,7 @@ const FeedScreen = () => {
       >
         <FeedHeader />
       </Animated.View>
-      <Wrapper>
+      {Posts?.length > 0 ? (
         <AnimatedFlatList
           data={Posts}
           ref={flatlistRef}
@@ -128,7 +132,13 @@ const FeedScreen = () => {
             />
           }
         />
-      </Wrapper>
+      ) : (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <TitleText style={{ color: Colors.icon }}>No post yet...</TitleText>
+        </View>
+      )}
     </>
   );
 };

@@ -2,16 +2,12 @@ import React, { ReactNode } from "react";
 import {
   Platform,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
-  View,
 } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { MXicon } from "./Icons";
-import { useNavigation } from "@react-navigation/native";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Colors } from "@/src/constants/Colors";
 import { useRouter } from "expo-router";
 

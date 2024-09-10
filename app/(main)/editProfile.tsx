@@ -1,23 +1,28 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
-import { Colors } from "@/src/constants/Colors";
-import Header from "@/src/components/Header";
-import Avatar from "@/src/components/Avatar";
-import { RFPercentage } from "react-native-responsive-fontsize";
+import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
-import { useRouter } from "expo-router";
+import Avatar from "@/src/components/Avatar";
+import Button from "@/src/components/Button";
+import Header from "@/src/components/Header";
 import Input from "@/src/components/Input";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { hp, wp } from "@/src/helpers/comman";
+import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
-import { NormalText } from "@/src/components/Text";
-import { useSelector } from "react-redux";
+import { Colors } from "@/src/constants/Colors";
+import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
-import Button from "@/src/components/Button";
 import * as ImagePicker from "expo-image-picker";
-import { getUserImage } from "@/src/services/imageServices";
+import { getUserImage, uploadFile } from "@/src/services/imageServices";
+
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { RFPercentage } from "react-native-responsive-fontsize";
+import { useDispatch, useSelector } from "react-redux";
+import { Image } from "expo-image";
+import { updateUser } from "@/src/services/userService";
+import { USERINFO } from "@/src/redux/actions/ActionType";
+
 interface UpdatedUsersData {
   email: string;
   name: string;
@@ -26,9 +31,9 @@ interface UpdatedUsersData {
   bio: string;
   address: string;
 }
-
 const EditProfile = () => {
   const navigation = useRouter();
+  const dispatch = useDispatch();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -40,6 +45,13 @@ const EditProfile = () => {
     bio: "",
     address: "",
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [errors, setErrors] = useState({
+    name: "",
+    phonNumber: "",
+    bio: "",
+  });
 
   useEffect(() => {
     if (UserInfo) {
@@ -49,7 +61,7 @@ const EditProfile = () => {
         image: typeof UserInfo?.image === "object" ? UserInfo.image : {},
         bio: UserInfo?.bio || "",
         address: UserInfo?.address || "",
-        email: UserInfo?.email || "",
+        email: UserInfo?.user_metadata?.email || "",
       });
     }
   }, [UserInfo]);
@@ -73,6 +85,66 @@ const EditProfile = () => {
     }
   };
 
+  const validateUserData = () => {
+    let isValid = true;
+    let newErrors = { name: "", phonNumber: "", bio: "" };
+
+    if (!user.name.trim()) {
+      newErrors.name = "Name is required";
+      isValid = false;
+    }
+
+    if (user.phonNumber?.length > 0) {
+      if (!/^\d{10}$/.test(user.phonNumber)) {
+        newErrors.phonNumber = "Phone number must be 10 digits";
+        isValid = false;
+      }
+    }
+
+    if (user.bio.length > 200) {
+      newErrors.bio = "Bio must be less than 200 characters";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const onUpdateUserData = async () => {
+    if (!validateUserData()) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      if (typeof user.image === "object") {
+        let imageRes = await uploadFile("profiles", user?.image?.uri, true);
+        if (imageRes?.success) {
+          user.image = imageRes?.data;
+        }
+      }
+      let updateUserRes = await updateUser(UserInfo?.id, user);
+      if (updateUserRes.success) {
+        dispatch({
+          type: USERINFO,
+          payload: {
+            userInfo: {
+              ...UserInfo,
+              ...updateUserRes?.data,
+            },
+          },
+        });
+        navigation.back();
+        setIsLoading(false);
+      } else {
+        console.log("Update user error");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log("Error", error);
+    }
+  };
+
   const imageSource =
     user.image && typeof user.image === "object"
       ? user.image?.uri
@@ -80,13 +152,14 @@ const EditProfile = () => {
 
   return (
     <ScreenWrapper bg={Colors.white}>
-      <Header title={"Edit Profile"} showBackIcon={true} mb={RFPercentage(2)} />
+      <Header title={"Edit Profile"} showBackIcon={true} />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ marginHorizontal: wp(3) }}
       >
+        <Spacer gap={wp(3)} />
         <View style={styles.avtarConatiner}>
-          <Avatar uri={imageSource} size={RFPercentage(13)} borderRadius={30} />
+          <Image style={styles.avatar} source={imageSource} />
           <Pressable style={styles.editConatiner} onPress={pickImage}>
             <SvgIcon name={"camera"} size={20} />
           </Pressable>
@@ -107,29 +180,34 @@ const EditProfile = () => {
           icon={<SvgIcon name={"user"} size={26} color={Colors.icon} />}
           placeholderText="Enter your username"
           onChangeText={(txt) => setUser({ ...user, name: txt })}
-          error={""}
+          error={errors?.name}
           value={user.name}
         />
-        <Spacer gap={wp(3)} />
+        <Spacer gap={errors?.name ? wp(2) : wp(3)} />
         <Input
           containerStyle={{}}
           icon={<SvgIcon name={"call"} size={26} color={Colors.icon} />}
           placeholderText="Enter your phone number"
           onChangeText={(txt) => setUser({ ...user, phonNumber: txt })}
-          error={""}
+          error={errors?.phonNumber}
           value={user.phonNumber}
+          maxLength={10}
         />
-        <Spacer gap={wp(3)} />
+        <Spacer gap={errors?.phonNumber ? wp(2) : wp(3)} />
         <Input
           containerStyle={styles.textAreaStyle}
           placeholderText="Enter your bio"
           onChangeText={(txt) => setUser({ ...user, bio: txt })}
-          error={""}
+          error={errors?.bio}
           multiline={true}
           value={user.bio}
         />
-        <Spacer gap={wp(5)} />
-        <Button title="Update" onPress={() => navigation.back()} />
+        <Spacer gap={errors?.bio ? wp(4) : wp(5)} />
+        <Button
+          title="Update"
+          onPress={() => onUpdateUserData()}
+          isLoading={isLoading}
+        />
       </KeyboardAwareScrollView>
     </ScreenWrapper>
   );
@@ -139,16 +217,22 @@ export default EditProfile;
 
 const styles = StyleSheet.create({
   avtarConatiner: {
+    height: RFPercentage(13),
+    width: RFPercentage(13),
+    backgroundColor: "white",
     alignSelf: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-    backgroundColor: Colors.white,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderRadius: 30,
+  },
+  avatar: {
+    flex: 1,
     borderRadius: 30,
   },
   editConatiner: {

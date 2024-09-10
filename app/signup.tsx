@@ -31,6 +31,7 @@ const Signup = () => {
   const [emailError, setEmailError] = useState<string>("");
   const [userNameError, setUserNameError] = useState<string>("");
   const [passwordError, serPasswordErrorr] = useState<string>("");
+  const [showPass, sehShowPass] = useState<boolean>(false);
 
   const onSignUp = async () => {
     try {
@@ -71,7 +72,6 @@ const Signup = () => {
       });
 
       setIsLoading(false);
-      navigation.navigate("/login");
       // console.log("session", session);
       // console.log("error", error);
     } catch (error) {
@@ -103,6 +103,7 @@ const Signup = () => {
           placeholderText="Enter your username"
           onChangeText={(txt) => (userNameRef.current = txt)}
           error={userNameError}
+          maxLength={20}
         />
         <Spacer gap={userNameError ? wp(2) : wp(3)} />
         <Input
@@ -117,9 +118,18 @@ const Signup = () => {
           containerStyle={{}}
           icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
           placeholderText="Enter your password"
-          secureTextEntry={true}
+          secureTextEntry={showPass ? false : true}
           onChangeText={(txt) => (passwordRef.current = txt)}
           error={passwordError}
+          rightIcon={
+            <Pressable onPress={() => sehShowPass(!showPass)}>
+              <SvgIcon
+                name={showPass ? "eye" : "closeEye"}
+                size={22}
+                color={Colors.icon}
+              />
+            </Pressable>
+          }
         />
         <Spacer gap={passwordError ? wp(2) : wp(3)} />
         <Button

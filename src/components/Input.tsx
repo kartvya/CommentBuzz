@@ -18,6 +18,7 @@ interface Iprops extends TextInputProps {
   inputRef?: React.RefObject<TextInput>;
   placeholderText?: string;
   error?: string;
+  rightIcon?: React.ReactNode;
 }
 
 const Input: React.FC<Iprops> = (props) => {
@@ -32,6 +33,7 @@ const Input: React.FC<Iprops> = (props) => {
           ref={props.inputRef && props.inputRef}
           {...props}
         />
+        {props.rightIcon && props.rightIcon}
       </View>
       {props.error && (
         <NormalText style={styles.errorText}>{props.error}</NormalText>

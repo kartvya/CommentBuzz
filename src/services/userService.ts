@@ -16,3 +16,20 @@ export const getUserData = async (userId: string) => {
     return { success: false, msg: error };
   }
 };
+
+export const updateUser = async (userId:string,data:any) => {
+  try {
+    const { error } = await supabase
+        .from("users")
+        .update(data)
+        .eq("id", userId);
+        if (error) {
+          console.log(error);
+          return { success: false,data:undefined, msg: error };      
+        } 
+        return { success: true, data:data, msg: "" };      
+  } catch (error) {
+    console.log(error);
+    return { success: false,data:undefined, msg: error };
+  }
+}
