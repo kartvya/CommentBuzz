@@ -17,7 +17,7 @@ import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import Button from "@/src/components/Button";
 import * as ImagePicker from "expo-image-picker";
-import { getUserImage, uploadFile } from "@/src/helpers/imageServices";
+import { getUserImage } from "@/src/services/imageServices";
 interface UpdatedUsersData {
   email: string;
   name: string;
@@ -56,7 +56,7 @@ const EditProfile = () => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,

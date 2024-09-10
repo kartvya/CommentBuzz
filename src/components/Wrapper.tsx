@@ -22,7 +22,7 @@ interface WrapperProps {
 const Wrapper: React.FC<WrapperProps> = ({ children }) => {
   const navigation = useRouter();
   const onPressSpiral = () => {
-    navigation.navigate("/welcome");
+    navigation.navigate("/uploadPost");
   };
 
   return (

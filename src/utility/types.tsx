@@ -32,3 +32,18 @@ export interface RouteData {
   name: string;
   path: any;
 }
+
+interface PostUser {
+  id: string;
+  image: string | null;
+  name: string;
+}
+
+export interface PostData {
+  body: string;
+  created_at: string;
+  files: string;
+  id: number;
+  user: PostUser;
+  userId: string;
+}

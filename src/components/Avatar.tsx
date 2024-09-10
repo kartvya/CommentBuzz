@@ -1,7 +1,7 @@
 import { Image, ImageStyle } from "expo-image";
 import { StyleSheet } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
-import { getUserImage } from "../helpers/imageServices";
+import { getUserImage } from "../services/imageServices";
 
 interface Iprops {
   uri: string;

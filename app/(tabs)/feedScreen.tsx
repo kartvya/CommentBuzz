@@ -4,12 +4,13 @@ import MemoizedPostView from "@/src/components/MemoizedPostView";
 import Wrapper from "@/src/components/Wrapper";
 import { Colors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
-import { RootState } from "@/src/redux/Store";
-import { User } from "@supabase/supabase-js";
-import { useCallback, useRef, useState } from "react";
+import { fetchPost } from "@/src/services/postServices";
+import { PostData } from "@/src/utility/types";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  ListRenderItemInfo,
+  FlatListProps,
+  ListRenderItem,
   FlatList as RNFlatList,
   StyleSheet,
   View,
@@ -17,10 +18,13 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
 
-const AnimatedFlatList = Animated.createAnimatedComponent(RNFlatList);
+const AnimatedFlatList =
+  Animated.createAnimatedComponent<
+    React.ComponentType<FlatListProps<PostData>>
+  >(RNFlatList);
 
+let limit = 0;
 const FeedScreen = () => {
   const insets = useSafeAreaInsets();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
@@ -28,6 +32,20 @@ const FeedScreen = () => {
   const flatlistRef = useRef<RNFlatList>(null);
   const [scrollY] = useState(new Animated.Value(0));
   const [refreshing, setRefreshing] = useState(false);
+  const [Posts, setPosts] = useState<PostData[]>([]);
+
+  useEffect(() => {
+    getAllPost();
+  }, []);
+
+  const getAllPost = async () => {
+    limit = limit + 10;
+    console.log("Updated limit", limit);
+    const res = await fetchPost(limit);
+    if (res.success) {
+      setPosts(res.data ?? []);
+    }
+  };
 
   const onViewableItemsChanged = ({
     viewableItems,
@@ -38,11 +56,6 @@ const FeedScreen = () => {
       const index = viewableItems[0]?.index ?? null;
     }
   };
-
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<any>) => <MemoizedPostView item={item} />,
-    []
-  );
 
   const viewabilityConfig = { itemVisiblePercentThreshold: 30 };
 
@@ -67,6 +80,11 @@ const FeedScreen = () => {
     extrapolate: "clamp",
   });
 
+  const renderItem: ListRenderItem<PostData> = useCallback(
+    ({ item }) => <MemoizedPostView item={item} />,
+    []
+  );
+
   return (
     <>
       <MyStatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -85,10 +103,10 @@ const FeedScreen = () => {
       </Animated.View>
       <Wrapper>
         <AnimatedFlatList
+          data={Posts}
           ref={flatlistRef}
           renderItem={renderItem}
-          data={[...new Array(0).keys()]}
-          keyExtractor={() => Math.random().toString()}
+          keyExtractor={(item) => item.id.toString()}
           ItemSeparatorComponent={() => (
             <View style={{ marginVertical: RFPercentage(1) }} />
           )}

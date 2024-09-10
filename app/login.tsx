@@ -9,7 +9,7 @@ import { Colors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import { Alert, Pressable, StyleSheet, View } from "react-native";
+import { Alert, Keyboard, Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -45,6 +45,7 @@ const Login = () => {
           password: password,
         });
         setLoading(false);
+        Keyboard.dismiss();
         if (error) {
           Alert.alert(error.message);
         } else {
@@ -60,7 +61,10 @@ const Login = () => {
       bg={Colors.white}
       conatinerStyle={{ paddingHorizontal: wp(4) }}
     >
-      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps={"always"}
+      >
         <Pressable
           style={styles.backIconConatiner}
           onPress={() => navigation.back()}
