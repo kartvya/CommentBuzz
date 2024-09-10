@@ -16,7 +16,7 @@ const Avatar = (props: Iprops) => {
     <Image
       source={getUserImage(uri)}
       transition={100}
-      contentFit="contain"
+      contentFit="cover"
       style={[
         styles.image,
         { height: size, width: size, borderRadius: borderRadius },

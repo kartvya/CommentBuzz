@@ -140,7 +140,11 @@ const Profile = () => {
         </View>
         <Spacer gap={RFPercentage(0.7)} />
         <View style={styles.avtarConatiner}>
-          <Avatar uri="" size={RFPercentage(13)} borderRadius={30} />
+          <Avatar
+            uri={UserInfo?.image}
+            size={RFPercentage(13)}
+            borderRadius={30}
+          />
           <Pressable
             style={styles.editConatiner}
             onPress={() => navigation.navigate("/(main)/editProfile")}

@@ -16,17 +16,27 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import Button from "@/src/components/Button";
+import * as ImagePicker from "expo-image-picker";
+import { getUserImage, uploadFile } from "@/src/helpers/imageServices";
+interface UpdatedUsersData {
+  email: string;
+  name: string;
+  phonNumber: string;
+  image: Partial<any>;
+  bio: string;
+  address: string;
+}
 
 const EditProfile = () => {
   const navigation = useRouter();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<UpdatedUsersData>({
     email: "",
     name: "",
     phonNumber: "",
-    image: "",
+    image: {},
     bio: "",
     address: "",
   });
@@ -36,13 +46,37 @@ const EditProfile = () => {
       setUser({
         name: UserInfo?.name || "",
         phonNumber: UserInfo?.phonNumber || "",
-        image: UserInfo?.image || "",
+        image: typeof UserInfo?.image === "object" ? UserInfo.image : {},
         bio: UserInfo?.bio || "",
         address: UserInfo?.address || "",
         email: UserInfo?.email || "",
       });
     }
   }, [UserInfo]);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setUser({ ...user, image: result.assets[0] });
+
+      {
+        /* MOVE TO ON SUBMIT */
+      }
+      // let imageRes = await uploadFile("profiles", result.assets[0]?.uri, true);
+      // console.log(imageRes.data, "dasdasdasdasd");
+    }
+  };
+
+  const imageSource =
+    user.image && typeof user.image === "object"
+      ? user.image?.uri
+      : getUserImage(UserInfo.image);
 
   return (
     <ScreenWrapper bg={Colors.white}>
@@ -52,11 +86,8 @@ const EditProfile = () => {
         contentContainerStyle={{ marginHorizontal: wp(3) }}
       >
         <View style={styles.avtarConatiner}>
-          <Avatar uri="" size={RFPercentage(13)} borderRadius={30} />
-          <Pressable
-            style={styles.editConatiner}
-            onPress={() => alert("Comming soon.")}
-          >
+          <Avatar uri={imageSource} size={RFPercentage(13)} borderRadius={30} />
+          <Pressable style={styles.editConatiner} onPress={pickImage}>
             <SvgIcon name={"camera"} size={20} />
           </Pressable>
         </View>
