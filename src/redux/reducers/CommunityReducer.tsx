@@ -1,6 +1,6 @@
 import { ALLPOST, DISLIKEPOST, LIKEPOST, LOGOUT } from "../actions/ActionType";
 
-export interface CommunityState {
+export interface FeedState {
   Post: any[];
 }
 
@@ -9,12 +9,12 @@ export interface CommunityAction {
   payload?: any;
 }
 
-const initialState: CommunityState = {
+const initialState: FeedState = {
   Post: [],
 };
 
-export const CommunityReducer = (
-  state: CommunityState = initialState,
+export const FeedReducer = (
+  state: FeedState = initialState,
   action: CommunityAction
 ) => {
   switch (action.type) {

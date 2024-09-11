@@ -15,6 +15,7 @@ import { useState } from "react";
 import {
   Alert,
   FlatList,
+  Image,
   Pressable,
   StyleSheet,
   useWindowDimensions,

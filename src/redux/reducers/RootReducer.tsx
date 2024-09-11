@@ -1,16 +1,16 @@
 import { combineReducers, Reducer } from "redux";
 import { Action } from "@reduxjs/toolkit";
 import { AuthState, authReducer } from "./AuthReducer";
-import { CommunityReducer, CommunityState } from "./CommunityReducer";
+import { FeedReducer, FeedState } from "./CommunityReducer";
 
 interface RootState {
   authReducer: AuthState;
-  CommunityReducer: CommunityState;
+  FeedReducer: FeedState;
 }
 
 const appReducer = combineReducers({
   authReducer,
-  CommunityReducer,
+  FeedReducer,
 });
 
 const rootReducer: Reducer<RootState | undefined, Action> = (state, action) => {

@@ -43,9 +43,7 @@ const MemoizedPostView: React.FC<any> = React.memo(
     const [isSoundOn, setIsSoundOn] = useState<boolean>(false);
     const videoRef = useRef(null);
     const AnimatedImage = Animated.createAnimatedComponent(Image);
-    const userPost = useAppSelector(
-      (state) => state.root?.CommunityReducer.Post
-    );
+    const userPost = useAppSelector((state) => state.root?.FeedReducer.Post);
     const scrollX = useSharedValue(0);
     const scale = useSharedValue(0);
     const rStyle = useAnimatedStyle(() => ({

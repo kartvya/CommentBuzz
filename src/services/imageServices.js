@@ -3,18 +3,15 @@ import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
 
 export const getUserImage = (imagePath) => {    
-    if (imagePath) {
-        return getSupaBaseFileUrl(imagePath) 
-    } else {
-        return require("../assets/images/defaultUser.png")
-    }
+    return getSupaBaseFileUrl(imagePath) 
 }
 
 export const getSupaBaseFileUrl = (filePath) => {
     if (filePath) {
         return {uri:`https://kozieirmipejaesdoqig.supabase.co/storage/v1/object/public/uploads/${filePath}`}
+    } else {
+        return {uri:"https://kozieirmipejaesdoqig.supabase.co/storage/v1/object/public/uploads/profiles/defaultUser.png"}
     }
-    return null
 }
 
 
