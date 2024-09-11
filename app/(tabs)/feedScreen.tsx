@@ -112,7 +112,13 @@ const FeedScreen = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           ItemSeparatorComponent={() => (
-            <View style={{ marginVertical: RFPercentage(1) }} />
+            <View
+              style={{
+                width: "100%",
+                height: StyleSheet.hairlineWidth,
+                backgroundColor: Colors.black,
+              }}
+            />
           )}
           showsVerticalScrollIndicator={false}
           viewabilityConfigCallbackPairs={
@@ -121,13 +127,13 @@ const FeedScreen = () => {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={{
-            paddingTop: paddingTop + 5,
+            paddingTop: paddingTop,
             paddingVertical: RFPercentage(1),
           }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => console.log("On Refresh")}
+              onRefresh={() => getAllPost()}
               progressViewOffset={paddingTop}
             />
           }

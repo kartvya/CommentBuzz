@@ -31,6 +31,8 @@ import { Image } from "expo-image";
 import { getSupaBaseFileUrl } from "../services/imageServices";
 import Avatar from "./Avatar";
 import { hp } from "../helpers/comman";
+import SvgIcon from "../assets/icons";
+import Spacer from "./Spacer";
 
 const width = Dimensions.get("window").width;
 
@@ -51,7 +53,7 @@ const MemoizedPostView: React.FC<any> = React.memo(
     }));
 
     const onDoubleTap = useCallback(() => {
-      if (!item.isLiked) {
+      if (false) {
         runOnJS(handleLikeToggle)(item.id);
       }
       scale.value = withSpring(1, undefined, (isFinished) => {
@@ -89,14 +91,38 @@ const MemoizedPostView: React.FC<any> = React.memo(
       }
     };
 
+    const onPressShareImage = () => {
+      try {
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const onPressComment = () => {
+      try {
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const onPressUpvote = () => {
+      try {
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const onPressDownVote = () => {
+      try {
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     return (
       <View style={styles.userContainer}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Avatar
-            uri={item?.user?.image ?? ""}
-            size={hp(5)}
-            borderRadius={10}
-          />
+          <Avatar uri={item?.user?.image} size={hp(5)} borderRadius={10} />
           <View style={styles.userNameContainer}>
             <NormalText>{item?.user?.name}</NormalText>
           </View>
@@ -119,58 +145,50 @@ const MemoizedPostView: React.FC<any> = React.memo(
             </ParsedText>
           </View>
         )}
-        <DoubleTouchableOpacity
-          onPress={() => onSingleTap()}
-          onDoublePress={() => onDoubleTap()}
-          doublePressDelay={250}
-        >
-          <View>
-            <Image
-              source={getSupaBaseFileUrl(item?.files)}
-              transition={100}
-              contentFit="cover"
-              style={{ aspectRatio: 4 / 5 }}
-            />
-          </View>
-        </DoubleTouchableOpacity>
-        {/* {true ? (
-          <View style={{ marginVertical: RFPercentage(2) }}>
-            <Paginator data={[...new Array(6).keys()]} scrollX={scrollX} />
-          </View>
-        ) : (
-          <View style={{ marginVertical: RFPercentage(1) }} />
-        )} */}
-        {/* <View
-        style={[
-          StyleSheet.absoluteFillObject,
-          { alignItems: "center", justifyContent: "center" },
-        ]}
-      >
-        <AnimatedImage
-          source={require("../../assets/images/whiteHeart.png")}
-          tintColor={Colors.dark.background}
-          resizeMode={"contain"}
-          style={[
-            {
-              height: RFPercentage(10),
-              width: RFPercentage(10),
-              resizeMode: "contain",
-            },
-            rStyle,
-          ]}
-        />
-      </View> */}
-        {/* <Pressable style={styles.pressebleIconConatiner} onPress={() => {}}>
-          <MXicon
-            type="FontAwesome"
-            name={item.isLiked ? "heart" : "heart-o"}
-            size={RFPercentage(2.5)}
-            color={item.isLiked ? "pink" : "black"}
+        <View>
+          <Image
+            source={getSupaBaseFileUrl(item?.files)}
+            transition={100}
+            contentFit="cover"
+            style={{ aspectRatio: 4 / 5 }}
           />
-          <NormalText style={{ marginHorizontal: RFPercentage(0.8) }}>
-            {item.likeCount} Likes
-          </NormalText>
-        </Pressable> */}
+        </View>
+        <View style={styles.footerConatiner}>
+          <View style={styles.flex}>
+            <View style={styles.upvoteConatiner}>
+              <Pressable style={styles.flex} onPress={onPressUpvote}>
+                <SvgIcon name={"upArrow"} size={25} color={Colors.black} />
+                <NormalText style={{ marginRight: RFPercentage(1) }}>
+                  0
+                </NormalText>
+              </Pressable>
+              <View style={styles.smallVerticalLine} />
+              <Pressable onPress={onPressDownVote}>
+                <SvgIcon name={"downArrow"} size={25} color={Colors.black} />
+              </Pressable>
+            </View>
+            <Spacer gap={RFPercentage(0.5)} />
+            <Pressable
+              onPress={onPressComment}
+              style={[
+                styles.upvoteConatiner,
+                { paddingHorizontal: RFPercentage(1) },
+              ]}
+            >
+              <SvgIcon name={"comment"} size={16} color={Colors.black} />
+              <NormalText style={{ marginLeft: RFPercentage(1) }}>0</NormalText>
+            </Pressable>
+          </View>
+          <Pressable
+            onPress={onPressShareImage}
+            style={[
+              styles.upvoteConatiner,
+              { paddingHorizontal: RFPercentage(1) },
+            ]}
+          >
+            <SvgIcon name={"share"} size={15} color={Colors.black} />
+          </Pressable>
+        </View>
       </View>
     );
   }
@@ -180,17 +198,8 @@ export default MemoizedPostView;
 const styles = StyleSheet.create({
   userContainer: {
     backgroundColor: "white",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-    marginHorizontal: RFPercentage(1),
-    padding: RFPercentage(2),
-    borderRadius: 10,
+    paddingHorizontal: RFPercentage(2),
+    paddingVertical: RFPercentage(1),
   },
   profileImage: {
     height: 40,
@@ -220,6 +229,30 @@ const styles = StyleSheet.create({
   },
   pressebleIconConatiner: {
     flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  footerConatiner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: RFPercentage(1),
+  },
+  upvoteConatiner: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 30,
+    borderColor: Colors.icon,
+    paddingHorizontal: RFPercentage(0.5),
+    height: RFPercentage(3),
+  },
+  smallVerticalLine: {
+    height: RFPercentage(1.4),
+    width: 1,
+    backgroundColor: Colors.icon,
+  },
+  flex: {
     flexDirection: "row",
     alignItems: "center",
   },

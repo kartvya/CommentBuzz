@@ -49,3 +49,22 @@ export const fetchPost = async (limit = 10) => {
         return {success:false,data:undefined,msg:"Could not fetch post"}
     }
 }
+
+export const fetchOnlyUserPost = async (limit = 10,userId) => {
+     try {
+        const { data, error } = await supabase
+            .from("posts")
+            .select("*,user:users(id,name,image)")
+            .eq("userId", userId)
+            .order("created_at", { ascending: false })
+            .limit(limit)
+        if (error) {
+            console.log(error);
+            return {success:false,data:undefined,msg:"Could not fetch post"}    
+        }
+         return {success:true,data:data,msg:""}
+    } catch (error) {
+        console.log(error);
+        return {success:false,data:undefined,msg:"Could not fetch post"}
+    }
+}

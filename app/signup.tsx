@@ -1,26 +1,18 @@
-import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import React, { useRef, useState } from "react";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
-import { Colors } from "@/src/constants/Colors";
-import { hp, wp } from "@/src/helpers/comman";
-import { useRouter } from "expo-router";
+import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
+import Button from "@/src/components/Button";
+import Input from "@/src/components/Input";
+import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
-import Input from "@/src/components/Input";
-import Button from "@/src/components/Button";
-import { RFValue } from "react-native-responsive-fontsize";
-import { supabase } from "@/lib/supabase";
-import { useStoreRootState } from "expo-router/build/global-state/router-store";
+import { Colors } from "@/src/constants/Colors";
+import { hp, wp } from "@/src/helpers/comman";
 import { isEmailValid, isPasswordValid } from "@/src/helpers/validation";
+import { useRouter } from "expo-router";
+import { useRef, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const Signup = () => {
   const navigation = useRouter();
@@ -84,7 +76,10 @@ const Signup = () => {
       bg={Colors.white}
       conatinerStyle={{ paddingHorizontal: wp(4) }}
     >
-      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps={"always"}
+      >
         <Pressable
           style={styles.backIconConatiner}
           onPress={() => navigation.navigate("/welcome")}

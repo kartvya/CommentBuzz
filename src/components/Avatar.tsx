@@ -4,7 +4,7 @@ import { RFPercentage } from "react-native-responsive-fontsize";
 import { getUserImage } from "../services/imageServices";
 
 interface Iprops {
-  uri: string;
+  uri: string | null;
   size?: number;
   borderRadius?: number;
   avatarImgStyle?: ImageStyle;
@@ -12,7 +12,6 @@ interface Iprops {
 
 const Avatar = (props: Iprops) => {
   const { size, borderRadius, avatarImgStyle, uri } = props;
-
   return (
     <Image
       source={getUserImage(uri)}

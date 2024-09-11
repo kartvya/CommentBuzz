@@ -3,6 +3,7 @@ import Avatar from "@/src/components/Avatar";
 import { Colors } from "@/src/constants/Colors";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
+import { getUserImage } from "@/src/services/imageServices";
 import { Tabs } from "expo-router";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
@@ -11,6 +12,7 @@ export default function TabLayout() {
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
+
   return (
     <Tabs
       screenOptions={{

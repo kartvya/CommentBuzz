@@ -8,6 +8,8 @@ import { Colors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
+import { getUserImage } from "@/src/services/imageServices";
+import UserPost from "@/src/tabsScreens/UserPost";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -28,11 +30,7 @@ interface Routes {
 }
 
 const renderScene = SceneMap({
-  first: () => (
-    <View>
-      <NormalText>Posts</NormalText>
-    </View>
-  ),
+  first: () => <UserPost />,
   second: () => (
     <View>
       <NormalText>Comments</NormalText>

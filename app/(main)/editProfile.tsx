@@ -1,6 +1,4 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
-import Avatar from "@/src/components/Avatar";
 import Button from "@/src/components/Button";
 import Header from "@/src/components/Header";
 import Input from "@/src/components/Input";
@@ -10,18 +8,18 @@ import { Colors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
-import * as ImagePicker from "expo-image-picker";
 import { getUserImage, uploadFile } from "@/src/services/imageServices";
+import * as ImagePicker from "expo-image-picker";
 
+import { USERINFO } from "@/src/redux/actions/ActionType";
+import { updateUser } from "@/src/services/userService";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { useDispatch, useSelector } from "react-redux";
-import { Image } from "expo-image";
-import { updateUser } from "@/src/services/userService";
-import { USERINFO } from "@/src/redux/actions/ActionType";
 
 interface UpdatedUsersData {
   email: string;
@@ -37,6 +35,8 @@ const EditProfile = () => {
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<UpdatedUsersData>({
     email: "",
     name: "",
@@ -45,8 +45,6 @@ const EditProfile = () => {
     bio: "",
     address: "",
   });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const [errors, setErrors] = useState({
     name: "",
     phonNumber: "",
@@ -76,12 +74,6 @@ const EditProfile = () => {
 
     if (!result.canceled) {
       setUser({ ...user, image: result.assets[0] });
-
-      {
-        /* MOVE TO ON SUBMIT */
-      }
-      // let imageRes = await uploadFile("profiles", result.assets[0]?.uri, true);
-      // console.log(imageRes.data, "dasdasdasdasd");
     }
   };
 
@@ -145,10 +137,13 @@ const EditProfile = () => {
     }
   };
 
-  const imageSource =
-    user.image && typeof user.image === "object"
-      ? user.image?.uri
-      : getUserImage(UserInfo.image);
+  const checkObj = (obj: any, key: string) => {
+    return obj && typeof obj === "object" && key in obj;
+  };
+
+  const imageSource = checkObj(user.image, "uri")
+    ? user.image?.uri
+    : getUserImage(UserInfo.image);
 
   return (
     <ScreenWrapper bg={Colors.white}>

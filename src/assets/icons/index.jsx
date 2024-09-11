@@ -21,8 +21,10 @@ import ThreeDotsHorizontal from "./ThreeDotsHorizontal";
 import User from "./User";
 import Video from "./Video";
 import RightArrow from "./RightArrow";
-import CloseEye from "./CloseEye"
-import Eye from "./Eye"
+import CloseEye from "./CloseEye";
+import Eye from "./Eye";
+import UpArrow from "./UpArrow";
+import DownArrow from "./DownArrow";
 
 const icons = {
   home: Home,
@@ -47,8 +49,10 @@ const icons = {
   image: Image,
   video: Video,
   rightArrow: RightArrow,
-  closeEye:CloseEye,
-  eye:Eye
+  closeEye: CloseEye,
+  eye: Eye,
+  upArrow: UpArrow,
+  downArrow: DownArrow,
 };
 
 const SvgIcon = ({ name, ...props }) => {

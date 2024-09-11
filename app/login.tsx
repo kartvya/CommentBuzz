@@ -82,7 +82,7 @@ const Login = () => {
           containerStyle={{}}
           icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
           placeholderText="Enter your email"
-          onChangeText={(txt) => (emailRef.current = txt)}
+          onChangeText={(txt: string) => (emailRef.current = txt)}
           error={emailError}
         />
         <Spacer gap={emailError ? wp(2) : wp(3)} />
@@ -91,15 +91,25 @@ const Login = () => {
           icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
           placeholderText="Enter your password"
           secureTextEntry={showPass ? false : true}
-          onChangeText={(txt) => (passwordRef.current = txt)}
+          onChangeText={(txt: string) => (passwordRef.current = txt)}
           error={passwordError}
           rightIcon={
             <Pressable onPress={() => sehShowPass(!showPass)}>
-              <SvgIcon
-                name={showPass ? "eye" : "closeEye"}
-                size={22}
-                color={Colors.icon}
-              />
+              {showPass ? (
+                <SvgIcon
+                  name={"eye"}
+                  size={22}
+                  color={Colors.icon}
+                  strokeWidth={0.5}
+                />
+              ) : (
+                <SvgIcon
+                  name={"closeEye"}
+                  size={22}
+                  color={Colors.black}
+                  strokeWidth={2}
+                />
+              )}
             </Pressable>
           }
         />

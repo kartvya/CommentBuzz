@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
 
-export const getUserImage = (imagePath) => {
+export const getUserImage = (imagePath) => {    
     if (imagePath) {
         return getSupaBaseFileUrl(imagePath) 
     } else {
