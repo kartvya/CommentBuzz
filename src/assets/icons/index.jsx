@@ -25,6 +25,8 @@ import CloseEye from "./CloseEye";
 import Eye from "./Eye";
 import UpArrow from "./UpArrow";
 import DownArrow from "./DownArrow";
+import SoundOn from "./SoundOn";
+import SoundOff from "./SoundOff";
 
 const icons = {
   home: Home,
@@ -53,6 +55,8 @@ const icons = {
   eye: Eye,
   upArrow: UpArrow,
   downArrow: DownArrow,
+  soundOn: SoundOn,
+  soundOff: SoundOff,
 };
 
 const SvgIcon = ({ name, ...props }) => {

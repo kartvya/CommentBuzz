@@ -1,5 +1,5 @@
 import { FlatList, ListRenderItem, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { PostData } from "../utility/types";
 import MemoizedPostView from "../components/MemoizedPostView";
 import { fetchOnlyUserPost, fetchPost } from "../services/postServices";
@@ -16,6 +16,7 @@ const UserPost = () => {
   ) as Users;
   const [refreshing, setRefreshing] = useState(false);
   const [Posts, setPosts] = useState<PostData[]>([]);
+  const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
 
   useEffect(() => {
     getAllPost();
@@ -29,10 +30,31 @@ const UserPost = () => {
     }
   };
 
+  const onViewableItemsChanged = ({
+    viewableItems,
+  }: {
+    viewableItems: Array<{ index: number | null }>;
+  }) => {
+    if (viewableItems.length > 0) {
+      const index = viewableItems[0]?.index ?? null;
+      setVisibleIndex(index);
+    }
+  };
+
+  const viewabilityConfig = { itemVisiblePercentThreshold: 30 };
+
+  const viewabilityConfigCallbackPairs = useRef([
+    { viewabilityConfig, onViewableItemsChanged },
+  ]);
+
   const renderItem: ListRenderItem<PostData> = useCallback(
-    ({ item }) => <MemoizedPostView item={item} />,
+    ({ item, index }) => (
+      <MemoizedPostView item={item} isVisible={index === visibleIndex} />
+    ),
     []
   );
+
+  console.log(visibleIndex, "asdasdasdasd");
 
   return (
     <>
@@ -52,6 +74,9 @@ const UserPost = () => {
           )}
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
+          viewabilityConfigCallbackPairs={
+            viewabilityConfigCallbackPairs.current
+          }
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

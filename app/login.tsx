@@ -24,19 +24,24 @@ const Login = () => {
 
   const onLogin = async () => {
     try {
+      let isValid = false;
       let email = emailRef.current.trim();
       let password = passwordRef.current.trim();
       if (!email) {
         setEmailError("This field is required.");
+        isValid = false;
       } else {
         setEmailError("");
+        isValid = true;
       }
       if (!password) {
         serPasswordErrorr("This field is required.");
+        isValid = false;
       } else {
         serPasswordErrorr("");
+        isValid = true;
       }
-      if (email && password) {
+      if (isValid) {
         setLoading(true);
         const {
           data: { session },

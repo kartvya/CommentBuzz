@@ -27,45 +27,55 @@ const Signup = () => {
 
   const onSignUp = async () => {
     try {
+      let isValid = false;
       let email = emailRef.current.trim();
       let userName = userNameRef.current.trim();
       let password = passwordRef.current.trim();
       if (!email) {
+        isValid = false;
         setEmailError("This field is required.");
       } else if (!isEmailValid(email)) {
+        isValid = false;
         setEmailError("Invalid email format.");
       } else {
+        isValid = true;
         setEmailError("");
       }
       if (!userName) {
+        isValid = false;
         setUserNameError("This field is required.");
       } else {
+        isValid = true;
         setUserNameError("");
       }
       if (!password) {
+        isValid = false;
         serPasswordErrorr("This field is required.");
       } else if (!isPasswordValid(password)) {
+        isValid = false;
         serPasswordErrorr("Please select strong password!");
       } else {
+        isValid = true;
         serPasswordErrorr("");
       }
       setIsLoading(true);
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            name: userName,
+      if (isValid) {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              name: userName,
+            },
           },
-        },
-      });
-
-      setIsLoading(false);
-      // console.log("session", session);
-      // console.log("error", error);
+        });
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+      }
     } catch (error) {
       console.log(error);
     }

@@ -22,6 +22,9 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { supabase } from "@/lib/supabase";
+import { getUserData } from "@/src/services/userService";
+import Loading from "@/src/components/Loading";
 
 const AnimatedFlatList =
   Animated.createAnimatedComponent<
@@ -35,16 +38,45 @@ const FeedScreen = () => {
 
   const flatlistRef = useRef<RNFlatList>(null);
   const [scrollY] = useState(new Animated.Value(0));
+  const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [Posts, setPosts] = useState<PostData[]>([]);
 
+  const handlePost = async (payload: any) => {
+    try {
+      if (payload.eventType == "INSERT" && payload?.new?.id) {
+        let newPost = { ...payload?.new };
+        let res = await getUserData(newPost.userId);
+        newPost.user = res.success ? res?.data : {};
+        setPosts((prevPost) => [newPost, ...prevPost]);
+      }
+      console.log(payload, "payloadpayload");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
+    let postChannel = supabase
+      .channel("posts")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "posts",
+        },
+        handlePost
+      )
+      .subscribe();
     getAllPost();
+    return () => {
+      supabase.removeChannel(postChannel);
+    };
   }, []);
 
   const getAllPost = async () => {
     limit = limit + 10;
-    console.log("Updated limit", limit);
     const res = await fetchPost(limit);
     if (res.success) {
       setPosts(res.data ?? []);
@@ -58,10 +90,11 @@ const FeedScreen = () => {
   }) => {
     if (viewableItems.length > 0) {
       const index = viewableItems[0]?.index ?? null;
+      setVisibleIndex(index);
     }
   };
 
-  const viewabilityConfig = { itemVisiblePercentThreshold: 30 };
+  const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 
   const viewabilityConfigCallbackPairs = useRef([
     { viewabilityConfig, onViewableItemsChanged },
@@ -85,8 +118,12 @@ const FeedScreen = () => {
   });
 
   const renderItem: ListRenderItem<PostData> = useCallback(
-    ({ item }) => <MemoizedPostView item={item} />,
-    []
+    ({ item, index }) => (
+      <>
+        <MemoizedPostView item={item} isVisible={index === visibleIndex} />
+      </>
+    ),
+    [visibleIndex]
   );
 
   return (
@@ -137,6 +174,11 @@ const FeedScreen = () => {
               progressViewOffset={paddingTop}
             />
           }
+          // ListFooterComponent={() => (
+          //   <View style={{ marginVertical: RFPercentage(2) }}>
+          //     <Loading />
+          //   </View>
+          // )}
         />
       ) : (
         <View

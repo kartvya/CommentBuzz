@@ -1,77 +1,44 @@
-import React, { useCallback, useRef, useState } from "react";
-import {
-  Dimensions,
-  Pressable,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  View,
-} from "react-native";
-import ParsedText from "react-native-parsed-text";
-import DoubleTouchableOpacity from "./DoubleTouchableOpacity";
-import Carousel from "react-native-reanimated-carousel";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Colors } from "@/src/constants/Colors";
-import { replaceMentionValues } from "react-native-controlled-mentions";
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withSpring,
-} from "react-native-reanimated";
-import { useDispatch } from "react-redux";
-import { AppDispatch, useAppSelector } from "@/src/redux/Store";
-import { MXicon } from "./Icons";
-import Paginator from "./Paginator";
-import { NormalText } from "./Text";
-import { PostData } from "../utility/types";
-import { Video } from "expo-av";
+import { ResizeMode, Video } from "expo-av";
 import { Image } from "expo-image";
-import { getSupaBaseFileUrl } from "../services/imageServices";
-import Avatar from "./Avatar";
-import { hp } from "../helpers/comman";
+import { useNavigation } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Pressable, StyleSheet, ToastAndroid, View } from "react-native";
+import { replaceMentionValues } from "react-native-controlled-mentions";
+import ParsedText from "react-native-parsed-text";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import SvgIcon from "../assets/icons";
+import { hp } from "../helpers/comman";
+import { getSupaBaseFileUrl } from "../services/imageServices";
+import { PostData } from "../utility/types";
+import Avatar from "./Avatar";
 import Spacer from "./Spacer";
+import { NormalText } from "./Text";
 
-const width = Dimensions.get("window").width;
+const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
+  React.memo(({ item, isVisible }) => {
+    const navigation = useNavigation();
 
-const MemoizedPostView: React.FC<any> = React.memo(
-  ({ item }: { item: PostData }, { isVisible }: { isVisible: boolean }) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const [activeIndex, setActiveIndex] = useState<number>(0);
     const [isSoundOn, setIsSoundOn] = useState<boolean>(false);
-    const videoRef = useRef(null);
-    const AnimatedImage = Animated.createAnimatedComponent(Image);
-    const userPost = useAppSelector((state) => state.root?.FeedReducer.Post);
-    const scrollX = useSharedValue(0);
-    const scale = useSharedValue(0);
-    const rStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: Math.max(scale.value, 0) }],
-    }));
+    const [isPause, setIsPause] = useState<boolean>(isVisible);
 
-    const onDoubleTap = useCallback(() => {
-      if (false) {
-        runOnJS(handleLikeToggle)(item.id);
-      }
-      scale.value = withSpring(1, undefined, (isFinished) => {
-        if (isFinished) {
-          scale.value = withDelay(500, withSpring(0));
-        }
+    useEffect(() => {
+      const unsubscribeFocus = navigation.addListener("focus", () => {
+        setIsPause(false);
       });
-    }, [item]);
 
-    const handleLikeToggle = (itemId: number) => {
-      console.log("like post");
-      // dispatch(toggleLike(itemId));
-    };
+      const unsubscribeBlur = navigation.addListener("blur", () => {
+        setIsPause(true);
+      });
+
+      return () => {
+        unsubscribeFocus();
+        unsubscribeBlur();
+      };
+    }, [navigation]);
 
     const renderText = (matchingString: string, matches: string[]) => {
       return replaceMentionValues(matchingString, ({ name }) => `${name}`);
-    };
-
-    const onSingleTap = () => {
-      console.log("Singke post");
     };
 
     const handleNamePress = (name: string, matchIndex: number) => {
@@ -144,12 +111,36 @@ const MemoizedPostView: React.FC<any> = React.memo(
           </View>
         )}
         <View>
-          <Image
-            source={getSupaBaseFileUrl(item?.files)}
-            transition={100}
-            contentFit="cover"
-            style={{ aspectRatio: 4 / 5 }}
-          />
+          {item?.files && item?.files?.includes("postImages") && (
+            <Image
+              source={getSupaBaseFileUrl(item?.files)}
+              transition={100}
+              contentFit="cover"
+              style={{ aspectRatio: 4 / 5 }}
+            />
+          )}
+          {item?.files && item?.files?.includes("postVideos") && (
+            <View>
+              <Video
+                style={{ aspectRatio: 4 / 5 }}
+                resizeMode={ResizeMode.COVER}
+                source={getSupaBaseFileUrl(item?.files)}
+                isLooping={true}
+                useNativeControls={false}
+                shouldPlay={!isPause && isVisible}
+                isMuted={isSoundOn}
+              />
+              <Pressable
+                style={styles.soundConatiner}
+                onPress={() => setIsSoundOn(!isSoundOn)}
+              >
+                <SvgIcon
+                  name={isSoundOn ? "soundOff" : "soundOn"}
+                  color={"white"}
+                />
+              </Pressable>
+            </View>
+          )}
         </View>
         <View style={styles.footerConatiner}>
           <View style={styles.flex}>
@@ -189,8 +180,7 @@ const MemoizedPostView: React.FC<any> = React.memo(
         </View>
       </View>
     );
-  }
-);
+  });
 
 export default MemoizedPostView;
 const styles = StyleSheet.create({
@@ -253,5 +243,13 @@ const styles = StyleSheet.create({
   flex: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  soundConatiner: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 5,
+    borderRadius: 100,
   },
 });
