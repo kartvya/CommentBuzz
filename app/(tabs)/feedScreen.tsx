@@ -40,6 +40,7 @@ const FeedScreen = () => {
   const [scrollY] = useState(new Animated.Value(0));
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [Posts, setPosts] = useState<PostData[]>([]);
 
   const handlePost = async (payload: any) => {
@@ -76,9 +77,15 @@ const FeedScreen = () => {
   }, []);
 
   const getAllPost = async () => {
+    if (!hasMore) {
+      return null;
+    }
     limit = limit + 10;
     const res = await fetchPost(limit);
     if (res.success) {
+      if (res?.data?.length === Posts?.length) {
+        setHasMore(false);
+      }
       setPosts(res.data ?? []);
     }
   };
@@ -174,11 +181,15 @@ const FeedScreen = () => {
               progressViewOffset={paddingTop}
             />
           }
-          // ListFooterComponent={() => (
-          //   <View style={{ marginVertical: RFPercentage(2) }}>
-          //     <Loading />
-          //   </View>
-          // )}
+          onEndReachedThreshold={0}
+          onEndReached={() => getAllPost()}
+          ListFooterComponent={() =>
+            hasMore ? (
+              <View style={{ marginVertical: RFPercentage(2) }}>
+                <Loading />
+              </View>
+            ) : null
+          }
         />
       ) : (
         <View

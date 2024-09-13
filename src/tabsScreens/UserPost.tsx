@@ -1,5 +1,19 @@
-import { FlatList, ListRenderItem, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  FlatList,
+  FlatListProps,
+  ListRenderItem,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { PostData } from "../utility/types";
 import MemoizedPostView from "../components/MemoizedPostView";
 import { fetchOnlyUserPost, fetchPost } from "../services/postServices";
@@ -9,8 +23,18 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
 import { TitleText } from "../components/Text";
+import Animated, { AnimatedProps } from "react-native-reanimated";
+
+const AnimatedFlatList = forwardRef<
+  FlatList<PostData>,
+  AnimatedProps<FlatListProps<PostData>>
+>((props, ref) => <Animated.FlatList {...props} ref={ref as any} />);
+
+type Props = Omit<FlatListProps<PostData>, "renderItem">;
+
 let limit = 10;
-const UserPost = () => {
+
+const UserPost = forwardRef<FlatList, Props>((props, ref) => {
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -51,15 +75,13 @@ const UserPost = () => {
     ({ item, index }) => (
       <MemoizedPostView item={item} isVisible={index === visibleIndex} />
     ),
-    []
+    [visibleIndex]
   );
-
-  console.log(visibleIndex, "asdasdasdasd");
 
   return (
     <>
       {Posts?.length > 0 ? (
-        <FlatList
+        <AnimatedFlatList
           data={Posts}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
@@ -83,6 +105,7 @@ const UserPost = () => {
               onRefresh={() => getAllPost()}
             />
           }
+          {...(props as Omit<Props, "data">)}
         />
       ) : (
         <View
@@ -93,8 +116,6 @@ const UserPost = () => {
       )}
     </>
   );
-};
+});
 
-export default UserPost;
-
-const styles = StyleSheet.create({});
+export default memo(UserPost);

@@ -3,24 +3,37 @@ import { ResizeMode, Video } from "expo-av";
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, ToastAndroid, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { replaceMentionValues } from "react-native-controlled-mentions";
 import ParsedText from "react-native-parsed-text";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
-import { getSupaBaseFileUrl } from "../services/imageServices";
+import { createPostVote, getSupaBaseFileUrl } from "../services/imageServices";
 import { PostData } from "../utility/types";
 import Avatar from "./Avatar";
 import Spacer from "./Spacer";
 import { NormalText } from "./Text";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/Store";
+import { Users } from "../redux/reducers/AuthReducer";
 
 const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
   React.memo(({ item, isVisible }) => {
     const navigation = useNavigation();
 
-    const [isSoundOn, setIsSoundOn] = useState<boolean>(false);
+    const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
     const [isPause, setIsPause] = useState<boolean>(isVisible);
+
+    const UserInfo = useSelector(
+      (state: RootState) => state.root?.authReducer?.userInfo
+    ) as Users;
 
     useEffect(() => {
       const unsubscribeFocus = navigation.addListener("focus", () => {
@@ -70,8 +83,15 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
       }
     };
 
-    const onPressUpvote = () => {
+    const onPressUpvote = async () => {
       try {
+        const postData = {
+          voteType: "upVote",
+          userId: UserInfo?.id,
+          postId: item?.id,
+        };
+        const res = await createPostVote(postData);
+        console.log(res, "msmsmsmsm");
       } catch (error) {
         console.log(error);
       }
@@ -121,15 +141,17 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
           )}
           {item?.files && item?.files?.includes("postVideos") && (
             <View>
-              <Video
-                style={{ aspectRatio: 4 / 5 }}
-                resizeMode={ResizeMode.COVER}
-                source={getSupaBaseFileUrl(item?.files)}
-                isLooping={true}
-                useNativeControls={false}
-                shouldPlay={!isPause && isVisible}
-                isMuted={isSoundOn}
-              />
+              <Pressable onPress={() => setIsSoundOn(!isSoundOn)}>
+                <Video
+                  style={{ aspectRatio: 4 / 5 }}
+                  resizeMode={ResizeMode.COVER}
+                  source={getSupaBaseFileUrl(item?.files)}
+                  isLooping={true}
+                  useNativeControls={false}
+                  shouldPlay={!isPause && isVisible}
+                  isMuted={isSoundOn}
+                />
+              </Pressable>
               <Pressable
                 style={styles.soundConatiner}
                 onPress={() => setIsSoundOn(!isSoundOn)}
@@ -145,12 +167,12 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
         <View style={styles.footerConatiner}>
           <View style={styles.flex}>
             <View style={styles.upvoteConatiner}>
-              <Pressable style={styles.flex} onPress={onPressUpvote}>
+              <TouchableOpacity style={styles.flex} onPress={onPressUpvote}>
                 <SvgIcon name={"upArrow"} size={25} color={Colors.black} />
                 <NormalText style={{ marginRight: RFPercentage(1) }}>
                   0
                 </NormalText>
-              </Pressable>
+              </TouchableOpacity>
               <View style={styles.smallVerticalLine} />
               <Pressable onPress={onPressDownVote}>
                 <SvgIcon name={"downArrow"} size={25} color={Colors.black} />

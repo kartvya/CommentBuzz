@@ -1,4 +1,6 @@
-import type { ViewStyle } from "react-native";
+import { RefObject } from "react";
+import type { FlatList, ViewStyle } from "react-native";
+import Animated from "react-native-reanimated";
 
 export type IconType =
   | "Fontisto"
@@ -47,3 +49,18 @@ export interface PostData {
   user: PostUser;
   userId: string;
 }
+
+export type Connection = {
+  photo: string;
+  name: string;
+};
+
+export type ScrollPair = {
+  list: RefObject<FlatList>;
+  position: Animated.SharedValue<number>;
+};
+
+export type HeaderConfig = {
+  heightExpanded: number;
+  heightCollapsed: number;
+};
