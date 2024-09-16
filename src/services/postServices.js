@@ -36,7 +36,7 @@ export const fetchPost = async (limit = 10) => {
     try {
         const { data, error } = await supabase
             .from("posts")
-            .select("*,user:users(id,name,image)")
+            .select("*,user:users(id,name,image),postVotes(*)")
             .order("created_at", { ascending: false })
             .limit(limit)
         if (error) {
@@ -66,5 +66,42 @@ export const fetchOnlyUserPost = async (limit = 10,userId) => {
     } catch (error) {
         console.log(error);
         return {success:false,data:undefined,msg:"Could not fetch post"}
+    }
+}
+
+export const createPostUpvote = async (postUpvote) => {
+    try {
+        const { data, error } = await supabase
+            .from("postVotes")
+            .upsert(postUpvote)
+            .select()
+            .single()
+        if (error) {
+            console.log(error);
+            return {success:false,data:undefined,msg:"Could not upvote post"}    
+        }
+         return {success:true,data:data,msg:""}
+    } catch (error) {
+        console.log(error);
+        return {success:false,data:undefined,msg:"Could not upvote post"}
+    }
+}
+
+export const deletePostUpvote = async (userId,postId) => {
+    try {
+        const {  error } = await supabase
+            .from("postVotes")
+            .delete()
+            .eq("userId", userId)
+            .eq("postId", postId)
+        
+        if (error) {
+            console.log(error);
+            return {success:false,data:undefined,msg:"Could not delete post"}    
+        }
+         return {success:true,data:undefined,msg:""}
+    } catch (error) {
+        console.log(error);
+        return {success:false,data:undefined,msg:"Could not delete  post"}
     }
 }

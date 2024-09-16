@@ -48,6 +48,16 @@ export interface PostData {
   id: number;
   user: PostUser;
   userId: string;
+  postVotes: PostVotes[];
+  upVoteCount: number;
+}
+
+export interface PostVotes {
+  created_at: string;
+  id: number;
+  postId: number;
+  userId: string;
+  voteType: string;
 }
 
 export type Connection = {

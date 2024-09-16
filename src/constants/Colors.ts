@@ -11,4 +11,7 @@ export const Colors = {
   tabIconSelected: tintColorLight,
   primeColor: "#106CC8",
   red: "rgba(255,0,0,0.8)",
+  upVoteRed: "#D1221E",
+  upvoteBg: "#262C2F",
+  downvote: "#5F56F7",
 };

@@ -15,14 +15,15 @@ import ParsedText from "react-native-parsed-text";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
-import { createPostVote, getSupaBaseFileUrl } from "../services/imageServices";
-import { PostData } from "../utility/types";
+import { getSupaBaseFileUrl } from "../services/imageServices";
+import { PostData, PostVotes } from "../utility/types";
 import Avatar from "./Avatar";
 import Spacer from "./Spacer";
 import { NormalText } from "./Text";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
+import { createPostUpvote, deletePostUpvote } from "../services/postServices";
 
 const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
   React.memo(({ item, isVisible }) => {
@@ -30,6 +31,12 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
 
     const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
     const [isPause, setIsPause] = useState<boolean>(isVisible);
+    const [postVotes, setPostVotes] = useState<PostVotes[]>([]);
+
+    useEffect(() => {
+      setPostVotes(item?.postVotes);
+    }, []);
+    console.log(item?.upVoteCount, "upvoooo");
 
     const UserInfo = useSelector(
       (state: RootState) => state.root?.authReducer?.userInfo
@@ -85,13 +92,22 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
 
     const onPressUpvote = async () => {
       try {
-        const postData = {
-          voteType: "upVote",
-          userId: UserInfo?.id,
-          postId: item?.id,
-        };
-        const res = await createPostVote(postData);
-        console.log(res, "msmsmsmsm");
+        if (isUpvote) {
+          console.log("remove");
+          const removedUpvote = postVotes?.filter(
+            (item) => item?.userId !== UserInfo?.id
+          );
+          setPostVotes([...removedUpvote]);
+          await deletePostUpvote(UserInfo?.id, item?.id);
+        } else {
+          const postData = {
+            voteType: "upVote",
+            userId: UserInfo?.id,
+            postId: item?.id,
+          };
+          setPostVotes([...postVotes, postData]);
+          const res = await createPostUpvote(postData);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -99,10 +115,30 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
 
     const onPressDownVote = () => {
       try {
+        const isUpvote =
+          postVotes?.filter((item) => item?.userId === UserInfo?.id)[0]
+            ?.voteType === "upVote"
+            ? true
+            : false;
+        console.log(isUpvote, "isUpvoteisUpvote");
+
+        // const postData = {
+        //   voteType: "downVote",
+        //   userId: UserInfo?.id,
+        //   postId: item?.id,
+        // };
+        // setPostVotes([...postVotes, postData]);
       } catch (error) {
         console.log(error);
       }
     };
+
+    const isUpvote =
+      postVotes?.filter((item) => item?.userId === UserInfo?.id)[0]
+        ?.voteType === "upVote"
+        ? true
+        : false;
+    const isDownVote = false;
 
     return (
       <View style={styles.userContainer}>
@@ -165,30 +201,43 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
           )}
         </View>
         <View style={styles.footerConatiner}>
-          <View style={styles.flex}>
+          <View style={[styles.flex]}>
             <View style={styles.upvoteConatiner}>
               <TouchableOpacity style={styles.flex} onPress={onPressUpvote}>
-                <SvgIcon name={"upArrow"} size={25} color={Colors.black} />
-                <NormalText style={{ marginRight: RFPercentage(1) }}>
-                  0
+                <SvgIcon
+                  name={"upArrow"}
+                  size={25}
+                  color={isUpvote ? Colors.red : Colors.icon}
+                />
+                <NormalText
+                  style={{
+                    marginRight: RFPercentage(1),
+                    color: isUpvote ? Colors.red : Colors.icon,
+                  }}
+                >
+                  {postVotes?.length}
                 </NormalText>
               </TouchableOpacity>
               <View style={styles.smallVerticalLine} />
               <Pressable onPress={onPressDownVote}>
-                <SvgIcon name={"downArrow"} size={25} color={Colors.black} />
+                <SvgIcon
+                  name={"downArrow"}
+                  size={25}
+                  color={isDownVote ? Colors.downvote : Colors.icon}
+                />
               </Pressable>
             </View>
             <Spacer gap={RFPercentage(0.5)} />
-            <Pressable
+            {/* <Pressable
               onPress={onPressComment}
               style={[
                 styles.upvoteConatiner,
                 { paddingHorizontal: RFPercentage(1) },
               ]}
             >
-              <SvgIcon name={"comment"} size={16} color={Colors.black} />
+              <SvgIcon name={"comment"} size={16} color={Colors.icon} />
               <NormalText style={{ marginLeft: RFPercentage(1) }}>0</NormalText>
-            </Pressable>
+            </Pressable> */}
           </View>
           <Pressable
             onPress={onPressShareImage}
@@ -197,7 +246,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
               { paddingHorizontal: RFPercentage(1) },
             ]}
           >
-            <SvgIcon name={"share"} size={15} color={Colors.black} />
+            <SvgIcon name={"share"} size={15} color={Colors.icon} />
           </Pressable>
         </View>
       </View>
@@ -251,11 +300,19 @@ const styles = StyleSheet.create({
   upvoteConatiner: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
     borderRadius: 30,
     borderColor: Colors.icon,
     paddingHorizontal: RFPercentage(0.5),
     height: RFPercentage(3),
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    backgroundColor: Colors.white,
+    elevation: 5,
   },
   smallVerticalLine: {
     height: RFPercentage(1.4),

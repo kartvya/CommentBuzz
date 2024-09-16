@@ -46,20 +46,3 @@ export const getFilePath = (folderName, isImage) => {
   return `/${folderName}/${new Date().getTime()}${isImage ? ".png" : ".mp4"}`;
 };
 
-export const createPostVote = async (postUpVote) => {
-    try {      
-    const { data, error } =await supabase
-      .from("postVotes")
-      .insert(postUpVote)
-      .select()
-      .single();
-    if (error) {
-      return { success: false,data: undefined, msg: "Could not upvote image" };
-    }
-    return { success: true, data: data, msg: ""  };
-  } catch (error) {
-    console.log(error);
-    return { success: false,data: undefined, msg: "Could not upvote image" };
-  }
-};
-

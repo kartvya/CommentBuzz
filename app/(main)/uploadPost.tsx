@@ -146,6 +146,7 @@ const UploadPost = () => {
         files,
         body: value,
         userId: UserInfo?.id,
+        upVoteCount: 0,
       };
       setLoading(true);
       const res = await createOrUpdatePost(data);

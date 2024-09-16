@@ -225,3 +225,332 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 });
+
+// import { supabase } from "@/lib/supabase";
+// import SvgIcon from "@/src/assets/icons";
+// import { TabViewContainer } from "@/src/components/AnimatedHeader/component/TabViewBase";
+// import staticData from "@/src/components/AnimatedHeader/config/staticData";
+// import { useHomeConfig } from "@/src/components/AnimatedHeader/hook";
+// import Loading from "@/src/components/Loading";
+// import ScreenWrapper from "@/src/components/ScreenWrapper";
+// import { TitleText } from "@/src/components/Text";
+// import { Colors } from "@/src/constants/Colors";
+// import { wp } from "@/src/helpers/comman";
+// import { Users } from "@/src/redux/reducers/AuthReducer";
+// import { RootState } from "@/src/redux/Store";
+// import { getUserImage } from "@/src/services/imageServices";
+// import { useRouter } from "expo-router";
+// import React, { useState } from "react";
+// import { Alert, Dimensions, Pressable, StyleSheet, View } from "react-native";
+// import Animated, {
+//   Extrapolate,
+//   interpolate,
+//   useAnimatedStyle,
+//   useDerivedValue,
+//   useSharedValue,
+// } from "react-native-reanimated";
+// import { useSelector } from "react-redux";
+
+// const G_WIN_WIDTH = Dimensions.get("window").width;
+// const G_WIN_HEIGHT = Dimensions.get("window").height;
+// const HEAD_HEIGHT = G_WIN_HEIGHT * 0.17;
+
+// const IMG_WH = 100;
+// const MARGIN_H = 15;
+// const MARGIN_V = 0;
+// const FROZE_TOP = IMG_WH;
+// const LINE_HEIGHT = 8;
+// const LINE_COUNT = 3;
+// const moveDistance = HEAD_HEIGHT - FROZE_TOP;
+// const title_h = LINE_HEIGHT;
+// const detail_h = LINE_HEIGHT * LINE_COUNT;
+// const marginTop = (HEAD_HEIGHT - IMG_WH - title_h - detail_h) * 0.5;
+
+// const TIMECOUNT = 2000;
+
+// const Profile: React.FC<any> = (props) => {
+//   const UserInfo = useSelector(
+//     (state: RootState) => state.root?.authReducer?.userInfo
+//   ) as Users;
+//   const navigation = useRouter();
+//   const { tabviewType, enableSnap } = useHomeConfig(props);
+//   const [scrollTrans, setScrollTrans] = useState(useSharedValue(0));
+//   const [isRefreshing, setIsRefreshing] = useState(false);
+//   const [headerImage, setHeaderImage] = useState(staticData.DetailImg);
+//   const [detail, setDetail] = useState(
+//     "It's hard to stay mad when there's so much beauty in the world."
+//   );
+
+//   const onPressLogout = () => {
+//     try {
+//       Alert.alert(
+//         "Confirm",
+//         "Are you sure want to log out?",
+//         [
+//           { text: "Cancel", onPress: () => console.log("Cancel Pressed!") },
+//           { text: "OK", onPress: onLogoutYesBTN },
+//         ],
+//         { cancelable: false }
+//       );
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+
+//   const onLogoutYesBTN = async () => {
+//     try {
+//       const { error } = await supabase.auth.signOut();
+//       if (error) {
+//         Alert.alert(
+//           "Sign out",
+//           "Something went wrong. Please try again. leater"
+//         );
+//       }
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+
+//   const transXValue = useDerivedValue(() => {
+//     const left = (G_WIN_WIDTH - IMG_WH) / 2;
+//     return interpolate(
+//       scrollTrans.value,
+//       [0, moveDistance],
+//       [0, -left],
+//       Extrapolate.CLAMP
+//     );
+//   });
+//   const transYValue = useDerivedValue(() => {
+//     const moveDistance = HEAD_HEIGHT - FROZE_TOP;
+//     const Img_one_move = marginTop + title_h + detail_h + MARGIN_V * 2;
+//     return interpolate(
+//       scrollTrans.value,
+//       [0, moveDistance],
+//       [0, Img_one_move],
+//       Extrapolate.CLAMP
+//     );
+//   });
+//   const scaleValue = useDerivedValue(() => {
+//     const moveDistance = HEAD_HEIGHT - FROZE_TOP;
+//     return interpolate(
+//       scrollTrans.value,
+//       [0, moveDistance],
+//       [1, 0.7],
+//       Extrapolate.CLAMP
+//     );
+//   });
+
+//   const headerTransStyle = useAnimatedStyle(() => {
+//     return {
+//       transform: [
+//         {
+//           translateX: transXValue.value,
+//         },
+//         {
+//           translateY: transYValue.value,
+//         },
+//         {
+//           scale: scaleValue.value,
+//         },
+//       ],
+//     };
+//   });
+
+//   const titleOpacity = useDerivedValue(() => {
+//     return interpolate(
+//       scrollTrans.value,
+//       [0, 10, 20],
+//       [1, 0.8, 0],
+//       Extrapolate.CLAMP
+//     );
+//   });
+//   const titleStyle = useAnimatedStyle(() => {
+//     return { opacity: titleOpacity.value };
+//   });
+
+//   const detailTransX = useDerivedValue(() => {
+//     return interpolate(
+//       scrollTrans.value,
+//       [0, moveDistance],
+//       [0, IMG_WH - (MARGIN_H + IMG_WH) * 0.5],
+//       Extrapolate.CLAMP
+//     );
+//   });
+//   const detailTransY = useDerivedValue(() => {
+//     return interpolate(
+//       scrollTrans.value,
+//       [0, moveDistance],
+//       [0, marginTop - (IMG_WH - detail_h) * 0.5],
+//       Extrapolate.CLAMP
+//     );
+//   });
+//   const detailStyle = useAnimatedStyle(() => {
+//     return {
+//       transform: [
+//         {
+//           translateX: detailTransX.value,
+//         },
+//         {
+//           translateY: detailTransY.value,
+//         },
+//       ],
+//     };
+//   });
+
+//   const renderScrollHeader = () => {
+//     return (
+//       <View
+//         style={{
+//           backgroundColor: "#fff",
+//           width: "100%",
+//           height: HEAD_HEIGHT,
+//           alignItems: "center",
+//           marginTop: 5,
+//         }}
+//       >
+//         <Animated.View style={[exStyles.avtarConatiner, headerTransStyle]}>
+//           <Animated.Image
+//             style={[
+//               {
+//                 width: IMG_WH,
+//                 flex: 1,
+//                 borderRadius: 30,
+//               },
+//             ]}
+//             source={getUserImage(UserInfo?.image)}
+//           />
+//           <Pressable
+//             style={exStyles.editConatiner}
+//             onPress={() => navigation.navigate("/(main)/editProfile")}
+//           >
+//             <SvgIcon name={"edit"} size={20} />
+//           </Pressable>
+//         </Animated.View>
+//         <Animated.View
+//           style={[
+//             {
+//               justifyContent: "center",
+//               alignItems: "center",
+//             },
+//             detailStyle,
+//           ]}
+//         >
+//           <TitleText
+//             style={[
+//               {
+//                 textAlign: "center",
+//               },
+//             ]}
+//           >
+//             {UserInfo?.name}
+//           </TitleText>
+//         </Animated.View>
+//       </View>
+//     );
+//   };
+
+//   const makeScrollTrans = (scrollTrans: Animated.SharedValue<number>) => {
+//     setScrollTrans(scrollTrans);
+//   };
+
+//   const onStartRefresh = () => {
+//     setIsRefreshing(true);
+//     setTimeout(() => {
+//       setDetail(
+//         "Nobody gets to live life backwards. Look ahead, that’s where your future lies."
+//       );
+//       setHeaderImage(staticData.HeaderImg);
+//       setIsRefreshing(false);
+//     }, TIMECOUNT);
+//   };
+
+//   const renderRefreshControl = () => {
+//     return <Loading />;
+//   };
+
+//   const Props = {
+//     renderScrollHeader,
+//     makeScrollTrans,
+//     frozeTop: FROZE_TOP,
+//     onStartRefresh: onStartRefresh,
+//     renderRefreshControl,
+//     isRefreshing,
+//     enableSnap,
+//   };
+//   return (
+//     <ScreenWrapper bg={Colors.white}>
+//       <View style={exStyles.headerConatiner}>
+//         <TitleText>Profile</TitleText>
+//         <Pressable
+//           style={[
+//             exStyles.backIconConatiner,
+//             {
+//               backgroundColor: "rgba(255,0,0,0.1)",
+//             },
+//           ]}
+//           onPress={onPressLogout}
+//         >
+//           <SvgIcon name={"logout"} />
+//         </Pressable>
+//       </View>
+//       <TabViewContainer {...Props} />
+//     </ScreenWrapper>
+//   );
+// };
+
+// export default Profile;
+// const exStyles = StyleSheet.create({
+//   headerConatiner: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     paddingHorizontal: wp(3),
+//     backgroundColor: "white",
+//     paddingBottom: wp(3),
+//   },
+//   backIconConatiner: {
+//     backgroundColor: "rgba(0,0,0,0.1)",
+//     alignSelf: "flex-start",
+//     borderRadius: 10,
+//     height: wp(8),
+//     width: wp(8),
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   avtarConatiner: {
+//     shadowColor: "#000",
+//     shadowOffset: {
+//       width: 0,
+//       height: 1,
+//     },
+//     shadowOpacity: 0.22,
+//     shadowRadius: 2.22,
+//     elevation: 3,
+//     backgroundColor: Colors.white,
+//     borderRadius: 30,
+//     height: IMG_WH,
+//   },
+//   editConatiner: {
+//     backgroundColor: Colors.white,
+//     borderRadius: 90,
+//     position: "absolute",
+//     bottom: -3,
+//     right: -12,
+//     padding: 7,
+//     shadowColor: "#000",
+//     shadowOffset: {
+//       width: 0,
+//       height: 2,
+//     },
+//     shadowOpacity: 0.25,
+//     shadowRadius: 3.84,
+//     elevation: 5,
+//     zIndex: 999,
+//   },
+//   userNameText: {},
+//   profileListItemConatiner: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//   },
+// });
