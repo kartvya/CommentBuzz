@@ -31,12 +31,22 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
 
     const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
     const [isPause, setIsPause] = useState<boolean>(isVisible);
-    const [postVotes, setPostVotes] = useState<PostVotes[]>([]);
+    const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
+      "none"
+    );
+    const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
 
     useEffect(() => {
-      setPostVotes(item?.postVotes);
+      const currentUserVote = item?.postVotes?.find(
+        (vote) => vote?.userId === UserInfo?.id
+      );
+      if (currentUserVote?.voteType === "upVote") {
+        setUserVote("upvote");
+      } else if (currentUserVote?.voteType === "downVote") {
+        setUserVote("downvote");
+      }
+      setVoteCount(item?.voteCount || 0);
     }, []);
-    console.log(item?.upVoteCount, "upvoooo");
 
     const UserInfo = useSelector(
       (state: RootState) => state.root?.authReducer?.userInfo
@@ -92,53 +102,63 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
 
     const onPressUpvote = async () => {
       try {
-        if (isUpvote) {
-          console.log("remove");
-          const removedUpvote = postVotes?.filter(
-            (item) => item?.userId !== UserInfo?.id
-          );
-          setPostVotes([...removedUpvote]);
+        if (userVote === "upvote") {
+          setVoteCount(voteCount - 1);
+          setUserVote("none");
           await deletePostUpvote(UserInfo?.id, item?.id);
-        } else {
-          const postData = {
+        } else if (userVote === "downvote") {
+          setVoteCount(voteCount + 2);
+          setUserVote("upvote");
+          await createPostUpvote({
             voteType: "upVote",
             userId: UserInfo?.id,
             postId: item?.id,
-          };
-          setPostVotes([...postVotes, postData]);
-          const res = await createPostUpvote(postData);
+            voteCount: voteCount + 2,
+          });
+        } else {
+          setVoteCount(voteCount + 1);
+          setUserVote("upvote");
+          await createPostUpvote({
+            voteType: "upVote",
+            userId: UserInfo?.id,
+            postId: item?.id,
+            voteCount: voteCount + 1,
+          });
         }
       } catch (error) {
         console.log(error);
       }
     };
 
-    const onPressDownVote = () => {
+    const onPressDownVote = async () => {
       try {
-        const isUpvote =
-          postVotes?.filter((item) => item?.userId === UserInfo?.id)[0]
-            ?.voteType === "upVote"
-            ? true
-            : false;
-        console.log(isUpvote, "isUpvoteisUpvote");
-
-        // const postData = {
-        //   voteType: "downVote",
-        //   userId: UserInfo?.id,
-        //   postId: item?.id,
-        // };
-        // setPostVotes([...postVotes, postData]);
+        if (userVote === "downvote") {
+          setVoteCount(voteCount + 1);
+          setUserVote("none");
+          await deletePostUpvote(UserInfo?.id, item?.id);
+        } else if (userVote === "upvote") {
+          setVoteCount(voteCount - 2);
+          setUserVote("downvote");
+          await createPostUpvote({
+            voteType: "downVote",
+            userId: UserInfo?.id,
+            postId: item?.id,
+            voteCount: voteCount - 2,
+          });
+        } else {
+          setVoteCount(voteCount - 1);
+          setUserVote("downvote");
+          await createPostUpvote({
+            voteType: "downVote",
+            userId: UserInfo?.id,
+            postId: item?.id,
+            voteCount: voteCount - 1,
+          });
+        }
       } catch (error) {
         console.log(error);
       }
     };
-
-    const isUpvote =
-      postVotes?.filter((item) => item?.userId === UserInfo?.id)[0]
-        ?.voteType === "upVote"
-        ? true
-        : false;
-    const isDownVote = false;
 
     return (
       <View style={styles.userContainer}>
@@ -203,27 +223,33 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
         <View style={styles.footerConatiner}>
           <View style={[styles.flex]}>
             <View style={styles.upvoteConatiner}>
+              {/* Upvote button */}
               <TouchableOpacity style={styles.flex} onPress={onPressUpvote}>
                 <SvgIcon
                   name={"upArrow"}
                   size={25}
-                  color={isUpvote ? Colors.red : Colors.icon}
+                  color={userVote === "upvote" ? Colors.red : Colors.icon}
                 />
                 <NormalText
                   style={{
                     marginRight: RFPercentage(1),
-                    color: isUpvote ? Colors.red : Colors.icon,
+                    color: userVote === "upvote" ? Colors.red : Colors.icon,
                   }}
                 >
-                  {postVotes?.length}
+                  {voteCount}
                 </NormalText>
               </TouchableOpacity>
+
               <View style={styles.smallVerticalLine} />
+
+              {/* Downvote button */}
               <Pressable onPress={onPressDownVote}>
                 <SvgIcon
                   name={"downArrow"}
                   size={25}
-                  color={isDownVote ? Colors.downvote : Colors.icon}
+                  color={
+                    userVote === "downvote" ? Colors.downvote : Colors.icon
+                  }
                 />
               </Pressable>
             </View>

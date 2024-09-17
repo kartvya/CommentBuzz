@@ -49,7 +49,7 @@ export interface PostData {
   user: PostUser;
   userId: string;
   postVotes: PostVotes[];
-  upVoteCount: number;
+  voteCount: number;
 }
 
 export interface PostVotes {
@@ -58,6 +58,7 @@ export interface PostVotes {
   postId: number;
   userId: string;
   voteType: string;
+  voteCount: number | null;
 }
 
 export type Connection = {

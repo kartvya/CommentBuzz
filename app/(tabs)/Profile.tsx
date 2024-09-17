@@ -229,7 +229,6 @@ const styles = StyleSheet.create({
 // import { supabase } from "@/lib/supabase";
 // import SvgIcon from "@/src/assets/icons";
 // import { TabViewContainer } from "@/src/components/AnimatedHeader/component/TabViewBase";
-// import staticData from "@/src/components/AnimatedHeader/config/staticData";
 // import { useHomeConfig } from "@/src/components/AnimatedHeader/hook";
 // import Loading from "@/src/components/Loading";
 // import ScreenWrapper from "@/src/components/ScreenWrapper";
@@ -276,7 +275,6 @@ const styles = StyleSheet.create({
 //   const { tabviewType, enableSnap } = useHomeConfig(props);
 //   const [scrollTrans, setScrollTrans] = useState(useSharedValue(0));
 //   const [isRefreshing, setIsRefreshing] = useState(false);
-//   const [headerImage, setHeaderImage] = useState(staticData.DetailImg);
 //   const [detail, setDetail] = useState(
 //     "It's hard to stay mad when there's so much beauty in the world."
 //   );
@@ -459,7 +457,6 @@ const styles = StyleSheet.create({
 //       setDetail(
 //         "Nobody gets to live life backwards. Look ahead, that’s where your future lies."
 //       );
-//       setHeaderImage(staticData.HeaderImg);
 //       setIsRefreshing(false);
 //     }, TIMECOUNT);
 //   };

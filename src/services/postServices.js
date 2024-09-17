@@ -70,22 +70,35 @@ export const fetchOnlyUserPost = async (limit = 10,userId) => {
 }
 
 export const createPostUpvote = async (postUpvote) => {
-    try {
-        const { data, error } = await supabase
-            .from("postVotes")
-            .upsert(postUpvote)
-            .select()
-            .single()
-        if (error) {
-            console.log(error);
-            return {success:false,data:undefined,msg:"Could not upvote post"}    
-        }
-         return {success:true,data:data,msg:""}
-    } catch (error) {
-        console.log(error);
-        return {success:false,data:undefined,msg:"Could not upvote post"}
+  try {
+    const { data: voteData, error: voteError } = await supabase
+      .from("postVotes")
+      .upsert(postUpvote)
+      .select()
+      .single();
+
+    if (voteError) {
+      console.log(voteError);
+      return { success: false, data: undefined, msg: "Could not upvote post" };
     }
-}
+
+    const { error: postError } = await supabase
+      .from("posts")
+      .update({ voteCount: postUpvote.voteCount })
+      .eq("id", postUpvote.postId)
+      .select()
+      .single();
+    if (postError) {
+      console.log(postError);
+      return { success: false, data: undefined, msg: "Could not update vote count" };
+    }
+
+    return { success: true, data: voteData, msg: "" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: "Could not upvote post" };
+  }
+};
 
 export const deletePostUpvote = async (userId,postId) => {
     try {
