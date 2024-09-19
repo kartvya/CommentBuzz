@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MyStatusBar from "./CustomeStatusBar";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import { Colors, DarkColors } from "../constants/Colors";
 
 interface ScreenWrapperProps {
   children: ReactNode;
@@ -21,8 +21,16 @@ const ScreenWrapper = ({
 
   return (
     <>
-      <MyStatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={[{ flex: 1, backgroundColor: bg }, conatinerStyle]}>
+      <MyStatusBar
+        backgroundColor={DarkColors.lightBg}
+        barStyle="light-content"
+      />
+      <View
+        style={[
+          { flex: 1, backgroundColor: DarkColors.backGround },
+          conatinerStyle,
+        ]}
+      >
         {children}
       </View>
     </>

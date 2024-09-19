@@ -4,7 +4,7 @@ import Avatar from "@/src/components/Avatar";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
-import { Colors } from "@/src/constants/Colors";
+import { Colors, DarkColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
@@ -49,14 +49,9 @@ const renderTabBar = (props: any) => (
     {...props}
     renderLabel={() => null}
     renderIcon={({ route }: { route: any }) => (
-      <View
-        style={{
-          borderRadius: 20,
-        }}
-      >
+      <View style={{}}>
         <NormalText
           style={{
-            color: Colors.black,
             marginVertical: RFPercentage(1),
             fontSize: RFValue(10),
           }}
@@ -66,11 +61,11 @@ const renderTabBar = (props: any) => (
         </NormalText>
       </View>
     )}
-    style={{ backgroundColor: Colors.white }}
+    style={{ backgroundColor: DarkColors.lightBg }}
     labelStyle={{ fontSize: 12 }}
     inactiveColor="gray"
     indicatorStyle={{
-      backgroundColor: Colors.primeColor,
+      backgroundColor: DarkColors?.primaryColor,
     }}
   />
 );
@@ -124,36 +119,42 @@ const Profile = () => {
     <>
       <ScreenWrapper bg={Colors.white}>
         <View style={styles.headerConatiner}>
-          <TitleText>Profile</TitleText>
+          <TitleText style={{ color: DarkColors.text }}>Profile</TitleText>
           <Pressable
             style={[
               styles.backIconConatiner,
               {
-                backgroundColor: "rgba(255,0,0,0.1)",
+                backgroundColor: "rgba(255,0,0,0.9)",
               },
             ]}
             onPress={onPressLogout}
           >
-            <SvgIcon name={"logout"} />
+            <SvgIcon name={"logout"} color={DarkColors.lightBg} />
           </Pressable>
         </View>
-        <Spacer gap={RFPercentage(0.7)} />
-        <View style={styles.avtarConatiner}>
-          <Avatar
-            uri={UserInfo?.image}
-            size={RFPercentage(13)}
-            borderRadius={30}
-          />
-          <Pressable
-            style={styles.editConatiner}
-            onPress={() => navigation.navigate("/(main)/editProfile")}
-          >
-            <SvgIcon name={"edit"} size={20} />
-          </Pressable>
-        </View>
-        <Spacer gap={RFPercentage(0.7)} />
-        <View style={{ alignItems: "center" }}>
-          <TitleText style={styles.userNameText}>{UserInfo?.name}</TitleText>
+        <Spacer gap={RFPercentage(1)} />
+        <View style={styles.avtarWithTextContainer}>
+          <View style={styles.avtarConatiner}>
+            <Avatar
+              uri={UserInfo?.image}
+              size={RFPercentage(10)}
+              borderRadius={20}
+            />
+            <Pressable
+              style={styles.editConatiner}
+              onPress={() => navigation.navigate("/(main)/editProfile")}
+            >
+              <SvgIcon name={"edit"} size={18} color={DarkColors?.text} />
+            </Pressable>
+          </View>
+          <Spacer gap={RFPercentage(1)} />
+          <View style={{ flex: 1 }}>
+            <TitleText style={styles.userNameText}>{UserInfo?.name}</TitleText>
+            <NormalText ellipsizeMode="tail" numberOfLines={2}>
+              {UserInfo?.bio}
+            </NormalText>
+          </View>
+          <Spacer gap={RFPercentage(1)} />
         </View>
         <Spacer gap={RFPercentage(1)} />
         <TabView
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: wp(3),
-    backgroundColor: "white",
+    backgroundColor: DarkColors?.lightBg,
     paddingBottom: wp(3),
   },
   backIconConatiner: {
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   avtarConatiner: {
-    alignSelf: "center",
+    alignSelf: "flex-start",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -200,9 +201,10 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: Colors.white,
     borderRadius: 30,
+    marginLeft: RFPercentage(1.3),
   },
   editConatiner: {
-    backgroundColor: Colors.white,
+    backgroundColor: DarkColors?.votesBg,
     borderRadius: 90,
     position: "absolute",
     bottom: -3,
@@ -223,6 +225,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  avtarWithTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 

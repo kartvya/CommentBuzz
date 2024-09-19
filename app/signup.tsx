@@ -5,7 +5,7 @@ import Input from "@/src/components/Input";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
-import { Colors } from "@/src/constants/Colors";
+import { Colors, DarkColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { isEmailValid, isPasswordValid } from "@/src/helpers/validation";
 import { useRouter } from "expo-router";
@@ -94,9 +94,9 @@ const Signup = () => {
           style={styles.backIconConatiner}
           onPress={() => navigation.navigate("/welcome")}
         >
-          <SvgIcon name={"arrowLeft"} />
+          <SvgIcon name={"arrowLeft"} color={DarkColors?.primaryColor} />
         </Pressable>
-        <Spacer gap={hp(3)} />
+        <Spacer gap={hp(2)} />
         <TitleText style={styles.greetingText}>Let's,</TitleText>
         <TitleText style={styles.greetingText}>Get Started</TitleText>
         <Spacer gap={hp(3)} />
@@ -131,7 +131,7 @@ const Signup = () => {
               <SvgIcon
                 name={showPass ? "eye" : "closeEye"}
                 size={22}
-                color={Colors.icon}
+                color={DarkColors.text}
               />
             </Pressable>
           }
@@ -150,7 +150,9 @@ const Signup = () => {
             style={{ marginLeft: wp(1) }}
             onPress={() => navigation.navigate("/login")}
           >
-            <NormalText style={{ color: Colors.primeColor }}>Login</NormalText>
+            <NormalText style={{ color: DarkColors.primaryColor }}>
+              Login
+            </NormalText>
           </Pressable>
         </View>
       </KeyboardAwareScrollView>
@@ -165,13 +167,23 @@ const styles = StyleSheet.create({
     fontSize: RFValue(30),
   },
   backIconConatiner: {
-    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundColor: "rgba(0,0,0,1)",
     alignSelf: "flex-start",
     borderRadius: 10,
     height: wp(8),
     width: wp(8),
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   alreadyAccount: {
     flexDirection: "row",

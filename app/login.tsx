@@ -5,7 +5,7 @@ import Input from "@/src/components/Input";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
-import { Colors } from "@/src/constants/Colors";
+import { Colors, DarkColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -75,9 +75,9 @@ const Login = () => {
           style={styles.backIconConatiner}
           onPress={() => navigation.back()}
         >
-          <SvgIcon name={"arrowLeft"} />
+          <SvgIcon name={"arrowLeft"} color={DarkColors?.primaryColor} />
         </Pressable>
-        <Spacer gap={hp(3)} />
+        <Spacer gap={hp(2)} />
         <TitleText style={styles.greetingText}>Hey,</TitleText>
         <TitleText style={styles.greetingText}>Welcome Back</TitleText>
         <Spacer gap={hp(3)} />
@@ -104,14 +104,14 @@ const Login = () => {
                 <SvgIcon
                   name={"eye"}
                   size={22}
-                  color={Colors.icon}
+                  color={DarkColors.text}
                   strokeWidth={0.5}
                 />
               ) : (
                 <SvgIcon
                   name={"closeEye"}
                   size={22}
-                  color={Colors.black}
+                  color={DarkColors.text}
                   strokeWidth={2}
                 />
               )}
@@ -136,7 +136,7 @@ const Login = () => {
             style={{ marginLeft: wp(1) }}
             onPress={() => navigation.navigate("/signup")}
           >
-            <NormalText style={{ color: Colors.primeColor }}>
+            <NormalText style={{ color: DarkColors.primaryColor }}>
               Register
             </NormalText>
           </Pressable>
@@ -153,13 +153,23 @@ const styles = StyleSheet.create({
     fontSize: RFValue(30),
   },
   backIconConatiner: {
-    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundColor: "rgba(0,0,0,1)",
     alignSelf: "flex-start",
     borderRadius: 10,
     height: wp(8),
     width: wp(8),
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   alreadyAccount: {
     flexDirection: "row",

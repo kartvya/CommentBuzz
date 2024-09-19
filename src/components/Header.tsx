@@ -4,6 +4,7 @@ import { TitleText } from "./Text";
 import SvgIcon from "../assets/icons";
 import { wp } from "../helpers/comman";
 import { useRouter } from "expo-router";
+import { DarkColors } from "../constants/Colors";
 
 interface IProps {
   title: string;
@@ -21,12 +22,12 @@ const Header = (props: IProps) => {
           style={[styles.backIconConatiner]}
           onPress={() => navigation.back()}
         >
-          <SvgIcon name={"arrowLeft"} />
+          <SvgIcon name={"arrowLeft"} color={DarkColors?.primaryColor} />
         </Pressable>
       ) : (
         <View style={{ width: wp(8) }} />
       )}
-      <TitleText>{title}</TitleText>
+      <TitleText style={{ color: DarkColors?.text }}>{title}</TitleText>
       <View style={{ width: wp(8) }} />
     </View>
   );
@@ -39,15 +40,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginHorizontal: wp(3),
+    paddingHorizontal: wp(3),
+    paddingBottom: wp(3),
+    backgroundColor: DarkColors?.lightBg,
   },
   backIconConatiner: {
-    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundColor: "rgba(0,0,0,1)",
     alignSelf: "flex-start",
     borderRadius: 10,
     height: wp(8),
     width: wp(8),
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
 });

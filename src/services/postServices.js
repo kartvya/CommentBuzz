@@ -54,7 +54,7 @@ export const fetchOnlyUserPost = async (limit = 10,userId) => {
      try {
         const { data, error } = await supabase
             .from("posts")
-            .select("*,user:users(id,name,image)")
+            .select("*,user:users(id,name,image),postVotes(*)")
             .eq("userId", userId)
             .order("created_at", { ascending: false })
             .limit(limit)

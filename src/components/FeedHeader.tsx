@@ -7,6 +7,7 @@ import Spacer from "./Spacer";
 import { TitleText } from "./Text";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import { DarkColors } from "../constants/Colors";
 
 const FeedHeader = () => {
   const insets = useSafeAreaInsets();
@@ -17,10 +18,10 @@ const FeedHeader = () => {
       <View style={styles.conatiner}>
         <TitleText style={styles.headerTitleText}>Comment Buzz</TitleText>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <SvgIcon name={"heart"} />
+          <SvgIcon name={"heart"} color={DarkColors?.text} />
           <Spacer gap={wp(1)} />
           <Pressable onPress={() => navigation.navigate("/uploadPost")}>
-            <SvgIcon name={"plus"} />
+            <SvgIcon name={"plus"} color={DarkColors?.text} />
           </Pressable>
         </View>
       </View>

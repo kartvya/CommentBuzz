@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
-import { Colors } from "@/src/constants/Colors";
+import { Colors, DarkColors } from "@/src/constants/Colors";
 import Header from "@/src/components/Header";
 import Avatar from "@/src/components/Avatar";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
@@ -257,7 +257,7 @@ const UploadPost = () => {
               <Avatar
                 uri={UserInfo?.image}
                 size={RFPercentage(6)}
-                borderRadius={30}
+                borderRadius={10}
               />
             </View>
             <Spacer gap={RFPercentage(1)} />
@@ -286,17 +286,27 @@ const UploadPost = () => {
                 },
               ]}
             />
-            <NormalText style={{ textAlign: "right", color: Colors.black }}>
+            <NormalText style={{ textAlign: "right", color: Colors.icon }}>
               {value.length}/300
             </NormalText>
           </View>
           <View style={styles.media}>
             <Pressable onPress={() => onPick(true)}>
-              <SvgIcon name={"image"} size={30} strokeWidth={1.5} />
+              <SvgIcon
+                name={"image"}
+                size={30}
+                strokeWidth={1.5}
+                color={Colors.white}
+              />
             </Pressable>
             <Spacer gap={RFPercentage(0.5)} />
             <Pressable onPress={() => onPick(false)}>
-              <SvgIcon name={"video"} size={33} strokeWidth={1.5} />
+              <SvgIcon
+                name={"video"}
+                size={33}
+                strokeWidth={1.5}
+                color={Colors.white}
+              />
             </Pressable>
           </View>
           {files && (
@@ -375,8 +385,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   commentInput: {
-    backgroundColor: Colors.white,
-    color: Colors.black,
+    color: DarkColors?.text,
     fontSize: RFValue(12),
     height: RFPercentage(9),
     textAlignVertical: "top",
@@ -384,9 +393,8 @@ const styles = StyleSheet.create({
   },
   textInputContainer: {
     padding: RFPercentage(1.5),
-    backgroundColor: Colors.white,
+    backgroundColor: DarkColors.lightBg,
     borderRadius: 10,
-    borderWidth: 0.5,
     marginBottom: RFPercentage(1),
   },
   suggestionItem: {

@@ -15,3 +15,12 @@ export const Colors = {
   upvoteBg: "#262C2F",
   downvote: "#5F56F7",
 };
+
+export const DarkColors = {
+  text: "#fff",
+  backGround: "#121212",
+  lightBg: "#1B1A1E",
+  borderColor: "#252528",
+  primaryColor: "#F44D3A",
+  votesBg: "#262C2F",
+};

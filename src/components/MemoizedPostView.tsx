@@ -1,4 +1,4 @@
-import { Colors } from "@/src/constants/Colors";
+import { Colors, DarkColors } from "@/src/constants/Colors";
 import { ResizeMode, Video } from "expo-av";
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
@@ -37,7 +37,13 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
     const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
 
     useEffect(() => {
-      const currentUserVote = item?.postVotes?.find(
+      const sortedData = item?.postVotes.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      console.log(item, "sortedDatasortedData");
+
+      const currentUserVote = sortedData?.find(
         (vote) => vote?.userId === UserInfo?.id
       );
       if (currentUserVote?.voteType === "upVote") {
@@ -46,7 +52,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
         setUserVote("downvote");
       }
       setVoteCount(item?.voteCount || 0);
-    }, []);
+    }, [item?.postVotes]);
 
     const UserInfo = useSelector(
       (state: RootState) => state.root?.authReducer?.userInfo
@@ -163,7 +169,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
     return (
       <View style={styles.userContainer}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Avatar uri={item?.user?.image} size={hp(5)} borderRadius={10} />
+          <Avatar uri={item?.user?.image} size={hp(5)} borderRadius={50} />
           <View style={styles.userNameContainer}>
             <NormalText>{item?.user?.name}</NormalText>
           </View>
@@ -192,14 +198,14 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
               source={getSupaBaseFileUrl(item?.files)}
               transition={100}
               contentFit="cover"
-              style={{ aspectRatio: 4 / 5 }}
+              style={{ aspectRatio: 4 / 5, borderRadius: 12 }}
             />
           )}
           {item?.files && item?.files?.includes("postVideos") && (
             <View>
               <Pressable onPress={() => setIsSoundOn(!isSoundOn)}>
                 <Video
-                  style={{ aspectRatio: 4 / 5 }}
+                  style={{ aspectRatio: 4 / 5, borderRadius: 12 }}
                   resizeMode={ResizeMode.COVER}
                   source={getSupaBaseFileUrl(item?.files)}
                   isLooping={true}
@@ -228,12 +234,12 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
                 <SvgIcon
                   name={"upArrow"}
                   size={25}
-                  color={userVote === "upvote" ? Colors.red : Colors.icon}
+                  color={userVote === "upvote" ? Colors.red : DarkColors.text}
                 />
                 <NormalText
                   style={{
                     marginRight: RFPercentage(1),
-                    color: userVote === "upvote" ? Colors.red : Colors.icon,
+                    color: userVote === "upvote" ? Colors.red : DarkColors.text,
                   }}
                 >
                   {voteCount}
@@ -248,7 +254,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
                   name={"downArrow"}
                   size={25}
                   color={
-                    userVote === "downvote" ? Colors.downvote : Colors.icon
+                    userVote === "downvote" ? Colors.downvote : DarkColors.text
                   }
                 />
               </Pressable>
@@ -272,7 +278,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
               { paddingHorizontal: RFPercentage(1) },
             ]}
           >
-            <SvgIcon name={"share"} size={15} color={Colors.icon} />
+            <SvgIcon name={"share"} size={15} color={DarkColors?.text} />
           </Pressable>
         </View>
       </View>
@@ -282,9 +288,11 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
 export default MemoizedPostView;
 const styles = StyleSheet.create({
   userContainer: {
-    backgroundColor: "white",
-    paddingHorizontal: RFPercentage(2),
-    paddingVertical: RFPercentage(1),
+    backgroundColor: DarkColors?.lightBg,
+    marginHorizontal: RFPercentage(1),
+    marginVertical: RFPercentage(1),
+    borderRadius: 12,
+    padding: RFPercentage(2),
   },
   profileImage: {
     height: 40,
@@ -295,7 +303,7 @@ const styles = StyleSheet.create({
     marginHorizontal: RFPercentage(1),
   },
   descriptionText: {
-    color: Colors.black,
+    color: DarkColors?.text,
     marginVertical: RFPercentage(0.5),
     marginTop: RFPercentage(1),
     fontFamily: "SpaceMono-Regular",
@@ -329,7 +337,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderColor: Colors.icon,
     paddingHorizontal: RFPercentage(0.5),
-    height: RFPercentage(3),
+    height: RFPercentage(3.3),
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -337,7 +345,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    backgroundColor: Colors.white,
+    backgroundColor: DarkColors?.votesBg,
     elevation: 5,
   },
   smallVerticalLine: {

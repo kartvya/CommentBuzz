@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from "react-native";
 import React from "react";
-import { Colors } from "../constants/Colors";
+import { Colors, DarkColors } from "../constants/Colors";
 import { hp, wp } from "../helpers/comman";
 import { NormalText } from "./Text";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -46,20 +46,20 @@ export default Input;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.white,
+    backgroundColor: DarkColors.lightBg,
     padding: wp(2),
     borderRadius: 10,
     height: hp(7),
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: wp(4),
-    borderWidth: 0.5,
   },
   input: {
     flex: 1,
     backgroundColor: "transparent",
     paddingLeft: wp(2),
     fontFamily: "SpaceMono-Regular",
+    color: DarkColors.text,
   },
   errorText: {
     color: Colors.red,

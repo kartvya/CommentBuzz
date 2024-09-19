@@ -1,20 +1,20 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import Button from "@/src/components/Button";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
+import Spacer from "@/src/components/Spacer";
+import { NormalText, TitleText } from "@/src/components/Text";
+import { Colors, DarkColors } from "@/src/constants/Colors";
+import { hp, wp } from "@/src/helpers/comman";
+import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useRef } from "react";
-import { hp, wp } from "@/src/helpers/comman";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { Colors } from "@/src/constants/Colors";
-import { NormalText, TitleText } from "@/src/components/Text";
-import { useRouter } from "expo-router";
-import Button from "@/src/components/Button";
-import Spacer from "@/src/components/Spacer";
+import { Pressable, StyleSheet, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const Welcome = () => {
   const animation = useRef<LottieView>(null);
   const navigation = useRouter();
   return (
-    <ScreenWrapper bg="white">
+    <ScreenWrapper>
       <View style={styles.conatiner}>
         <LottieView
           autoPlay
@@ -45,7 +45,7 @@ const Welcome = () => {
               style={{ marginLeft: wp(1) }}
               onPress={() => navigation.push("/login")}
             >
-              <NormalText style={{ color: Colors.primeColor }}>
+              <NormalText style={{ color: DarkColors?.primaryColor }}>
                 Login
               </NormalText>
             </Pressable>

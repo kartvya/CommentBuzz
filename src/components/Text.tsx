@@ -7,6 +7,7 @@ import {
   TextStyle,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { DarkColors } from "../constants/Colors";
 
 interface CustomTextProps extends TextProps {
   numberOfLines?: number;
@@ -40,12 +41,12 @@ export const NormalText: React.FC<CustomTextProps> = ({
 const styles = StyleSheet.create({
   titleText: {
     fontSize: RFValue(16),
-    color: "black",
+    color: DarkColors.text,
     fontFamily: "SpaceMono-Regular",
   },
   normalText: {
     fontSize: RFValue(12),
-    color: "black",
+    color: DarkColors.text,
     fontFamily: "SpaceMono-Regular",
   },
 });

@@ -4,7 +4,7 @@ import Header from "@/src/components/Header";
 import Input from "@/src/components/Input";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
-import { Colors } from "@/src/constants/Colors";
+import { Colors, DarkColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
@@ -156,18 +156,19 @@ const EditProfile = () => {
         <View style={styles.avtarConatiner}>
           <Image style={styles.avatar} source={imageSource} />
           <Pressable style={styles.editConatiner} onPress={pickImage}>
-            <SvgIcon name={"camera"} size={20} />
+            <SvgIcon name={"camera"} size={20} color={Colors.white} />
           </Pressable>
         </View>
         <Spacer gap={RFPercentage(3)} />
         <Input
-          containerStyle={{ backgroundColor: "rgba(0,0,0,0.1)" }}
+          containerStyle={{ backgroundColor: "rgba(0,0,0,0.4)" }}
           icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
           placeholderText="Enter your email"
           onChangeText={(txt) => setUser({ ...user, name: txt })}
           error={""}
           editable={false}
           value={user.email}
+          onPressIn={() => alert("You can not edit email.")}
         />
         <Spacer gap={wp(3)} />
         <Input
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   editConatiner: {
-    backgroundColor: Colors.white,
+    backgroundColor: DarkColors.votesBg,
     borderRadius: 90,
     position: "absolute",
     bottom: -3,

@@ -1,40 +1,20 @@
-import {
-  FlatList,
-  FlatListProps,
-  ListRenderItem,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import React, {
-  forwardRef,
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { PostData } from "../utility/types";
-import MemoizedPostView from "../components/MemoizedPostView";
-import { fetchOnlyUserPost, fetchPost } from "../services/postServices";
-import { Colors } from "../constants/Colors";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { FlatList, ListRenderItem, StyleSheet, View } from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
+import MemoizedPostView from "../components/MemoizedPostView";
+import { TitleText } from "../components/Text";
+import { Colors, DarkColors } from "../constants/Colors";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
-import { TitleText } from "../components/Text";
-import Animated, { AnimatedProps } from "react-native-reanimated";
+import { fetchOnlyUserPost } from "../services/postServices";
+import { PostData } from "../utility/types";
 
-const AnimatedFlatList = forwardRef<
-  FlatList<PostData>,
-  AnimatedProps<FlatListProps<PostData>>
->((props, ref) => <Animated.FlatList {...props} ref={ref as any} />);
-
-type Props = Omit<FlatListProps<PostData>, "renderItem">;
+type Props = {};
 
 let limit = 10;
 
-const UserPost = forwardRef<FlatList, Props>((props, ref) => {
+const UserPost = forwardRef<Props>((props, ref) => {
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -75,13 +55,13 @@ const UserPost = forwardRef<FlatList, Props>((props, ref) => {
     ({ item, index }) => (
       <MemoizedPostView item={item} isVisible={index === visibleIndex} />
     ),
-    [visibleIndex]
+    [visibleIndex, Posts]
   );
 
   return (
     <>
       {Posts?.length > 0 ? (
-        <AnimatedFlatList
+        <FlatList
           data={Posts}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
@@ -103,9 +83,9 @@ const UserPost = forwardRef<FlatList, Props>((props, ref) => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => getAllPost()}
+              tintColor={DarkColors.primaryColor}
             />
           }
-          {...(props as Omit<Props, "data">)}
         />
       ) : (
         <View
@@ -118,4 +98,4 @@ const UserPost = forwardRef<FlatList, Props>((props, ref) => {
   );
 });
 
-export default memo(UserPost);
+export default UserPost;

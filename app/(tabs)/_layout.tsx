@@ -1,9 +1,8 @@
 import SvgIcon from "@/src/assets/icons";
 import Avatar from "@/src/components/Avatar";
-import { Colors } from "@/src/constants/Colors";
+import { DarkColors } from "@/src/constants/Colors";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
-import { getUserImage } from "@/src/services/imageServices";
 import { Tabs } from "expo-router";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
@@ -16,9 +15,12 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primeColor,
+        tabBarActiveTintColor: DarkColors?.primaryColor,
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: DarkColors?.lightBg,
+        },
       }}
     >
       <Tabs.Screen
@@ -28,7 +30,7 @@ export default function TabLayout() {
             <SvgIcon
               size={RFPercentage(3.4)}
               name="home"
-              color={focused ? Colors.primeColor : color}
+              color={focused ? DarkColors?.primaryColor : color}
               strokeWidth="2"
             />
           ),
@@ -44,7 +46,7 @@ export default function TabLayout() {
               borderRadius={100}
               avatarImgStyle={{
                 borderWidth: 2,
-                borderColor: focused ? Colors.primeColor : color,
+                borderColor: focused ? DarkColors?.primaryColor : color,
               }}
             />
           ),

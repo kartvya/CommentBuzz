@@ -8,7 +8,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { TitleText } from "./Text";
-import { Colors } from "@/src/constants/Colors";
+import { Colors, DarkColors } from "@/src/constants/Colors";
 import { hp, wp } from "../helpers/comman";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -62,7 +62,7 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: Colors.primeColor,
+    backgroundColor: DarkColors.primaryColor,
     height: hp(6),
     justifyContent: "center",
     borderRadius: wp(3),
