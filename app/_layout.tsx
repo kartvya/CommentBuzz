@@ -52,7 +52,7 @@ const MainLayout = () => {
             },
           },
         });
-        navigation.navigate("/(tabs)/feedScreen");
+        navigation.navigate("/(drawer)/(tabs)/feedScreen");
       }
     } catch (error) {
       console.log(error);

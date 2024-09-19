@@ -100,7 +100,7 @@ export const createPostUpvote = async (postUpvote) => {
   }
 };
 
-export const deletePostUpvote = async (userId,postId) => {
+export const deletePostUpvote = async (userId, postId, postVoteCount, feedBuzzCoins) => {
     try {
         const {  error } = await supabase
             .from("postVotes")
@@ -112,6 +112,17 @@ export const deletePostUpvote = async (userId,postId) => {
             console.log(error);
             return {success:false,data:undefined,msg:"Could not delete post"}    
         }
+
+         const { error: postError } = await supabase
+      .from("posts")
+      .update({ voteCount: postVoteCount})
+      .eq("id", postId)
+      .select()
+      .single();
+    if (postError) {
+      console.log(postError);
+      return { success: false, data: undefined, msg: "Could not update vote count" };
+    }
          return {success:true,data:undefined,msg:""}
     } catch (error) {
         console.log(error);

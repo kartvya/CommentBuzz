@@ -8,14 +8,12 @@ import { Colors, DarkColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
-import { getUserImage } from "@/src/services/imageServices";
 import UserPost from "@/src/tabsScreens/UserPost";
+import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
-  FlatList,
-  Image,
   Pressable,
   StyleSheet,
   useWindowDimensions,
@@ -71,6 +69,7 @@ const renderTabBar = (props: any) => (
 );
 
 const Profile = () => {
+  const navigationDrawer = useNavigation();
   const navigation = useRouter();
   const layout = useWindowDimensions();
 
@@ -115,22 +114,34 @@ const Profile = () => {
     }
   };
 
+  const onPressDrawer = () => {
+    try {
+      //@ts-ignore
+      navigationDrawer?.openDrawer();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <ScreenWrapper bg={Colors.white}>
         <View style={styles.headerConatiner}>
           <TitleText style={{ color: DarkColors.text }}>Profile</TitleText>
-          <Pressable
-            style={[
-              styles.backIconConatiner,
-              {
-                backgroundColor: "rgba(255,0,0,0.9)",
-              },
-            ]}
-            onPress={onPressLogout}
-          >
-            <SvgIcon name={"logout"} color={DarkColors.lightBg} />
-          </Pressable>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Spacer gap={RFPercentage(0.5)} />
+            <Pressable
+              style={[styles.backIconConatiner, {}]}
+              onPress={onPressDrawer}
+            >
+              <SvgIcon
+                name={"hamburgerMenu"}
+                color={DarkColors.text}
+                strokeWidth={0.1}
+                size={20}
+              />
+            </Pressable>
+          </View>
         </View>
         <Spacer gap={RFPercentage(1)} />
         <View style={styles.avtarWithTextContainer}>

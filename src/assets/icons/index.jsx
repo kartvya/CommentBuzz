@@ -27,6 +27,9 @@ import UpArrow from "./UpArrow";
 import DownArrow from "./DownArrow";
 import SoundOn from "./SoundOn";
 import SoundOff from "./SoundOff";
+import BuzzCoin from "./BuzzCoin";
+import Cake from "./Cake";
+import HamburgerMenu from "./HamburgerMenu";
 
 const icons = {
   home: Home,
@@ -57,6 +60,9 @@ const icons = {
   downArrow: DownArrow,
   soundOn: SoundOn,
   soundOff: SoundOff,
+  buzzCoin: BuzzCoin,
+  cake: Cake,
+  hamburgerMenu: HamburgerMenu,
 };
 
 const SvgIcon = ({ name, ...props }) => {

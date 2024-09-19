@@ -69,6 +69,7 @@ const Signup = () => {
           options: {
             data: {
               name: userName,
+              buzzCoins: 0,
             },
           },
         });

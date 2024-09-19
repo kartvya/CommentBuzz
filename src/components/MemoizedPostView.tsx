@@ -20,29 +20,32 @@ import { PostData, PostVotes } from "../utility/types";
 import Avatar from "./Avatar";
 import Spacer from "./Spacer";
 import { NormalText } from "./Text";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
 import { createPostUpvote, deletePostUpvote } from "../services/postServices";
+import { USERINFO } from "../redux/actions/ActionType";
 
 const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
   React.memo(({ item, isVisible }) => {
     const navigation = useNavigation();
-
+    const dispatch = useDispatch();
+    const UserInfo = useSelector(
+      (state: RootState) => state.root?.authReducer?.userInfo
+    ) as Users;
     const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
     const [isPause, setIsPause] = useState<boolean>(isVisible);
     const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
       "none"
     );
     const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
+    const [feedBuzzCoins, setFeedBuzzCoins] = useState(UserInfo?.buzzCoins);
 
     useEffect(() => {
       const sortedData = item?.postVotes.sort(
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
-      console.log(item, "sortedDatasortedData");
-
       const currentUserVote = sortedData?.find(
         (vote) => vote?.userId === UserInfo?.id
       );
@@ -50,13 +53,12 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
         setUserVote("upvote");
       } else if (currentUserVote?.voteType === "downVote") {
         setUserVote("downvote");
+      } else {
+        setUserVote("none");
       }
       setVoteCount(item?.voteCount || 0);
-    }, [item?.postVotes]);
-
-    const UserInfo = useSelector(
-      (state: RootState) => state.root?.authReducer?.userInfo
-    ) as Users;
+      setFeedBuzzCoins(UserInfo?.buzzCoins);
+    }, [item?.postVotes, item?.voteCount]);
 
     useEffect(() => {
       const unsubscribeFocus = navigation.addListener("focus", () => {
@@ -94,6 +96,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
 
     const onPressShareImage = () => {
       try {
+        increment();
       } catch (error) {
         console.log(error);
       }
@@ -105,13 +108,36 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
         console.log(error);
       }
     };
+    let value = 0;
+    function increment() {
+      value += 0.01;
+      value = parseFloat(value.toFixed(2));
+      console.log(value);
+    }
+
+    const updateBuzzCoins = (earnedBuzz: number) => {
+      try {
+        // dispatch({
+        //   type: USERINFO,
+        //   payload: {
+        //     userInfo: {
+        //       ...UserInfo,
+        //       buzzCoins: earnedBuzz,
+        //     },
+        //   },
+        // });
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
     const onPressUpvote = async () => {
       try {
         if (userVote === "upvote") {
           setVoteCount(voteCount - 1);
           setUserVote("none");
-          await deletePostUpvote(UserInfo?.id, item?.id);
+          await deletePostUpvote(UserInfo?.id, item?.id, voteCount - 1);
+          updateBuzzCoins(item?.postBuzz ?? 0 - 0.1);
         } else if (userVote === "downvote") {
           setVoteCount(voteCount + 2);
           setUserVote("upvote");
@@ -121,6 +147,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
             postId: item?.id,
             voteCount: voteCount + 2,
           });
+          updateBuzzCoins(item?.postBuzz ?? 0 + 0.2);
         } else {
           setVoteCount(voteCount + 1);
           setUserVote("upvote");
@@ -130,6 +157,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
             postId: item?.id,
             voteCount: voteCount + 1,
           });
+          updateBuzzCoins(item?.postBuzz ?? 0 + 0.1);
         }
       } catch (error) {
         console.log(error);
@@ -141,7 +169,8 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
         if (userVote === "downvote") {
           setVoteCount(voteCount + 1);
           setUserVote("none");
-          await deletePostUpvote(UserInfo?.id, item?.id);
+          await deletePostUpvote(UserInfo?.id, item?.id, voteCount + 1);
+          updateBuzzCoins(item?.postBuzz ?? 0 + 0.1);
         } else if (userVote === "upvote") {
           setVoteCount(voteCount - 2);
           setUserVote("downvote");
@@ -151,6 +180,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
             postId: item?.id,
             voteCount: voteCount - 2,
           });
+          updateBuzzCoins(item?.postBuzz ?? 0 - 0.2);
         } else {
           setVoteCount(voteCount - 1);
           setUserVote("downvote");
@@ -160,6 +190,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
             postId: item?.id,
             voteCount: voteCount - 1,
           });
+          updateBuzzCoins(item?.postBuzz ?? 0 - 0.1);
         }
       } catch (error) {
         console.log(error);
@@ -286,6 +317,7 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
   });
 
 export default MemoizedPostView;
+
 const styles = StyleSheet.create({
   userContainer: {
     backgroundColor: DarkColors?.lightBg,

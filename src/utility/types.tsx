@@ -50,6 +50,7 @@ export interface PostData {
   userId: string;
   postVotes: PostVotes[];
   voteCount: number;
+  postBuzz: number;
 }
 
 export interface PostVotes {

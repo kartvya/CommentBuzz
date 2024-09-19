@@ -51,7 +51,6 @@ const FeedScreen = () => {
         newPost.user = res.success ? res?.data : {};
         setPosts((prevPost) => [newPost, ...prevPost]);
       }
-      console.log(payload, "payloadpayload");
     } catch (error) {
       console.log(error);
     }
@@ -82,12 +81,10 @@ const FeedScreen = () => {
     }
     limit = limit + 10;
     const res = await fetchPost(limit);
-    console.log(res.data, "asdasdasdasd");
-
     if (res.success) {
-      if (res?.data?.length === Posts?.length) {
-        setHasMore(false);
-      }
+      // if (res?.data?.length === Posts?.length) {
+      //   setHasMore(false);
+      // }
       setPosts(res.data ?? []);
     }
   };
@@ -200,7 +197,12 @@ const FeedScreen = () => {
         />
       ) : (
         <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: DarkColors?.backGround,
+          }}
         >
           <TitleText>No post yet...</TitleText>
         </View>

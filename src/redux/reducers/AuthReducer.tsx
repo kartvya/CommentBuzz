@@ -1,15 +1,20 @@
 import { LOGOUT, USERINFO } from "../actions/ActionType";
 
-interface Identity {
+interface UserIdentity {
   created_at: string;
   email: string;
   id: string;
-  identity_data: any; // Replace 'any' with the appropriate type if known
+  identity_data: Record<string, unknown>;
   identity_id: string;
   last_sign_in_at: string;
   provider: string;
   updated_at: string;
   user_id: string;
+}
+
+interface UserAppMetadata {
+  provider: string;
+  providers: string[];
 }
 
 interface UserMetadata {
@@ -19,29 +24,23 @@ interface UserMetadata {
   phone_verified: boolean;
   sub: string;
 }
-
-interface AppMetadata {
-  provider: string;
-  providers: string[];
-}
-
 export interface Users {
-  address: string | null;
-  app_metadata: AppMetadata;
+  address: string;
+  app_metadata: UserAppMetadata;
   aud: string;
-  bio: string | null;
-  collectedPoints: number | null;
+  bio: string;
+  buzzCoins: number | null;
   confirmed_at: string;
   created_at: string;
-  email: string | null;
+  email: string;
   email_confirmed_at: string;
   id: string;
-  identities: Identity[];
-  image: string | null;
+  identities: UserIdentity[];
+  image: string;
   is_anonymous: boolean;
   last_sign_in_at: string;
   name: string;
-  phonNumber: string | null;
+  phonNumber: string;
   phone: string;
   role: string;
   updated_at: string;
