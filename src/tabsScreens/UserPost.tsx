@@ -1,5 +1,11 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, ListRenderItem, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  ListRenderItem,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import MemoizedPostView from "../components/MemoizedPostView";
@@ -9,12 +15,21 @@ import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
 import { fetchOnlyUserPost } from "../services/postServices";
 import { PostData } from "../utility/types";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { RFPercentage } from "react-native-responsive-fontsize";
+import Spacer from "../components/Spacer";
+import { useRouter } from "expo-router";
+import { supabase } from "@/lib/supabase";
+import { getUserData } from "../services/userService";
+import { useIsFocused } from "@react-navigation/native";
 
 type Props = {};
 
 let limit = 10;
 
 const UserPost = forwardRef<Props>((props, ref) => {
+  const navigation = useRouter();
+  const isFocused = useIsFocused();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -22,9 +37,37 @@ const UserPost = forwardRef<Props>((props, ref) => {
   const [Posts, setPosts] = useState<PostData[]>([]);
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
 
+  const handlePost = async (payload: any) => {
+    try {
+      if (payload.eventType == "INSERT" && payload?.new?.id) {
+        let newPost = { ...payload?.new };
+        let res = await getUserData(newPost.userId);
+        newPost.user = res.success ? res?.data : {};
+        setPosts((prevPost) => [newPost, ...prevPost]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
+    let postChannel = supabase
+      .channel("posts")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "posts",
+        },
+        handlePost
+      )
+      .subscribe();
     getAllPost();
-  }, []);
+    return () => {
+      supabase.removeChannel(postChannel);
+    };
+  }, [isFocused]);
 
   const getAllPost = async () => {
     limit = limit + 10;
@@ -59,7 +102,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
         fetchAllPost={() => getAllPost()}
       />
     ),
-    [visibleIndex, Posts]
+    [visibleIndex, Posts, isFocused]
   );
 
   return (
@@ -68,7 +111,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
         <FlatList
           data={Posts}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id?.toString()}
           ItemSeparatorComponent={() => (
             <View
               style={{
@@ -95,7 +138,20 @@ const UserPost = forwardRef<Props>((props, ref) => {
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
-          <TitleText style={{ color: Colors.icon }}>No post yet...</TitleText>
+          <Pressable onPress={() => navigation.navigate("/(main)/uploadPost")}>
+            <AntDesign
+              name="pluscircleo"
+              size={RFPercentage(5)}
+              color={Colors.icon}
+            />
+          </Pressable>
+          <Spacer gap={RFPercentage(0.5)} />
+          <TitleText style={{ color: Colors.icon, textAlign: "center" }}>
+            No post yet,
+          </TitleText>
+          <TitleText style={{ color: Colors.icon, textAlign: "center" }}>
+            share your best moments...
+          </TitleText>
         </View>
       )}
     </>

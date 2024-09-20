@@ -29,6 +29,7 @@ import Avatar from "./Avatar";
 import Spacer from "./Spacer";
 import { NormalText } from "./Text";
 import PostActionModal from "./PostActionModal";
+import moment from "moment";
 
 const MemoizedPostView: React.FC<{
   item: PostData;
@@ -235,7 +236,7 @@ const MemoizedPostView: React.FC<{
       let res = await deletePost(delObj);
       if (res?.success) {
         setShowPostActionModal(false);
-        fetchAllPost;
+        fetchAllPost();
       }
     } catch (error) {
       console.log(error);
@@ -250,6 +251,9 @@ const MemoizedPostView: React.FC<{
             <Avatar uri={item?.user?.image} size={hp(5)} borderRadius={50} />
             <View style={styles.userNameContainer}>
               <NormalText>{item?.user?.name}</NormalText>
+              <NormalText style={styles.subText}>
+                {moment(item.created_at).fromNow()}
+              </NormalText>
             </View>
           </View>
           {UserInfo?.id === item?.userId && (
@@ -462,5 +466,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  subText: {
+    fontSize: RFValue(9),
   },
 });

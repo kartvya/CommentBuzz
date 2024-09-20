@@ -1,16 +1,16 @@
+import { supabase } from "@/lib/supabase";
 import MyStatusBar from "@/src/components/CustomeStatusBar";
 import FeedHeader from "@/src/components/FeedHeader";
+import Loading from "@/src/components/Loading";
 import MemoizedPostView from "@/src/components/MemoizedPostView";
 import { TitleText } from "@/src/components/Text";
-import Wrapper from "@/src/components/Wrapper";
-import { Colors, DarkColors } from "@/src/constants/Colors";
+import { DarkColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { fetchPost } from "@/src/services/postServices";
+import { getUserData } from "@/src/services/userService";
 import { PostData } from "@/src/utility/types";
+import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RootState } from "@/src/redux/Store";
-import { User } from "@supabase/supabase-js";
-import LottieView from "lottie-react-native";
 import {
   Animated,
   FlatListProps,
@@ -22,9 +22,6 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { supabase } from "@/lib/supabase";
-import { getUserData } from "@/src/services/userService";
-import Loading from "@/src/components/Loading";
 
 const AnimatedFlatList =
   Animated.createAnimatedComponent<
@@ -34,6 +31,7 @@ const AnimatedFlatList =
 let limit = 0;
 const FeedScreen = () => {
   const insets = useSafeAreaInsets();
+  const isFocused = useIsFocused();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
 
   const flatlistRef = useRef<RNFlatList>(null);
@@ -82,9 +80,17 @@ const FeedScreen = () => {
     limit = limit + 10;
     const res = await fetchPost(limit);
     if (res.success) {
-      // if (res?.data?.length === Posts?.length) {
-      //   setHasMore(false);
-      // }
+      if (res?.data?.length === Posts?.length) {
+        setHasMore(false);
+      }
+      setPosts(res.data ?? []);
+    }
+  };
+
+  const refreshPulled = async () => {
+    limit = 10;
+    const res = await fetchPost(limit);
+    if (res.success) {
       setPosts(res.data ?? []);
     }
   };
@@ -129,11 +135,11 @@ const FeedScreen = () => {
         <MemoizedPostView
           item={item}
           isVisible={index === visibleIndex}
-          fetchAllPost={() => getAllPost()}
+          fetchAllPost={() => refreshPulled()}
         />
       </>
     ),
-    [visibleIndex, Posts]
+    [visibleIndex, Posts, isFocused]
   );
 
   return (
@@ -184,7 +190,7 @@ const FeedScreen = () => {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => getAllPost()}
+              onRefresh={() => refreshPulled()}
               progressViewOffset={paddingTop}
               tintColor={DarkColors.primaryColor}
             />
