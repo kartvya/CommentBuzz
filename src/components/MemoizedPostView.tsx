@@ -27,9 +27,11 @@ import {
 import { PostData } from "../utility/types";
 import Avatar from "./Avatar";
 import Spacer from "./Spacer";
-import { NormalText } from "./Text";
+import { NormalText, TitleText } from "./Text";
 import PostActionModal from "./PostActionModal";
 import moment from "moment";
+import GlobalCenterModal from "./GlobalCenterModal";
+import Button from "./Button";
 
 const MemoizedPostView: React.FC<{
   item: PostData;
@@ -49,6 +51,7 @@ const MemoizedPostView: React.FC<{
   const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
   const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.postBuzz);
   const [postActionModal, setShowPostActionModal] = useState<boolean>(false);
+  const [deleteModal, setShowDeleteModal] = useState<boolean>(false);
 
   useEffect(() => {
     const sortedData = item?.postVotes?.sort(
@@ -235,7 +238,7 @@ const MemoizedPostView: React.FC<{
       };
       let res = await deletePost(delObj);
       if (res?.success) {
-        setShowPostActionModal(false);
+        setShowDeleteModal(false);
         fetchAllPost();
       }
     } catch (error) {
@@ -375,7 +378,41 @@ const MemoizedPostView: React.FC<{
       <PostActionModal
         isVisible={postActionModal}
         onClose={() => setShowPostActionModal(false)}
-        onPressDelete={() => onDeletePost()}
+        onPressDelete={() => {
+          setShowDeleteModal(true), setShowPostActionModal(false);
+        }}
+      />
+
+      <GlobalCenterModal
+        isVisible={deleteModal}
+        childern={
+          <View
+            style={{
+              backgroundColor: DarkColors.text,
+              borderRadius: 10,
+              padding: RFPercentage(1),
+              paddingHorizontal: RFPercentage(2),
+            }}
+          >
+            <TitleText style={{ color: Colors.text }}>
+              Are you sure want to delete this post?
+            </TitleText>
+            <Spacer gap={RFPercentage(1)} />
+            <View style={styles.avtarTitleConatiner}>
+              <Button
+                title="No"
+                onPress={() => setShowDeleteModal(false)}
+                btnStyle={{ flex: 1, backgroundColor: DarkColors.lightBg }}
+              />
+              <Spacer gap={RFPercentage(0.5)} />
+              <Button
+                title="Yes"
+                onPress={() => onDeletePost()}
+                btnStyle={{ flex: 1, backgroundColor: DarkColors.primaryColor }}
+              />
+            </View>
+          </View>
+        }
       />
     </>
   );

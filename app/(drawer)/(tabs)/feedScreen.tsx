@@ -74,16 +74,18 @@ const FeedScreen = () => {
   }, []);
 
   const getAllPost = async () => {
-    if (!hasMore) {
-      return null;
-    }
     limit = limit + 10;
     const res = await fetchPost(limit);
     if (res.success) {
-      if (res?.data?.length === Posts?.length) {
+      if (res?.data?.length > 0 && res?.data?.length <= 10) {
         setHasMore(false);
+        setPosts(res.data ?? []);
+      } else {
+        if (res?.data?.length === Posts?.length) {
+          setHasMore(false);
+        }
+        setPosts(res.data ?? []);
       }
-      setPosts(res.data ?? []);
     }
   };
 

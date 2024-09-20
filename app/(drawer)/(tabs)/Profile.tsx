@@ -8,6 +8,8 @@ import { Colors, DarkColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
+import UserAbout from "@/src/tabsScreens/UserAbout";
+import UserComments from "@/src/tabsScreens/UserComments";
 import UserPost from "@/src/tabsScreens/UserPost";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -30,16 +32,8 @@ interface Routes {
 
 const renderScene = SceneMap({
   first: () => <UserPost />,
-  second: () => (
-    <View>
-      <NormalText>Comments</NormalText>
-    </View>
-  ),
-  third: () => (
-    <View>
-      <NormalText>About</NormalText>
-    </View>
-  ),
+  second: () => <UserComments />,
+  third: () => <UserAbout />,
 });
 
 const renderTabBar = (props: any) => (

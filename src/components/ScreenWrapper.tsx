@@ -9,12 +9,14 @@ interface ScreenWrapperProps {
   children: ReactNode;
   bg?: string;
   conatinerStyle?: ViewStyle;
+  statusBarColor?: string;
 }
 
 const ScreenWrapper = ({
   children,
   bg,
   conatinerStyle,
+  statusBarColor,
 }: ScreenWrapperProps) => {
   const insets = useSafeAreaInsets();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
@@ -22,7 +24,7 @@ const ScreenWrapper = ({
   return (
     <>
       <MyStatusBar
-        backgroundColor={DarkColors.lightBg}
+        backgroundColor={statusBarColor ? statusBarColor : DarkColors.lightBg}
         barStyle="light-content"
       />
       <View

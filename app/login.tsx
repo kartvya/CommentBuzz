@@ -64,8 +64,8 @@ const Login = () => {
   };
   return (
     <ScreenWrapper
-      bg={Colors.white}
       conatinerStyle={{ paddingHorizontal: wp(4) }}
+      statusBarColor={DarkColors?.backGround}
     >
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}

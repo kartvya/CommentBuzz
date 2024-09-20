@@ -19,12 +19,16 @@ import {
 } from "../redux/reducers/AuthReducer";
 import moment from "moment";
 import { supabase } from "@/lib/supabase";
-import React from "react";
+import React, { useState } from "react";
+import GlobalCenterModal from "./GlobalCenterModal";
+import Button from "./Button";
 
 const CustomDrawer = (props: any) => {
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
+
+  const [logoutModal, setLogoutModal] = useState(false);
 
   const formatedDate = (time: string) => {
     const givenDate = moment(time);
@@ -77,6 +81,7 @@ const CustomDrawer = (props: any) => {
           "Something went wrong. Please try again. leater"
         );
       }
+      setLogoutModal(false);
     } catch (error) {
       console.log(error);
     }
@@ -120,7 +125,7 @@ const CustomDrawer = (props: any) => {
           }}
         />
         <TouchableHighlight
-          onPress={onPressLogout}
+          onPress={() => setLogoutModal(true)}
           style={styles.listConatiner}
           underlayColor={DarkColors.votesBg}
         >
@@ -134,6 +139,44 @@ const CustomDrawer = (props: any) => {
           </React.Fragment>
         </TouchableHighlight>
       </View>
+
+      <GlobalCenterModal
+        isVisible={logoutModal}
+        childern={
+          <View
+            style={{
+              backgroundColor: DarkColors.text,
+              borderRadius: 10,
+              padding: RFPercentage(1),
+              paddingHorizontal: RFPercentage(2),
+            }}
+          >
+            <TitleText style={{ color: Colors.text }}>
+              Are you sure want to log out?
+            </TitleText>
+            <Spacer gap={RFPercentage(1)} />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Button
+                title="No"
+                onPress={() => setLogoutModal(false)}
+                btnStyle={{ flex: 1, backgroundColor: DarkColors.lightBg }}
+              />
+              <Spacer gap={RFPercentage(0.5)} />
+              <Button
+                title="Yes"
+                onPress={onLogoutYesBTN}
+                btnStyle={{ flex: 1, backgroundColor: DarkColors.primaryColor }}
+              />
+            </View>
+          </View>
+        }
+      />
     </>
   );
 };

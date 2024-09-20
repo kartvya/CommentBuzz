@@ -22,6 +22,7 @@ import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { getUserData } from "../services/userService";
 import { useIsFocused } from "@react-navigation/native";
+import Loading from "../components/Loading";
 
 type Props = {};
 
@@ -36,6 +37,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
   const [refreshing, setRefreshing] = useState(false);
   const [Posts, setPosts] = useState<PostData[]>([]);
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
+  const [hasMore, setHasMore] = useState(true);
 
   const handlePost = async (payload: any) => {
     try {
@@ -73,6 +75,22 @@ const UserPost = forwardRef<Props>((props, ref) => {
     limit = limit + 10;
     const res = await fetchOnlyUserPost(limit, UserInfo?.id);
     if (res.success) {
+      if (res?.data?.length > 0 && res?.data?.length <= 10) {
+        setHasMore(false);
+        setPosts(res.data ?? []);
+      } else {
+        if (res?.data?.length === Posts?.length) {
+          setHasMore(false);
+        }
+        setPosts(res.data ?? []);
+      }
+    }
+  };
+
+  const refreshPulled = async () => {
+    limit = 10;
+    const res = await fetchOnlyUserPost(limit, UserInfo?.id);
+    if (res.success) {
       setPosts(res.data ?? []);
     }
   };
@@ -99,7 +117,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
       <MemoizedPostView
         item={item}
         isVisible={index === visibleIndex}
-        fetchAllPost={() => getAllPost()}
+        fetchAllPost={() => refreshPulled()}
       />
     ),
     [visibleIndex, Posts, isFocused]
@@ -129,9 +147,16 @@ const UserPost = forwardRef<Props>((props, ref) => {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => getAllPost()}
+              onRefresh={() => refreshPulled()}
               tintColor={DarkColors.primaryColor}
             />
+          }
+          ListFooterComponent={() =>
+            hasMore ? (
+              <View style={{ marginVertical: RFPercentage(2) }}>
+                <Loading />
+              </View>
+            ) : null
           }
         />
       ) : (

@@ -84,7 +84,7 @@ const Signup = () => {
 
   return (
     <ScreenWrapper
-      bg={Colors.white}
+      statusBarColor={DarkColors?.backGround}
       conatinerStyle={{ paddingHorizontal: wp(4) }}
     >
       <KeyboardAwareScrollView
