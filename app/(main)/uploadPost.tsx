@@ -1,3 +1,14 @@
+import SvgIcon from "@/src/assets/icons";
+import Avatar from "@/src/components/Avatar";
+import Header from "@/src/components/Header";
+import ScreenWrapper from "@/src/components/ScreenWrapper";
+import Spacer from "@/src/components/Spacer";
+import { NormalText } from "@/src/components/Text";
+import { Colors, DarkColors } from "@/src/constants/Colors";
+import { hp, wp } from "@/src/helpers/comman";
+import { RootState } from "@/src/redux/Store";
+import { Users } from "@/src/redux/reducers/AuthReducer";
+import { useCallback, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -5,32 +16,20 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
-import React, { useCallback, useState } from "react";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
-import { Colors, DarkColors } from "@/src/constants/Colors";
-import Header from "@/src/components/Header";
-import Avatar from "@/src/components/Avatar";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import SvgIcon from "@/src/assets/icons";
-import { useSelector } from "react-redux";
-import { RootState } from "@/src/redux/Store";
-import { Users } from "@/src/redux/reducers/AuthReducer";
-import { NormalText } from "@/src/components/Text";
-import { hp, wp } from "@/src/helpers/comman";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Spacer from "@/src/components/Spacer";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { useSelector } from "react-redux";
 
-import { MentionInput } from "react-native-controlled-mentions";
 import Button from "@/src/components/Button";
-import * as ImagePicker from "expo-image-picker";
-import { Image } from "expo-image";
 import { getSupaBaseFileUrl } from "@/src/services/imageServices";
 import { ResizeMode, Video } from "expo-av";
-import { createOrUpdatePost } from "../../src/services/postServices";
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
+import { MentionInput } from "react-native-controlled-mentions";
+import { createOrUpdatePost } from "../../src/services/postServices";
 
 export interface Person {
   id: number;
@@ -170,14 +169,14 @@ const UploadPost = () => {
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [4, 5],
-          quality: 0.7,
+          quality: 0.5,
         });
       } else {
         var result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Videos,
           allowsEditing: true,
           aspect: [4, 5],
-          quality: 0.7,
+          quality: 0.5,
         });
       }
 

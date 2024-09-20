@@ -71,7 +71,7 @@ const FeedScreen = () => {
     return () => {
       supabase.removeChannel(postChannel);
     };
-  }, []);
+  }, [isFocused]);
 
   const getAllPost = async () => {
     limit = limit + 10;

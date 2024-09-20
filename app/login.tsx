@@ -21,6 +21,7 @@ const Login = () => {
   const [passwordError, serPasswordErrorr] = useState<string>("");
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showPass, sehShowPass] = useState<boolean>(false);
+  const [globalError, setGlobalError] = useState<string>("");
 
   const onLogin = async () => {
     try {
@@ -53,8 +54,9 @@ const Login = () => {
         setLoading(false);
         Keyboard.dismiss();
         if (error) {
-          Alert.alert(error.message);
+          setGlobalError(error.message);
         } else {
+          setGlobalError("");
           navigation.navigate("/(tabs)/feedScreen");
         }
       }
@@ -70,6 +72,9 @@ const Login = () => {
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps={"always"}
+        enableOnAndroid
+        extraScrollHeight={20}
+        extraHeight={20}
       >
         <Pressable
           style={styles.backIconConatiner}
@@ -129,6 +134,7 @@ const Login = () => {
           onPress={() => onLogin()}
           isLoading={isLoading}
         />
+        <NormalText style={styles.errorText}>{globalError}</NormalText>
         <Spacer gap={wp(3)} />
         <View style={styles.alreadyAccount}>
           <NormalText>Don't have an account</NormalText>
@@ -181,5 +187,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  errorText: {
+    color: Colors.red,
+    fontSize: RFValue(10),
   },
 });

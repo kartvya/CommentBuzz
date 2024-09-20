@@ -24,6 +24,7 @@ const Signup = () => {
   const [userNameError, setUserNameError] = useState<string>("");
   const [passwordError, serPasswordErrorr] = useState<string>("");
   const [showPass, sehShowPass] = useState<boolean>(false);
+  const [globalError, setGlobalError] = useState<string>("");
 
   const onSignUp = async () => {
     try {
@@ -73,6 +74,11 @@ const Signup = () => {
             },
           },
         });
+        if (error) {
+          setGlobalError(error?.message);
+        } else {
+          setGlobalError("");
+        }
         setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -90,6 +96,9 @@ const Signup = () => {
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps={"always"}
+        enableOnAndroid
+        extraScrollHeight={20}
+        extraHeight={20}
       >
         <Pressable
           style={styles.backIconConatiner}
@@ -144,6 +153,7 @@ const Signup = () => {
           onPress={() => onSignUp()}
           isLoading={isLoading}
         />
+        <NormalText style={styles.errorText}>{globalError}</NormalText>
         <Spacer gap={wp(3)} />
         <View style={styles.alreadyAccount}>
           <NormalText>Already have an account</NormalText>
@@ -193,5 +203,9 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     textAlign: "right",
+  },
+  errorText: {
+    color: Colors.red,
+    fontSize: RFValue(10),
   },
 });

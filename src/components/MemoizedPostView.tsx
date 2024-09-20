@@ -265,7 +265,7 @@ const MemoizedPostView: React.FC<{
             </Pressable>
           )}
         </View>
-        {item.body && (
+        {item.body ? (
           <View>
             <ParsedText
               style={styles.descriptionText}
@@ -282,6 +282,8 @@ const MemoizedPostView: React.FC<{
               {item?.body}
             </ParsedText>
           </View>
+        ) : (
+          <Spacer gap={RFPercentage(0.8)} />
         )}
         <View>
           {item?.files && item?.files?.includes("postImages") && (
@@ -320,7 +322,6 @@ const MemoizedPostView: React.FC<{
         <View style={styles.footerConatiner}>
           <View style={[styles.flex]}>
             <View style={styles.upvoteConatiner}>
-              {/* Upvote button */}
               <TouchableOpacity style={styles.flex} onPress={onPressUpvote}>
                 <SvgIcon
                   name={"upArrow"}
@@ -338,9 +339,10 @@ const MemoizedPostView: React.FC<{
               </TouchableOpacity>
 
               <View style={styles.smallVerticalLine} />
-
-              {/* Downvote button */}
-              <Pressable onPress={onPressDownVote}>
+              <Pressable
+                onPress={onPressDownVote}
+                style={{ marginLeft: RFPercentage(0.4) }}
+              >
                 <SvgIcon
                   name={"downArrow"}
                   size={25}
@@ -471,7 +473,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderColor: Colors.icon,
     paddingHorizontal: RFPercentage(0.5),
-    height: RFPercentage(3.3),
+    height: RFPercentage(3.6),
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
