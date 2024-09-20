@@ -13,197 +13,250 @@ import {
 import { replaceMentionValues } from "react-native-controlled-mentions";
 import ParsedText from "react-native-parsed-text";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { useDispatch, useSelector } from "react-redux";
 import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
+import { RootState } from "../redux/Store";
+import { Users } from "../redux/reducers/AuthReducer";
 import { getSupaBaseFileUrl } from "../services/imageServices";
-import { PostData, PostVotes } from "../utility/types";
+import {
+  createPostUpvote,
+  deletePost,
+  deletePostUpvote,
+} from "../services/postServices";
+import { PostData } from "../utility/types";
 import Avatar from "./Avatar";
 import Spacer from "./Spacer";
 import { NormalText } from "./Text";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/Store";
-import { Users } from "../redux/reducers/AuthReducer";
-import { createPostUpvote, deletePostUpvote } from "../services/postServices";
-import { USERINFO } from "../redux/actions/ActionType";
+import PostActionModal from "./PostActionModal";
 
-const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
-  React.memo(({ item, isVisible }) => {
-    const navigation = useNavigation();
-    const dispatch = useDispatch();
-    const UserInfo = useSelector(
-      (state: RootState) => state.root?.authReducer?.userInfo
-    ) as Users;
-    const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
-    const [isPause, setIsPause] = useState<boolean>(isVisible);
-    const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
-      "none"
+const MemoizedPostView: React.FC<{
+  item: PostData;
+  isVisible: boolean;
+  fetchAllPost: () => void;
+}> = React.memo(({ item, isVisible, fetchAllPost }) => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const UserInfo = useSelector(
+    (state: RootState) => state.root?.authReducer?.userInfo
+  ) as Users;
+  const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
+  const [isPause, setIsPause] = useState<boolean>(isVisible);
+  const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
+    "none"
+  );
+  const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
+  const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.postBuzz);
+  const [postActionModal, setShowPostActionModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const sortedData = item?.postVotes?.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-    const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
-    const [feedBuzzCoins, setFeedBuzzCoins] = useState(UserInfo?.buzzCoins);
-
-    useEffect(() => {
-      const sortedData = item?.postVotes.sort(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-      const currentUserVote = sortedData?.find(
-        (vote) => vote?.userId === UserInfo?.id
-      );
-      if (currentUserVote?.voteType === "upVote") {
-        setUserVote("upvote");
-      } else if (currentUserVote?.voteType === "downVote") {
-        setUserVote("downvote");
-      } else {
-        setUserVote("none");
-      }
-      setVoteCount(item?.voteCount || 0);
-      setFeedBuzzCoins(UserInfo?.buzzCoins);
-    }, [item?.postVotes, item?.voteCount]);
-
-    useEffect(() => {
-      const unsubscribeFocus = navigation.addListener("focus", () => {
-        setIsPause(false);
-      });
-
-      const unsubscribeBlur = navigation.addListener("blur", () => {
-        setIsPause(true);
-      });
-
-      return () => {
-        unsubscribeFocus();
-        unsubscribeBlur();
-      };
-    }, [navigation]);
-
-    const renderText = (matchingString: string, matches: string[]) => {
-      return replaceMentionValues(matchingString, ({ name }) => `${name}`);
-    };
-
-    const handleNamePress = (name: string, matchIndex: number) => {
-      const input = "@ ";
-      const match = name.match(/@\[(.*?)\]/);
-
-      if (match && match.length > 1) {
-        const extractedText = match[1];
-        ToastAndroid.show(
-          `${extractedText} has been tagged to this post!`,
-          ToastAndroid.SHORT
-        );
-      } else {
-        console.log("No match found or invalid input format.");
-      }
-    };
-
-    const onPressShareImage = () => {
-      try {
-        increment();
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const onPressComment = () => {
-      try {
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    let value = 0;
-    function increment() {
-      value += 0.01;
-      value = parseFloat(value.toFixed(2));
-      console.log(value);
+    const currentUserVote = sortedData?.find(
+      (vote) => vote?.userId === UserInfo?.id
+    );
+    if (currentUserVote?.voteType === "upVote") {
+      setUserVote("upvote");
+    } else if (currentUserVote?.voteType === "downVote") {
+      setUserVote("downvote");
+    } else {
+      setUserVote("none");
     }
+    setVoteCount(item?.voteCount || 0);
+    setFeedBuzzCoins(item?.postBuzz);
+  }, [item?.postVotes, item?.voteCount]);
 
-    const updateBuzzCoins = (earnedBuzz: number) => {
-      try {
-        // dispatch({
-        //   type: USERINFO,
-        //   payload: {
-        //     userInfo: {
-        //       ...UserInfo,
-        //       buzzCoins: earnedBuzz,
-        //     },
-        //   },
-        // });
-      } catch (error) {
-        console.log(error);
-      }
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", () => {
+      setIsPause(false);
+    });
+
+    const unsubscribeBlur = navigation.addListener("blur", () => {
+      setIsPause(true);
+    });
+
+    return () => {
+      unsubscribeFocus();
+      unsubscribeBlur();
     };
+  }, [navigation]);
 
-    const onPressUpvote = async () => {
-      try {
-        if (userVote === "upvote") {
-          setVoteCount(voteCount - 1);
-          setUserVote("none");
-          await deletePostUpvote(UserInfo?.id, item?.id, voteCount - 1);
-          updateBuzzCoins(item?.postBuzz ?? 0 - 0.1);
-        } else if (userVote === "downvote") {
-          setVoteCount(voteCount + 2);
-          setUserVote("upvote");
-          await createPostUpvote({
-            voteType: "upVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount + 2,
-          });
-          updateBuzzCoins(item?.postBuzz ?? 0 + 0.2);
-        } else {
-          setVoteCount(voteCount + 1);
-          setUserVote("upvote");
-          await createPostUpvote({
-            voteType: "upVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount + 1,
-          });
-          updateBuzzCoins(item?.postBuzz ?? 0 + 0.1);
-        }
-      } catch (error) {
-        console.log(error);
+  const renderText = (matchingString: string, matches: string[]) => {
+    return replaceMentionValues(matchingString, ({ name }) => `${name}`);
+  };
+
+  const handleNamePress = (name: string, matchIndex: number) => {
+    const input = "@ ";
+    const match = name.match(/@\[(.*?)\]/);
+
+    if (match && match.length > 1) {
+      const extractedText = match[1];
+      ToastAndroid.show(
+        `${extractedText} has been tagged to this post!`,
+        ToastAndroid.SHORT
+      );
+    } else {
+      console.log("No match found or invalid input format.");
+    }
+  };
+
+  const onPressShareImage = () => {
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onPressComment = () => {
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /* Math function that calculates buzzcoins based on post upvotes and downvotes */
+  function buzzCoinMathFunction(
+    type: "decreaseone" | "decreasetwo" | "increasetwo" | "increaseone"
+  ) {
+    let coin = feedBuzzCoins ?? 0;
+    if (UserInfo?.id !== item?.userId) {
+      if (type === "decreaseone") {
+        coin -= 0.01;
+        coin = parseFloat(coin.toFixed(2));
+        setFeedBuzzCoins(coin);
+        return coin;
+      } else if (type === "increasetwo") {
+        coin += 0.02;
+        coin = parseFloat(coin.toFixed(2));
+        setFeedBuzzCoins(coin);
+        return coin;
+      } else if (type === "decreasetwo") {
+        coin -= 0.02;
+        coin = parseFloat(coin.toFixed(2));
+        setFeedBuzzCoins(coin);
+        return coin;
+      } else {
+        coin += 0.01;
+        coin = parseFloat(coin.toFixed(2));
+        setFeedBuzzCoins(coin);
+        return coin;
       }
-    };
+    } else {
+      return item?.postBuzz;
+    }
+  }
 
-    const onPressDownVote = async () => {
-      try {
-        if (userVote === "downvote") {
-          setVoteCount(voteCount + 1);
-          setUserVote("none");
-          await deletePostUpvote(UserInfo?.id, item?.id, voteCount + 1);
-          updateBuzzCoins(item?.postBuzz ?? 0 + 0.1);
-        } else if (userVote === "upvote") {
-          setVoteCount(voteCount - 2);
-          setUserVote("downvote");
-          await createPostUpvote({
-            voteType: "downVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount - 2,
-          });
-          updateBuzzCoins(item?.postBuzz ?? 0 - 0.2);
-        } else {
-          setVoteCount(voteCount - 1);
-          setUserVote("downvote");
-          await createPostUpvote({
-            voteType: "downVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount - 1,
-          });
-          updateBuzzCoins(item?.postBuzz ?? 0 - 0.1);
-        }
-      } catch (error) {
-        console.log(error);
+  /* Upvote function */
+  const onPressUpvote = async () => {
+    try {
+      if (userVote === "upvote") {
+        setVoteCount(voteCount - 1);
+        setUserVote("none");
+        const delObj = {
+          userId: UserInfo?.id,
+          postId: item?.id,
+          voteCount: voteCount - 1,
+          feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
+        };
+        await deletePostUpvote(delObj);
+      } else if (userVote === "downvote") {
+        setVoteCount(voteCount + 2);
+        setUserVote("upvote");
+        await createPostUpvote({
+          voteType: "upVote",
+          userId: UserInfo?.id,
+          postId: item?.id,
+          voteCount: voteCount + 2,
+          feedBuzzCoins: buzzCoinMathFunction("increasetwo"),
+        });
+      } else {
+        setVoteCount(voteCount + 1);
+        setUserVote("upvote");
+        await createPostUpvote({
+          voteType: "upVote",
+          userId: UserInfo?.id,
+          postId: item?.id,
+          voteCount: voteCount + 1,
+          feedBuzzCoins: buzzCoinMathFunction("increaseone"),
+        });
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    return (
+  /* Downvote function */
+  const onPressDownVote = async () => {
+    try {
+      if (userVote === "downvote") {
+        setVoteCount(voteCount + 1);
+        setUserVote("none");
+        const delObj = {
+          userId: UserInfo?.id,
+          postId: item?.id,
+          voteCount: voteCount + 1,
+          feedBuzzCoins: buzzCoinMathFunction("increaseone"),
+        };
+        await deletePostUpvote(delObj);
+      } else if (userVote === "upvote") {
+        setVoteCount(voteCount - 2);
+        setUserVote("downvote");
+        await createPostUpvote({
+          voteType: "downVote",
+          userId: UserInfo?.id,
+          postId: item?.id,
+          voteCount: voteCount - 2,
+          feedBuzzCoins: buzzCoinMathFunction("decreasetwo"),
+        });
+      } else {
+        setVoteCount(voteCount - 1);
+        setUserVote("downvote");
+        await createPostUpvote({
+          voteType: "downVote",
+          userId: UserInfo?.id,
+          postId: item?.id,
+          voteCount: voteCount - 1,
+          feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onDeletePost = async () => {
+    try {
+      const delObj = {
+        userId: UserInfo?.id,
+        postId: item?.id,
+      };
+      let res = await deletePost(delObj);
+      if (res?.success) {
+        setShowPostActionModal(false);
+        fetchAllPost;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <>
       <View style={styles.userContainer}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Avatar uri={item?.user?.image} size={hp(5)} borderRadius={50} />
-          <View style={styles.userNameContainer}>
-            <NormalText>{item?.user?.name}</NormalText>
+        <View style={styles.avtarTitleConatiner}>
+          <View style={styles.avtarTitleConatiner}>
+            <Avatar uri={item?.user?.image} size={hp(5)} borderRadius={50} />
+            <View style={styles.userNameContainer}>
+              <NormalText>{item?.user?.name}</NormalText>
+            </View>
           </View>
+          {UserInfo?.id === item?.userId && (
+            <Pressable onPress={() => setShowPostActionModal(true)}>
+              <SvgIcon name={"postMore"} color={DarkColors?.text} />
+            </Pressable>
+          )}
         </View>
         {item.body && (
           <View>
@@ -313,8 +366,16 @@ const MemoizedPostView: React.FC<{ item: PostData; isVisible: boolean }> =
           </Pressable>
         </View>
       </View>
-    );
-  });
+
+      {/* Post action modal */}
+      <PostActionModal
+        isVisible={postActionModal}
+        onClose={() => setShowPostActionModal(false)}
+        onPressDelete={() => onDeletePost()}
+      />
+    </>
+  );
+});
 
 export default MemoizedPostView;
 
@@ -396,5 +457,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 5,
     borderRadius: 100,
+  },
+  avtarTitleConatiner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

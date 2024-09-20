@@ -24,6 +24,13 @@ interface UserMetadata {
   phone_verified: boolean;
   sub: string;
 }
+
+export interface postDataAssociatedWithUser {
+  reduce: any;
+  created_at: string;
+  id: number;
+  postBuzz: number;
+}
 export interface Users {
   address: string;
   app_metadata: UserAppMetadata;
@@ -45,6 +52,7 @@ export interface Users {
   role: string;
   updated_at: string;
   user_metadata: UserMetadata;
+  posts: postDataAssociatedWithUser;
 }
 
 export interface AuthState {

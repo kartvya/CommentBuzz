@@ -4,7 +4,12 @@ export const getUserData = async (userId: string) => {
   try {
     const { data, error } = await supabase
       .from("users")
-      .select()
+      .select(
+        `
+        *, 
+        posts(id, postBuzz, created_at) 
+        `
+      )
       .eq("id", userId)
       .single();
     if (error) {
@@ -17,19 +22,19 @@ export const getUserData = async (userId: string) => {
   }
 };
 
-export const updateUser = async (userId:string,data:any) => {
+export const updateUser = async (userId: string, data: any) => {
   try {
     const { error } = await supabase
-        .from("users")
-        .update(data)
-        .eq("id", userId);
-        if (error) {
-          console.log(error);
-          return { success: false,data:undefined, msg: error };      
-        } 
-        return { success: true, data:data, msg: "" };      
+      .from("users")
+      .update(data)
+      .eq("id", userId);
+    if (error) {
+      console.log(error);
+      return { success: false, data: undefined, msg: error };
+    }
+    return { success: true, data: data, msg: "" };
   } catch (error) {
     console.log(error);
-    return { success: false,data:undefined, msg: error };
+    return { success: false, data: undefined, msg: error };
   }
-}
+};

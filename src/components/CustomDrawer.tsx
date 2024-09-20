@@ -13,7 +13,10 @@ import Spacer from "./Spacer";
 import { NormalText, TitleText } from "./Text";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
-import { Users } from "../redux/reducers/AuthReducer";
+import {
+  postDataAssociatedWithUser,
+  Users,
+} from "../redux/reducers/AuthReducer";
 import moment from "moment";
 import { supabase } from "@/lib/supabase";
 import React from "react";
@@ -32,17 +35,22 @@ const CustomDrawer = (props: any) => {
     givenDate.add(months, "months");
     let days = currentDate.diff(givenDate, "days");
     let formattedDuration = "";
-    if (months === 0 && years === 0) {
+    if (days === 0) {
+      formattedDuration = `Newbie`;
+    } else if (months === 0 && years === 0) {
       formattedDuration = `${days}d`;
     } else if (years === 0) {
       formattedDuration = `${months}m ${days}d`;
-    } else if (days === 0) {
-      formattedDuration = `Newbie`;
     } else {
       formattedDuration = `${years}y ${months}m`;
     }
     return formattedDuration;
   };
+
+  const postBuzz = UserInfo?.posts?.reduce(
+    (acc: number, post: postDataAssociatedWithUser) => acc + post.postBuzz,
+    0
+  );
 
   const onPressLogout = () => {
     try {
@@ -86,9 +94,7 @@ const CustomDrawer = (props: any) => {
             <SvgIcon name={"buzzCoin"} color={DarkColors.text} size={30} />
             <Spacer gap={RFPercentage(0.5)} />
             <View>
-              <TitleText style={styles.coinsValueStyle}>
-                {UserInfo?.buzzCoins ? UserInfo?.buzzCoins : 0}
-              </TitleText>
+              <TitleText style={styles.coinsValueStyle}>{postBuzz}</TitleText>
               <NormalText style={styles.coinsTitleText}>Buzzcoins</NormalText>
             </View>
           </View>

@@ -126,7 +126,11 @@ const FeedScreen = () => {
   const renderItem: ListRenderItem<PostData> = useCallback(
     ({ item, index }) => (
       <>
-        <MemoizedPostView item={item} isVisible={index === visibleIndex} />
+        <MemoizedPostView
+          item={item}
+          isVisible={index === visibleIndex}
+          fetchAllPost={() => getAllPost()}
+        />
       </>
     ),
     [visibleIndex, Posts]

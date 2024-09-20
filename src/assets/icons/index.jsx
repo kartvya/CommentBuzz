@@ -30,6 +30,7 @@ import SoundOff from "./SoundOff";
 import BuzzCoin from "./BuzzCoin";
 import Cake from "./Cake";
 import HamburgerMenu from "./HamburgerMenu";
+import PostMore from "./PostMore";
 
 const icons = {
   home: Home,
@@ -63,6 +64,7 @@ const icons = {
   buzzCoin: BuzzCoin,
   cake: Cake,
   hamburgerMenu: HamburgerMenu,
+  postMore: PostMore,
 };
 
 const SvgIcon = ({ name, ...props }) => {
