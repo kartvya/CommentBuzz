@@ -377,13 +377,16 @@ const MemoizedPostView: React.FC<{
       </View>
 
       {/* Post action modal */}
-      <PostActionModal
-        isVisible={postActionModal}
-        onClose={() => setShowPostActionModal(false)}
-        onPressDelete={() => {
-          setShowDeleteModal(true), setShowPostActionModal(false);
-        }}
-      />
+      {!deleteModal && (
+        <PostActionModal
+          isVisible={postActionModal}
+          onClose={() => setShowPostActionModal(false)}
+          onPressDelete={() => {
+            setShowPostActionModal(false);
+            setShowDeleteModal(true);
+          }}
+        />
+      )}
 
       <GlobalCenterModal
         isVisible={deleteModal}

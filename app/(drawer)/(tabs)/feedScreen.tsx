@@ -15,6 +15,7 @@ import {
   Animated,
   FlatListProps,
   ListRenderItem,
+  Platform,
   FlatList as RNFlatList,
   StyleSheet,
   View,
@@ -33,7 +34,7 @@ const FeedScreen = () => {
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
-
+  const paddingBottom = insets.bottom + 65;
   const flatlistRef = useRef<RNFlatList>(null);
   const [scrollY] = useState(new Animated.Value(0));
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
@@ -43,14 +44,60 @@ const FeedScreen = () => {
 
   const handlePost = async (payload: any) => {
     try {
-      if (payload.eventType == "INSERT" && payload?.new?.id) {
+      console.log("Payload received:", payload);
+
+      if (payload.eventType === "INSERT" && payload?.new?.id) {
         let newPost = { ...payload?.new };
+
+        // Fetch user data
         let res = await getUserData(newPost.userId);
         newPost.user = res.success ? res?.data : {};
-        setPosts((prevPost) => [newPost, ...prevPost]);
+
+        // Check and update state
+        setPosts((prevPosts) => {
+          const postExists = prevPosts.some((post) => post.id === newPost.id);
+          console.log(postExists, "postExists");
+
+          if (postExists) {
+            // Post already exists, check if update is required
+            const updatedPosts = prevPosts.map((post) =>
+              post.id === newPost.id ? newPost : post
+            );
+            return updatedPosts;
+          }
+
+          // Add new post to state
+          return [newPost, ...prevPosts];
+        });
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error in handlePost:", error);
+    }
+  };
+
+  const getAllPost = async () => {
+    limit = limit + 10;
+    const res = await fetchPost(limit);
+    if (res.success) {
+      const postsData = res.data ?? [];
+
+      if (postsData.length > 0 && postsData.length <= 10) {
+        setHasMore(false);
+        // Remove duplicates if needed
+        setPosts((prevPosts) => {
+          const uniquePosts = [
+            ...new Map(
+              [...prevPosts, ...postsData].map((post) => [post.id, post])
+            ).values(),
+          ];
+          return uniquePosts;
+        });
+      } else {
+        if (postsData.length === Posts.length) {
+          setHasMore(false);
+        }
+        setPosts(postsData);
+      }
     }
   };
 
@@ -67,27 +114,14 @@ const FeedScreen = () => {
         handlePost
       )
       .subscribe();
-    getAllPost();
     return () => {
       supabase.removeChannel(postChannel);
     };
   }, [isFocused]);
 
-  const getAllPost = async () => {
-    limit = limit + 10;
-    const res = await fetchPost(limit);
-    if (res.success) {
-      if (res?.data?.length > 0 && res?.data?.length <= 10) {
-        setHasMore(false);
-        setPosts(res.data ?? []);
-      } else {
-        if (res?.data?.length === Posts?.length) {
-          setHasMore(false);
-        }
-        setPosts(res.data ?? []);
-      }
-    }
-  };
+  useEffect(() => {
+    getAllPost();
+  }, [isFocused]);
 
   const refreshPulled = async () => {
     limit = 10;
@@ -186,8 +220,9 @@ const FeedScreen = () => {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={{
-            paddingTop: paddingTop,
-            paddingVertical: RFPercentage(1),
+            paddingTop:
+              Platform.OS === "android" ? paddingTop + 30 : paddingTop,
+            paddingBottom: paddingBottom,
           }}
           refreshControl={
             <RefreshControl

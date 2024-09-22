@@ -31,7 +31,7 @@ import BuzzCoin from "./BuzzCoin";
 import Cake from "./Cake";
 import HamburgerMenu from "./HamburgerMenu";
 import PostMore from "./PostMore";
-
+import Refer from './Refer'
 const icons = {
   home: Home,
   mail: Mail,
@@ -65,6 +65,7 @@ const icons = {
   cake: Cake,
   hamburgerMenu: HamburgerMenu,
   postMore: PostMore,
+  refer:Refer
 };
 
 const SvgIcon = ({ name, ...props }) => {

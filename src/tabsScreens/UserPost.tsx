@@ -23,6 +23,7 @@ import { supabase } from "@/lib/supabase";
 import { getUserData } from "../services/userService";
 import { useIsFocused } from "@react-navigation/native";
 import Loading from "../components/Loading";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {};
 
@@ -31,6 +32,8 @@ let limit = 10;
 const UserPost = forwardRef<Props>((props, ref) => {
   const navigation = useRouter();
   const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
+  const paddingBottom = insets.bottom + 65;
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -41,11 +44,16 @@ const UserPost = forwardRef<Props>((props, ref) => {
 
   const handlePost = async (payload: any) => {
     try {
-      if (payload.eventType == "INSERT" && payload?.new?.id) {
+      if (payload.eventType === "INSERT" && payload?.new?.id) {
         let newPost = { ...payload?.new };
         let res = await getUserData(newPost.userId);
         newPost.user = res.success ? res?.data : {};
-        setPosts((prevPost) => [newPost, ...prevPost]);
+        setPosts((prevPost) => {
+          if (prevPost.some((post) => post.id === newPost.id)) {
+            return prevPost;
+          }
+          return [newPost, ...prevPost];
+        });
       }
     } catch (error) {
       console.log(error);
@@ -65,24 +73,39 @@ const UserPost = forwardRef<Props>((props, ref) => {
         handlePost
       )
       .subscribe();
-    getAllPost();
     return () => {
       supabase.removeChannel(postChannel);
     };
   }, [isFocused]);
 
+  useEffect(() => {
+    getAllPost();
+  }, [isFocused]);
+
   const getAllPost = async () => {
     limit = limit + 10;
     const res = await fetchOnlyUserPost(limit, UserInfo?.id);
+
     if (res.success) {
-      if (res?.data?.length > 0 && res?.data?.length <= 10) {
+      // Ensure res.data is defined before checking its length
+      const postsData = res.data ?? [];
+
+      if (postsData.length > 0 && postsData.length <= 10) {
         setHasMore(false);
-        setPosts(res.data ?? []);
+        // Remove duplicates if needed
+        setPosts((prevPosts) => {
+          const uniquePosts = [
+            ...new Map(
+              [...prevPosts, ...postsData].map((post) => [post.id, post])
+            ).values(),
+          ];
+          return uniquePosts;
+        });
       } else {
-        if (res?.data?.length === Posts?.length) {
+        if (postsData.length === Posts.length) {
           setHasMore(false);
         }
-        setPosts(res.data ?? []);
+        setPosts(postsData);
       }
     }
   };
@@ -151,6 +174,9 @@ const UserPost = forwardRef<Props>((props, ref) => {
               tintColor={DarkColors.primaryColor}
             />
           }
+          contentContainerStyle={{
+            paddingBottom: paddingBottom,
+          }}
           ListFooterComponent={() =>
             hasMore ? (
               <View style={{ marginVertical: RFPercentage(2) }}>

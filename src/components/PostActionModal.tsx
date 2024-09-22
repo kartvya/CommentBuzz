@@ -1,10 +1,11 @@
-import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { TitleText } from "./Text";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { DarkColors } from "../constants/Colors";
 import SvgIcon from "../assets/icons";
 import Spacer from "./Spacer";
+import Modal from "react-native-modal";
 
 interface Iprops {
   isVisible: boolean;
@@ -14,7 +15,13 @@ interface Iprops {
 
 export default function PostActionModal(props: Iprops) {
   return (
-    <Modal animationType="slide" transparent={true} visible={props.isVisible}>
+    <Modal
+      testID={"modal"}
+      isVisible={props.isVisible}
+      onSwipeComplete={props.onClose}
+      swipeDirection={["down"]}
+      style={styles.view}
+    >
       <View style={styles.modalContent}>
         <View style={styles.titleContainer}>
           <TitleText style={styles.title}>Post Action</TitleText>
@@ -43,6 +50,10 @@ export default function PostActionModal(props: Iprops) {
 }
 
 const styles = StyleSheet.create({
+  view: {
+    justifyContent: "flex-end",
+    margin: 0,
+  },
   modalContent: {
     height: "26%",
     width: "100%",

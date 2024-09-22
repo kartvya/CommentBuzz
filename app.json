@@ -19,7 +19,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.kartvya.CommentBuzz"
     },
     "web": {
       "bundler": "metro",
@@ -31,7 +35,9 @@
       [
         "expo-font",
         {
-          "fonts": ["./src/assets/fonts"]
+          "fonts": [
+            "./src/assets/fonts"
+          ]
         }
       ],
       [
@@ -43,6 +49,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ad1eaac8-2dcb-422a-ba7e-789128982859"
+      }
     }
   }
 }

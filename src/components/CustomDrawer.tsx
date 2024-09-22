@@ -22,8 +22,10 @@ import { supabase } from "@/lib/supabase";
 import React, { useState } from "react";
 import GlobalCenterModal from "./GlobalCenterModal";
 import Button from "./Button";
+import { useRouter } from "expo-router";
 
 const CustomDrawer = (props: any) => {
+  const navigation = useRouter();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -124,6 +126,56 @@ const CustomDrawer = (props: any) => {
             marginVertical: RFPercentage(1),
           }}
         />
+
+        <TouchableHighlight
+          onPress={() => navigation.navigate("/(main)/editProfile")}
+          style={styles.listConatiner}
+          underlayColor={DarkColors.votesBg}
+        >
+          <React.Fragment>
+            <TitleText style={{ color: DarkColors.text }}>
+              Edit profile
+            </TitleText>
+            <SvgIcon name={"edit"} size={18} color={DarkColors?.text} />
+          </React.Fragment>
+        </TouchableHighlight>
+
+        <TouchableHighlight
+          onPress={() => alert("Comming soon")}
+          style={styles.listConatiner}
+          underlayColor={DarkColors.votesBg}
+        >
+          <React.Fragment>
+            <TitleText style={{ color: DarkColors.text }}>
+              Refer & Earn
+            </TitleText>
+            <SvgIcon
+              name={"refer"}
+              size={18}
+              color={DarkColors?.text}
+              strokeWidth={3}
+            />
+          </React.Fragment>
+        </TouchableHighlight>
+
+        <TouchableHighlight
+          onPress={() => alert("Comming soon")}
+          style={styles.listConatiner}
+          underlayColor={DarkColors.votesBg}
+        >
+          <React.Fragment>
+            <TitleText style={{ color: DarkColors.text }}>
+              Buzz Leaderboard
+            </TitleText>
+            <SvgIcon
+              name={"refer"}
+              size={18}
+              color={DarkColors?.text}
+              strokeWidth={3}
+            />
+          </React.Fragment>
+        </TouchableHighlight>
+
         <TouchableHighlight
           onPress={() => setLogoutModal(true)}
           style={styles.listConatiner}
@@ -139,6 +191,24 @@ const CustomDrawer = (props: any) => {
           </React.Fragment>
         </TouchableHighlight>
       </View>
+
+      {/* <GlobalCenterModal
+        isVisible={true}
+        childern={
+          <View
+            style={{
+              backgroundColor: DarkColors.text,
+              borderRadius: 10,
+              padding: RFPercentage(1),
+              paddingHorizontal: RFPercentage(2),
+            }}
+          >
+            <NormalText style={{ color: Colors.text }}>
+              What is buzz coins
+            </NormalText>
+          </View>
+        }
+      /> */}
 
       <GlobalCenterModal
         isVisible={logoutModal}
@@ -213,5 +283,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     borderRadius: 10,
     padding: 8,
+    marginVertical: RFPercentage(0.4),
   },
 });

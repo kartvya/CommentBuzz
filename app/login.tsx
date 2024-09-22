@@ -72,7 +72,7 @@ const Login = () => {
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps={"always"}
-        enableOnAndroid
+        enableOnAndroid={false}
         extraScrollHeight={20}
         extraHeight={20}
       >

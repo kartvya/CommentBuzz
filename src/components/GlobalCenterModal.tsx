@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
-import { Modal, ModalProps, StyleSheet } from "react-native";
+import { ModalProps, StyleSheet } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ReactNativeModal from "react-native-modal";
 import { RFPercentage } from "react-native-responsive-fontsize";
 
 type Iprops = ModalProps & {
@@ -8,26 +9,27 @@ type Iprops = ModalProps & {
   childern: ReactNode;
 };
 const GlobalCenterModal = ({ isVisible, childern, ...rest }: Iprops) => {
+  console.log(isVisible, "isVisiblisVisiblee");
+
   return (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={isVisible}
-      statusBarTranslucent
-      {...rest}
+    <ReactNativeModal
+      testID={"modal"}
+      isVisible={isVisible}
+      style={styles.view}
+      animationIn={"fadeIn"}
+      animationOut={"fadeOut"}
     >
-      <KeyboardAwareScrollView
-        contentContainerStyle={{
-          flex: 1,
-          justifyContent: "center",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          paddingHorizontal: RFPercentage(1),
-        }}
-      >
-        {childern}
-      </KeyboardAwareScrollView>
-    </Modal>
+      {childern}
+    </ReactNativeModal>
   );
 };
 
 export default GlobalCenterModal;
+
+const styles = StyleSheet.create({
+  view: {
+    justifyContent: "center",
+    margin: 0,
+    paddingHorizontal: RFPercentage(1),
+  },
+});

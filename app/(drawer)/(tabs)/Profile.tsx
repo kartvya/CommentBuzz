@@ -12,6 +12,7 @@ import UserAbout from "@/src/tabsScreens/UserAbout";
 import UserComments from "@/src/tabsScreens/UserComments";
 import UserPost from "@/src/tabsScreens/UserPost";
 import { useNavigation } from "@react-navigation/native";
+import { ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -137,31 +138,31 @@ const Profile = () => {
             </Pressable>
           </View>
         </View>
-        <Spacer gap={RFPercentage(1)} />
         <View style={styles.avtarWithTextContainer}>
-          <View style={styles.avtarConatiner}>
+          <Pressable
+            style={styles.avtarConatiner}
+            onPress={() => navigation.navigate("/(main)/editProfile")}
+          >
             <Avatar
               uri={UserInfo?.image}
               size={RFPercentage(10)}
               borderRadius={20}
             />
-            <Pressable
-              style={styles.editConatiner}
-              onPress={() => navigation.navigate("/(main)/editProfile")}
-            >
+            <View style={styles.editConatiner}>
               <SvgIcon name={"edit"} size={18} color={DarkColors?.text} />
-            </Pressable>
-          </View>
+            </View>
+          </Pressable>
           <Spacer gap={RFPercentage(1)} />
           <View style={{ flex: 1 }}>
             <TitleText style={styles.userNameText}>{UserInfo?.name}</TitleText>
-            <NormalText ellipsizeMode="tail" numberOfLines={2}>
-              {UserInfo?.bio}
-            </NormalText>
+            {UserInfo?.bio && (
+              <NormalText ellipsizeMode="tail" numberOfLines={2}>
+                {UserInfo?.bio}
+              </NormalText>
+            )}
           </View>
           <Spacer gap={RFPercentage(1)} />
         </View>
-        <Spacer gap={RFPercentage(1)} />
         <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}
@@ -225,7 +226,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 999,
   },
-  userNameText: {},
+  userNameText: {
+    elevation: 5,
+  },
   profileListItemConatiner: {
     flexDirection: "row",
     alignItems: "center",
@@ -234,6 +237,7 @@ const styles = StyleSheet.create({
   avtarWithTextContainer: {
     flexDirection: "row",
     alignItems: "center",
+    paddingVertical: RFPercentage(2),
   },
 });
 

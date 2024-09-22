@@ -6,6 +6,7 @@ import { RootState } from "@/src/redux/Store";
 import { Tabs } from "expo-router";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
+import CustomTabBar from "@/src/components/CustomeTabBar/CustomTabBar";
 
 export default function TabLayout() {
   const UserInfo = useSelector(
@@ -14,13 +15,14 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: DarkColors?.primaryColor,
         headerShown: false,
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          backgroundColor: DarkColors?.lightBg,
-        },
+        // tabBarActiveTintColor: DarkColors?.primaryColor,
+        // tabBarShowLabel: false,
+        // tabBarStyle: {
+        //   backgroundColor: DarkColors?.lightBg,
+        // },
       }}
     >
       <Tabs.Screen
