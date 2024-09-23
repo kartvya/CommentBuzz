@@ -1,13 +1,12 @@
+import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SvgIcon from "../assets/icons";
+import { DarkColors } from "../constants/Colors";
 import { wp } from "../helpers/comman";
 import Spacer from "./Spacer";
 import { TitleText } from "./Text";
-import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
-import { DarkColors } from "../constants/Colors";
 
 const FeedHeader = () => {
   const insets = useSafeAreaInsets();

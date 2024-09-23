@@ -133,7 +133,9 @@ const CustomDrawer = (props: any) => {
           underlayColor={DarkColors.votesBg}
         >
           <React.Fragment>
-            <TitleText style={{ color: DarkColors.text }}>
+            <TitleText
+              style={{ color: DarkColors.text, fontSize: RFValue(13) }}
+            >
               Edit profile
             </TitleText>
             <SvgIcon name={"edit"} size={18} color={DarkColors?.text} />
@@ -146,7 +148,9 @@ const CustomDrawer = (props: any) => {
           underlayColor={DarkColors.votesBg}
         >
           <React.Fragment>
-            <TitleText style={{ color: DarkColors.text }}>
+            <TitleText
+              style={{ color: DarkColors.text, fontSize: RFValue(13) }}
+            >
               Refer & Earn
             </TitleText>
             <SvgIcon
@@ -164,7 +168,9 @@ const CustomDrawer = (props: any) => {
           underlayColor={DarkColors.votesBg}
         >
           <React.Fragment>
-            <TitleText style={{ color: DarkColors.text }}>
+            <TitleText
+              style={{ color: DarkColors.text, fontSize: RFValue(13) }}
+            >
               Buzz Leaderboard
             </TitleText>
             <SvgIcon
@@ -276,6 +282,7 @@ const styles = StyleSheet.create({
   },
   listTextStyle: {
     color: DarkColors.primaryColor,
+    fontSize: RFValue(13),
   },
   listConatiner: {
     flexDirection: "row",
@@ -283,6 +290,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     borderRadius: 10,
     padding: 8,
-    marginVertical: RFPercentage(0.4),
   },
 });

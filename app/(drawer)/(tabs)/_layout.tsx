@@ -39,6 +39,19 @@ export default function TabLayout() {
         })}
       />
       <Tabs.Screen
+        name="createPost"
+        options={({ navigation, route }) => ({
+          tabBarIcon: ({ color, focused }) => (
+            <SvgIcon
+              size={RFPercentage(3.4)}
+              name="plus"
+              color={focused ? DarkColors?.primaryColor : color}
+              strokeWidth="2"
+            />
+          ),
+        })}
+      />
+      <Tabs.Screen
         name="Profile"
         options={({ navigation, route }) => ({
           tabBarIcon: ({ color, focused }) => (

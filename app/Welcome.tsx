@@ -14,7 +14,7 @@ const Welcome = () => {
   const animation = useRef<LottieView>(null);
   const navigation = useRouter();
   return (
-    <ScreenWrapper>
+    <ScreenWrapper statusBarColor={DarkColors.backGround}>
       <View style={styles.conatiner}>
         <LottieView
           autoPlay
