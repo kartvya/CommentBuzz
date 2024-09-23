@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import { DarkColors } from "../constants/Colors";
 
 interface IProps {
-  title: string;
+  title?: string;
   showBackIcon: boolean;
   mb?: number;
 }
