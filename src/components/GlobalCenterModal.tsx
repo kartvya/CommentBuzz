@@ -7,14 +7,19 @@ import { RFPercentage } from "react-native-responsive-fontsize";
 type Iprops = ModalProps & {
   isVisible: boolean;
   childern: ReactNode;
+  onDismiss?: () => void;
 };
-const GlobalCenterModal = ({ isVisible, childern, ...rest }: Iprops) => {
-  console.log(isVisible, "isVisiblisVisiblee");
-
+const GlobalCenterModal = ({
+  isVisible,
+  childern,
+  onDismiss,
+  ...rest
+}: Iprops) => {
   return (
     <ReactNativeModal
       testID={"modal"}
       isVisible={isVisible}
+      onBackdropPress={onDismiss}
       style={styles.view}
       animationIn={"fadeIn"}
       animationOut={"fadeOut"}

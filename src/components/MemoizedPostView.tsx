@@ -18,7 +18,7 @@ import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
-import { getSupaBaseFileUrl } from "../services/imageServices";
+import { getSupaBaseFileUrl, getUserImage } from "../services/imageServices";
 import {
   createPostUpvote,
   deletePost,
@@ -52,6 +52,10 @@ const MemoizedPostView: React.FC<{
   const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.postBuzz);
   const [postActionModal, setShowPostActionModal] = useState<boolean>(false);
   const [deleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [showProfilePitcture, setShowProfilePitcture] =
+    useState<boolean>(false);
+  const [selectedProfilePitcture, setSelectedProfilePitcture] =
+    useState<string>("");
 
   useEffect(() => {
     const sortedData = item?.postVotes?.sort(
@@ -251,7 +255,14 @@ const MemoizedPostView: React.FC<{
       <View style={styles.userContainer}>
         <View style={styles.avtarTitleConatiner}>
           <View style={styles.avtarTitleConatiner}>
-            <Avatar uri={item?.user?.image} size={hp(5)} borderRadius={50} />
+            <Avatar
+              uri={item?.user?.image}
+              size={hp(5)}
+              borderRadius={50}
+              onLongPress={() => {
+                setShowProfilePitcture(true);
+              }}
+            />
             <View style={styles.userNameContainer}>
               <NormalText>{item?.user?.name}</NormalText>
               <NormalText style={styles.subText}>
@@ -417,6 +428,24 @@ const MemoizedPostView: React.FC<{
               />
             </View>
           </View>
+        }
+      />
+
+      <GlobalCenterModal
+        isVisible={showProfilePitcture}
+        onDismiss={() => setShowProfilePitcture(false)}
+        childern={
+          <Image
+            source={getUserImage(item?.user?.image)}
+            contentFit="contain"
+            style={{
+              height: RFPercentage(25),
+              width: RFPercentage(25),
+              borderRadius: 100,
+              alignSelf: "center",
+              backgroundColor: DarkColors.text,
+            }}
+          />
         }
       />
     </>

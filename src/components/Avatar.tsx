@@ -1,9 +1,9 @@
 import { Image, ImageStyle } from "expo-image";
-import { StyleSheet } from "react-native";
+import { Pressable, PressableProps, StyleSheet } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { getUserImage } from "../services/imageServices";
 
-interface Iprops {
+interface Iprops extends PressableProps {
   uri: string | null;
   size?: number;
   borderRadius?: number;
@@ -11,19 +11,21 @@ interface Iprops {
 }
 
 const Avatar = (props: Iprops) => {
-  const { size, borderRadius, avatarImgStyle, uri } = props;
+  const { size, borderRadius, avatarImgStyle, uri, ...rest } = props;
 
   return (
-    <Image
-      source={getUserImage(uri)}
-      transition={100}
-      contentFit="cover"
-      style={[
-        styles.image,
-        { height: size, width: size, borderRadius: borderRadius },
-        avatarImgStyle,
-      ]}
-    />
+    <Pressable {...rest}>
+      <Image
+        source={getUserImage(uri)}
+        transition={100}
+        contentFit="cover"
+        style={[
+          styles.image,
+          { height: size, width: size, borderRadius: borderRadius },
+          avatarImgStyle,
+        ]}
+      />
+    </Pressable>
   );
 };
 
