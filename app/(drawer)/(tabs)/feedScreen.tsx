@@ -83,7 +83,6 @@ const FeedScreen = () => {
 
       if (postsData.length > 0 && postsData.length <= 10) {
         setHasMore(false);
-        // Remove duplicates if needed
         setPosts((prevPosts) => {
           const uniquePosts = [
             ...new Map(

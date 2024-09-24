@@ -4,7 +4,9 @@ import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
+  Share,
   StyleSheet,
   ToastAndroid,
   TouchableOpacity,
@@ -18,7 +20,11 @@ import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
-import { getSupaBaseFileUrl, getUserImage } from "../services/imageServices";
+import {
+  downloadImage,
+  getSupaBaseFileUrl,
+  getUserImage,
+} from "../services/imageServices";
 import {
   createPostUpvote,
   deletePost,
@@ -61,11 +67,12 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       useState<boolean>(false);
     const [selectedProfilePitcture, setSelectedProfilePitcture] =
       useState<string>("");
+    const [shareLoad, setShareLoad] = useState(false);
 
     useEffect(() => {
       const sortedData = item?.postVotes?.sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
       );
       const currentUserVote = sortedData?.find(
         (vote) => vote?.userId === UserInfo?.id
@@ -115,8 +122,16 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       }
     };
 
-    const onPressShareImage = () => {
+    const onPressShareImage = async () => {
       try {
+        let content = { message: item.body, url: "" };
+        if (item?.files) {
+          setShareLoad(true);
+          let url = await downloadImage(getSupaBaseFileUrl(item?.files).uri);
+          setShareLoad(false);
+          content.url = url ?? "";
+        }
+        Share.share(content);
       } catch (error) {
         console.log(error);
       }
@@ -124,7 +139,10 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
 
     const onPressComment = () => {
       try {
-        router.navigate("/(main)/comments");
+        router.push({
+          pathname: "/(main)/comments",
+          params: { postId: item.id },
+        });
       } catch (error) {
         console.log(error);
       }
@@ -274,7 +292,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
               <View style={styles.userNameContainer}>
                 <NormalText>{item?.user?.name}</NormalText>
                 <NormalText style={styles.subText}>
-                  {moment(item.created_at).fromNow()}
+                  {moment(item?.created_at).fromNow()}
                 </NormalText>
               </View>
             </View>
@@ -284,7 +302,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
               </Pressable>
             )}
           </View>
-          {item.body ? (
+          {item?.body ? (
             <View>
               <ParsedText
                 style={styles.descriptionText}
@@ -385,20 +403,27 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                 >
                   <SvgIcon name={"comment"} size={16} color={DarkColors.text} />
                   <NormalText style={{ marginLeft: RFPercentage(1) }}>
-                    0
+                    {item?.comments[0]?.count}
                   </NormalText>
                 </Pressable>
               )}
             </View>
-            <Pressable
-              onPress={onPressShareImage}
-              style={[
-                styles.upvoteConatiner,
-                { paddingHorizontal: RFPercentage(1) },
-              ]}
-            >
-              <SvgIcon name={"share"} size={15} color={DarkColors?.text} />
-            </Pressable>
+            {shareLoad ? (
+              <ActivityIndicator
+                size={"small"}
+                color={DarkColors.primaryColor}
+              />
+            ) : (
+              <Pressable
+                onPress={onPressShareImage}
+                style={[
+                  styles.upvoteConatiner,
+                  { paddingHorizontal: RFPercentage(1) },
+                ]}
+              >
+                <SvgIcon name={"share"} size={15} color={DarkColors?.text} />
+              </Pressable>
+            )}
           </View>
         </View>
 
@@ -419,30 +444,41 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           childern={
             <View
               style={{
-                backgroundColor: DarkColors.text,
+                backgroundColor: DarkColors.lightBg,
                 borderRadius: 10,
                 padding: RFPercentage(1),
                 paddingHorizontal: RFPercentage(2),
               }}
             >
-              <TitleText style={{ color: Colors.text }}>
-                Are you sure want to delete this post?
-              </TitleText>
-              <Spacer gap={RFPercentage(1)} />
+              <TitleText>Are you sure?</TitleText>
+              <Spacer gap={RFPercentage(0.4)} />
+              <NormalText>
+                You cannot restore post that have been deleted.
+              </NormalText>
+              <Spacer gap={RFPercentage(0.7)} />
               <View style={styles.avtarTitleConatiner}>
                 <Button
-                  title="No"
+                  title="Cancel"
                   onPress={() => setShowDeleteModal(false)}
-                  btnStyle={{ flex: 1, backgroundColor: DarkColors.lightBg }}
+                  btnStyle={{
+                    flex: 1,
+                    backgroundColor: "transparent",
+                    borderRadius: 100,
+                    height: hp(5),
+                  }}
+                  textStyle={{ color: DarkColors.icon, fontSize: RFValue(13) }}
                 />
                 <Spacer gap={RFPercentage(0.5)} />
                 <Button
-                  title="Yes"
+                  title="Delete"
                   onPress={() => onDeletePost()}
                   btnStyle={{
                     flex: 1,
-                    backgroundColor: DarkColors.primaryColor,
+                    backgroundColor: "red",
+                    borderRadius: 100,
+                    height: hp(5),
                   }}
+                  textStyle={{ fontSize: RFValue(13) }}
                 />
               </View>
             </View>

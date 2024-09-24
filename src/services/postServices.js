@@ -54,7 +54,7 @@ export const fetchPost = async (limit = 10) => {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select("*,user:users(id,name,image),postVotes(*)")
+      .select("*,user:users(id,name,image),postVotes(*),comments(count)")
       .order("created_at", { ascending: false })
       .limit(limit);
     if (error) {
@@ -68,11 +68,30 @@ export const fetchPost = async (limit = 10) => {
   }
 };
 
+export const fetchPostDetails = async (postId) => {
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*,user:users(id,name,image),postVotes(*),comments(*,user:users(id,name,image))")
+      .eq("id", postId)
+      .order("created_at", {ascending:true,foreignTable:'comments'})
+      .single()
+    if (error) {
+      console.log(error);
+      return { success: false, data: undefined, msg: "Could not fetch postdetails" };
+    }
+    return { success: true, data: data, msg: "" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: "Could not fetch postdetails" };
+  }
+};
+
 export const fetchOnlyUserPost = async (limit = 10, userId) => {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select("*,user:users(id,name,image),postVotes(*)")
+      .select("*,user:users(id,name,image),postVotes(*),comments(count)")
       .eq("userId", userId)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -164,5 +183,44 @@ export const deletePostUpvote = async (deleteObj) => {
   } catch (error) {
     console.log(error);
     return { success: false, data: undefined, msg: "Could not delete  post" };
+  }
+};
+
+export const createComment = async (comment) => {
+  try {
+    const { data: voteData, error: commentError } = await supabase
+      .from("comments")
+      .insert(comment)
+      .select()
+      .single();
+
+    if (commentError) {
+      console.log(commentError);
+      return { success: false, data: undefined, msg: "Could not comment post" };
+    }
+
+    return { success: true, data: voteData, msg: "" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: "Could not comment post" };
+  }
+};
+
+export const deleteComment = async (commentId) => {
+  try {
+    const {  error: commentError } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id",commentId)
+
+    if (commentError) {
+      console.log(commentError);
+      return { success: false, data: undefined, msg: "Could not delete comment" };
+    }
+
+    return { success: true, data: {commentId}, msg: "" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: "Could not delete comment" };
   }
 };

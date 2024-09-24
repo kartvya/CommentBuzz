@@ -23,6 +23,7 @@ import React, { useState } from "react";
 import GlobalCenterModal from "./GlobalCenterModal";
 import Button from "./Button";
 import { useRouter } from "expo-router";
+import { hp } from "../helpers/comman";
 
 const CustomDrawer = (props: any) => {
   const navigation = useRouter();
@@ -221,15 +222,15 @@ const CustomDrawer = (props: any) => {
         childern={
           <View
             style={{
-              backgroundColor: DarkColors.text,
+              backgroundColor: DarkColors.lightBg,
               borderRadius: 10,
               padding: RFPercentage(1),
               paddingHorizontal: RFPercentage(2),
             }}
           >
-            <TitleText style={{ color: Colors.text }}>
-              Are you sure want to log out?
-            </TitleText>
+            <TitleText>Wait!</TitleText>
+            <Spacer gap={RFPercentage(0.4)} />
+            <NormalText>Are you sure want to log out?</NormalText>
             <Spacer gap={RFPercentage(1)} />
             <View
               style={{
@@ -241,13 +242,23 @@ const CustomDrawer = (props: any) => {
               <Button
                 title="No"
                 onPress={() => setLogoutModal(false)}
-                btnStyle={{ flex: 1, backgroundColor: DarkColors.lightBg }}
+                btnStyle={{
+                  flex: 1,
+                  backgroundColor: "transparent",
+                  borderRadius: 100,
+                  height: hp(5),
+                }}
               />
               <Spacer gap={RFPercentage(0.5)} />
               <Button
                 title="Yes"
                 onPress={onLogoutYesBTN}
-                btnStyle={{ flex: 1, backgroundColor: DarkColors.primaryColor }}
+                btnStyle={{
+                  flex: 1,
+                  backgroundColor: "red",
+                  borderRadius: 100,
+                  height: hp(5),
+                }}
               />
             </View>
           </View>

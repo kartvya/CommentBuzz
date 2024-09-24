@@ -46,3 +46,18 @@ export const getFilePath = (folderName, isImage) => {
   return `/${folderName}/${new Date().getTime()}${isImage ? ".png" : ".mp4"}`;
 };
 
+export const downloadImage = async(url) => {
+  try {
+    const { uri } = await FileSystem.downloadAsync(url, getLocalFilePath(url))
+    return uri
+  } catch (error) {
+    console.log(error);
+    return null  
+  }
+}
+
+export const getLocalFilePath = (filePath) => {
+  let fileName = filePath.split('/').pop();
+  return `${FileSystem.documentDirectory}${fileName}`
+}
+

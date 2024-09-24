@@ -41,6 +41,19 @@ interface PostUser {
   name: string;
 }
 
+export interface CommentsData {
+  created_at: string;
+  id: number;
+  postId: number;
+  text: string;
+  user: PostUser;
+  userId: string;
+}
+
+interface CommentsCount {
+  count: number;
+}
+
 export interface PostData {
   body: string;
   created_at: string;
@@ -51,6 +64,20 @@ export interface PostData {
   postVotes: PostVotes[];
   voteCount: number;
   postBuzz: number;
+  comments: CommentsCount[];
+}
+
+export interface CommentsPostData {
+  body: string;
+  created_at: string;
+  files: string;
+  id: number;
+  user: PostUser;
+  userId: string;
+  postVotes: PostVotes[];
+  voteCount: number;
+  postBuzz: number;
+  comments: CommentsData[];
 }
 
 export interface PostVotes {

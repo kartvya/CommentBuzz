@@ -23,4 +23,5 @@ export const DarkColors = {
   borderColor: "#252528",
   primaryColor: "#F44D3A",
   votesBg: "#262C2F",
+  icon: "#C2C5C8",
 };
