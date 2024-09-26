@@ -4,7 +4,7 @@ import Header from "@/src/components/Header";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { NormalText } from "@/src/components/Text";
-import { Colors, DarkColors } from "@/src/constants/Colors";
+import { Colors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
@@ -55,7 +55,7 @@ interface PostData {
 
 const UploadPost = () => {
   const navigation = useRouter();
-
+  const themeColors = useThemeColors();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -247,12 +247,17 @@ const UploadPost = () => {
   };
 
   return (
-    <ScreenWrapper bg={Colors.white}>
+    <ScreenWrapper bg={themeColors.white}>
       <Header title="New post" showBackIcon={true} />
       <View style={styles.conatiner}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <View style={styles.avtarConatiner}>
+            <View
+              style={[
+                styles.avtarConatiner,
+                { backgroundColor: themeColors.white },
+              ]}
+            >
               <Avatar
                 uri={UserInfo?.image}
                 size={RFPercentage(6)}
@@ -263,13 +268,18 @@ const UploadPost = () => {
             <NormalText>{UserInfo?.name}</NormalText>
           </View>
           <Spacer gap={RFPercentage(1.2)} />
-          <View style={styles.textInputContainer}>
+          <View
+            style={[
+              styles.textInputContainer,
+              { backgroundColor: themeColors.lightBg },
+            ]}
+          >
             <MentionInput
               scrollEnabled
               placeholder={"Write something here..."}
-              placeholderTextColor={Colors.icon}
+              placeholderTextColor={themeColors.icon}
               maxLength={300}
-              style={styles.commentInput}
+              style={[styles.commentInput, { color: themeColors?.text }]}
               value={value}
               onChange={handleTagRemoval}
               partTypes={[
@@ -285,7 +295,7 @@ const UploadPost = () => {
                 },
               ]}
             />
-            <NormalText style={{ textAlign: "right", color: Colors.icon }}>
+            <NormalText style={{ textAlign: "right", color: themeColors.icon }}>
               {value.length}/300
             </NormalText>
           </View>
@@ -295,7 +305,7 @@ const UploadPost = () => {
                 name={"image"}
                 size={30}
                 strokeWidth={1.5}
-                color={Colors.white}
+                color={themeColors.white}
               />
             </Pressable>
             <Spacer gap={RFPercentage(0.5)} />
@@ -304,7 +314,7 @@ const UploadPost = () => {
                 name={"video"}
                 size={33}
                 strokeWidth={1.5}
-                color={Colors.white}
+                color={themeColors.white}
               />
             </Pressable>
           </View>
@@ -334,7 +344,7 @@ const UploadPost = () => {
                 />
               )}
               <Pressable style={styles.deleteIcon} onPress={onPressDelete}>
-                <SvgIcon name={"delete"} color={Colors.white} />
+                <SvgIcon name={"delete"} color={themeColors.white} />
               </Pressable>
             </View>
           )}
@@ -344,6 +354,7 @@ const UploadPost = () => {
           onPress={onPressSubmit}
           btnStyle={{ marginBottom: Platform.OS === "ios" ? hp(4) : 5 }}
           isLoading={loading}
+          textStyle={{ color: Colors.white }}
         />
       </View>
     </ScreenWrapper>
@@ -371,7 +382,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
-    backgroundColor: Colors.white,
     borderRadius: 15,
     marginTop: RFPercentage(2),
     marginLeft: RFPercentage(0.1),
@@ -384,7 +394,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   commentInput: {
-    color: DarkColors?.text,
     fontSize: RFValue(12),
     height: RFPercentage(9),
     textAlignVertical: "top",
@@ -392,7 +401,6 @@ const styles = StyleSheet.create({
   },
   textInputContainer: {
     padding: RFPercentage(1.5),
-    backgroundColor: DarkColors.lightBg,
     borderRadius: 10,
     marginBottom: RFPercentage(1),
   },

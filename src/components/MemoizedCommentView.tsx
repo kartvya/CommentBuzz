@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
 import SvgIcon from "../assets/icons";
-import { Colors, DarkColors } from "../constants/Colors";
+import { Colors, DarkColors, useThemeColors } from "../constants/Colors";
 import { hp } from "../helpers/comman";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
@@ -28,6 +28,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
     const UserInfo = useSelector(
       (state: RootState) => state.root?.authReducer?.userInfo
     ) as Users;
+    const themeColors = useThemeColors();
 
     const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
       "none"
@@ -184,24 +185,26 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
             borderRadius={100}
           />
           <Spacer gap={RFPercentage(0.6)} />
-          <View style={styles.comatiner}>
+          <View
+            style={[styles.comatiner, { backgroundColor: themeColors.lightBg }]}
+          >
             <View style={styles.commentsAvtarContainer}>
               <NormalText
-                style={{ color: DarkColors.text, fontSize: RFValue(10) }}
+                style={{ color: themeColors.text, fontSize: RFValue(10) }}
               >
                 {item?.user?.name}
               </NormalText>
               <TitleText
                 style={{
                   marginHorizontal: RFPercentage(0.4),
-                  color: DarkColors.icon,
+                  color: themeColors.icon,
                 }}
               >
                 •
               </TitleText>
               <NormalText
                 style={{
-                  color: DarkColors.icon,
+                  color: themeColors.icon,
                   fontSize: RFValue(9),
                   top: 1,
                 }}
@@ -215,7 +218,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
             <View style={styles.footerConatiner}>
               {isUserComment && (
                 <Pressable onPress={() => setShowCommentActionModal(true)}>
-                  <SvgIcon name={"postMore"} color={DarkColors?.text} />
+                  <SvgIcon name={"postMore"} color={themeColors?.text} />
                 </Pressable>
               )}
               <Spacer gap={RFPercentage(0.8)} />
@@ -224,13 +227,16 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
                   <SvgIcon
                     name={"upArrow"}
                     size={25}
-                    color={userVote === "upvote" ? Colors.red : DarkColors.text}
+                    color={
+                      userVote === "upvote" ? Colors.red : themeColors.text
+                    }
                   />
                 </TouchableOpacity>
                 <NormalText
                   style={{
                     marginHorizontal: RFPercentage(0.5),
-                    color: userVote === "upvote" ? Colors.red : DarkColors.text,
+                    color:
+                      userVote === "upvote" ? Colors.red : themeColors.text,
                   }}
                 >
                   {voteCount}
@@ -245,7 +251,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
                     color={
                       userVote === "downvote"
                         ? Colors.downvote
-                        : DarkColors.text
+                        : themeColors.text
                     }
                   />
                 </Pressable>
@@ -270,7 +276,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
           childern={
             <View
               style={{
-                backgroundColor: DarkColors.lightBg,
+                backgroundColor: themeColors.lightBg,
                 borderRadius: 10,
                 padding: RFPercentage(1),
                 paddingHorizontal: RFPercentage(2),
@@ -292,7 +298,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
                     borderRadius: 100,
                     height: hp(5),
                   }}
-                  textStyle={{ color: DarkColors.icon, fontSize: RFValue(13) }}
+                  textStyle={{ color: themeColors.icon, fontSize: RFValue(13) }}
                 />
                 <Spacer gap={RFPercentage(0.5)} />
                 <Button
@@ -319,7 +325,6 @@ export default MemoizedCommentView;
 
 const styles = StyleSheet.create({
   comatiner: {
-    backgroundColor: DarkColors.lightBg,
     borderRadius: 12,
     paddingHorizontal: RFPercentage(1.7),
     paddingVertical: RFPercentage(1.3),

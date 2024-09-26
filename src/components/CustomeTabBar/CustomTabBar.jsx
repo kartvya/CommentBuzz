@@ -45,7 +45,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
       style={[
         styles.tabBarContainer,
         {
-          bottom: Platform.OS === "ios" ? insets.bottom - 10 : insets.bottom,
+          bottom: Platform.OS === "ios" ? insets.bottom - 10 : insets.bottom + 5,
           backgroundColor: themeColors.votesBg,
         },
       ]}

@@ -8,7 +8,7 @@ import MemoizedPostView from "@/src/components/MemoizedPostView";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { TitleText } from "@/src/components/Text";
-import { DarkColors } from "@/src/constants/Colors";
+import { useThemeColors } from "@/src/constants/Colors";
 import { hp } from "@/src/helpers/comman";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
@@ -38,6 +38,7 @@ import { useSelector } from "react-redux";
 
 const Comments = () => {
   const { postId } = useLocalSearchParams();
+  const themeColors = useThemeColors();
   const commentRef = useRef<string>("");
   const flatListRef = useRef<FlatList>(null);
   const inputRef = useRef<any>(null);
@@ -206,13 +207,13 @@ const Comments = () => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={() => getPostDetails()}
-                tintColor={DarkColors.primaryColor}
+                tintColor={themeColors.primaryColor}
               />
             }
             ListEmptyComponent={() => (
               <View
                 style={{
-                  backgroundColor: DarkColors?.backGround,
+                  backgroundColor: themeColors?.backGround,
                   marginVertical: RFPercentage(2),
                   alignItems: "center",
                 }}
@@ -230,6 +231,7 @@ const Comments = () => {
                   Platform.OS === "ios"
                     ? insets.bottom - 5
                     : insets.bottom + 10,
+                backgroundColor: themeColors.backGround,
               },
             ]}
           >
@@ -243,15 +245,26 @@ const Comments = () => {
             />
             <Spacer gap={RFPercentage(0.5)} />
             {sendCommentLoad ? (
-              <View style={styles.sendBtn}>
+              <View
+                style={[
+                  styles.sendBtn,
+                  { backgroundColor: themeColors.lightBg },
+                ]}
+              >
                 <Loading size={"small"} />
               </View>
             ) : (
-              <Pressable style={styles.sendBtn} onPress={onCommentUpload}>
+              <Pressable
+                style={[
+                  styles.sendBtn,
+                  { backgroundColor: themeColors.lightBg },
+                ]}
+                onPress={onCommentUpload}
+              >
                 <SvgIcon
                   name={"send"}
                   size={30}
-                  color={DarkColors.primaryColor}
+                  color={themeColors.primaryColor}
                 />
               </Pressable>
             )}
@@ -270,10 +283,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: RFPercentage(2),
     paddingTop: RFPercentage(1),
-    backgroundColor: DarkColors.backGround,
   },
   sendBtn: {
-    backgroundColor: DarkColors.lightBg,
     flex: 0.3,
     borderRadius: 10,
     height: hp(7),
