@@ -1,39 +1,173 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useState } from "react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { useSelector } from "react-redux";
+import SvgIcon from "../assets/icons";
 import { Colors, DarkColors } from "../constants/Colors";
-import { NormalText, TitleText } from "./Text";
+import { hp } from "../helpers/comman";
+import { RootState } from "../redux/Store";
+import { Users } from "../redux/reducers/AuthReducer";
+import { createCommentVote, deleteCommentVote } from "../services/postServices";
 import { CommentsData } from "../utility/types";
 import Avatar from "./Avatar";
-import Spacer from "./Spacer";
-import SvgIcon from "../assets/icons";
-import moment from "moment";
-import PostActionModal from "./PostActionModal";
-import GlobalCenterModal from "./GlobalCenterModal";
 import Button from "./Button";
-import { hp } from "../helpers/comman";
-import { deleteComment } from "../services/postServices";
+import GlobalCenterModal from "./GlobalCenterModal";
+import PostActionModal from "./PostActionModal";
+import Spacer from "./Spacer";
+import { NormalText, TitleText } from "./Text";
 interface Iprops {
   item: CommentsData;
   isUserComment: boolean;
   onDeleteComment: () => void;
+  postId: string;
 }
 
 const MemoizedCommentView: React.FC<Iprops> = React.memo(
-  ({ item, isUserComment, onDeleteComment }) => {
+  ({ item, isUserComment, onDeleteComment, postId }) => {
+    const UserInfo = useSelector(
+      (state: RootState) => state.root?.authReducer?.userInfo
+    ) as Users;
+
     const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
       "none"
     );
     const [showCommentActionModal, setShowCommentActionModal] = useState(false);
     const [deleteModal, setShowDeleteModal] = useState<boolean>(false);
-    const onPressUpvote = () => {};
-    const onPressDownVote = () => {};
+    const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.commentBuzz);
+    const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
+
+    useEffect(() => {
+      const sortedData = item?.commentVotes?.sort(
+        (
+          a: { created_at: string | number | Date },
+          b: { created_at: string | number | Date }
+        ) =>
+          new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
+      );
+      const currentUserVote = sortedData?.find(
+        (vote: { userId: string }) => vote?.userId === UserInfo?.id
+      );
+      if (currentUserVote?.voteType === "upVote") {
+        setUserVote("upvote");
+      } else if (currentUserVote?.voteType === "downVote") {
+        setUserVote("downvote");
+      } else {
+        setUserVote("none");
+      }
+      setVoteCount(item?.voteCount || 0);
+      setFeedBuzzCoins(item?.commentBuzz);
+    }, [item?.commentVotes, item?.voteCount]);
+
+    function buzzCoinMathFunction(
+      type: "decreaseone" | "decreasetwo" | "increasetwo" | "increaseone"
+    ) {
+      let coin = feedBuzzCoins ?? 0;
+      if (UserInfo?.id !== item?.userId) {
+        if (type === "decreaseone") {
+          coin -= 0.01;
+          coin = parseFloat(coin.toFixed(2));
+          setFeedBuzzCoins(coin);
+          return coin;
+        } else if (type === "increasetwo") {
+          coin += 0.02;
+          coin = parseFloat(coin.toFixed(2));
+          setFeedBuzzCoins(coin);
+          return coin;
+        } else if (type === "decreasetwo") {
+          coin -= 0.02;
+          coin = parseFloat(coin.toFixed(2));
+          setFeedBuzzCoins(coin);
+          return coin;
+        } else {
+          coin += 0.01;
+          coin = parseFloat(coin.toFixed(2));
+          setFeedBuzzCoins(coin);
+          return coin;
+        }
+      } else {
+        return item?.commentBuzz;
+      }
+    }
+
+    const onPressUpvote = async () => {
+      try {
+        if (userVote === "upvote") {
+          setVoteCount(voteCount - 1);
+          setUserVote("none");
+          const delObj = {
+            userId: UserInfo?.id,
+            postId: postId,
+            voteCount: voteCount - 1,
+            feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
+          };
+          await deleteCommentVote(delObj);
+        } else if (userVote === "downvote") {
+          setVoteCount(voteCount + 2);
+          setUserVote("upvote");
+          await createCommentVote({
+            commentId: item?.id,
+            voteType: "upVote",
+            userId: UserInfo?.id,
+            postId: postId,
+            voteCount: voteCount + 2,
+            feedBuzzCoins: buzzCoinMathFunction("increasetwo"),
+          });
+        } else {
+          setVoteCount(voteCount + 1);
+          setUserVote("upvote");
+          await createCommentVote({
+            commentId: item?.id,
+            voteType: "upVote",
+            userId: UserInfo?.id,
+            postId: postId,
+            voteCount: voteCount + 1,
+            feedBuzzCoins: buzzCoinMathFunction("increaseone"),
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const onPressDownVote = async () => {
+      try {
+        if (userVote === "downvote") {
+          setVoteCount(voteCount + 1);
+          setUserVote("none");
+          const delObj = {
+            userId: UserInfo?.id,
+            postId: postId,
+            voteCount: voteCount + 1,
+            feedBuzzCoins: buzzCoinMathFunction("increaseone"),
+          };
+          await deleteCommentVote(delObj);
+        } else if (userVote === "upvote") {
+          setVoteCount(voteCount - 2);
+          setUserVote("downvote");
+          await createCommentVote({
+            commentId: item?.id,
+            voteType: "downVote",
+            userId: UserInfo?.id,
+            postId: postId,
+            voteCount: voteCount - 2,
+            feedBuzzCoins: buzzCoinMathFunction("decreasetwo"),
+          });
+        } else {
+          setVoteCount(voteCount - 1);
+          setUserVote("downvote");
+          await createCommentVote({
+            commentId: item?.id,
+            voteType: "downVote",
+            userId: UserInfo?.id,
+            postId: postId,
+            voteCount: voteCount - 1,
+            feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
     return (
       <>
@@ -99,7 +233,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
                     color: userVote === "upvote" ? Colors.red : DarkColors.text,
                   }}
                 >
-                  0
+                  {voteCount}
                 </NormalText>
                 <Pressable
                   onPress={onPressDownVote}

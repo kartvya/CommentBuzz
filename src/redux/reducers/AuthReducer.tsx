@@ -1,4 +1,4 @@
-import { LOGOUT, USERINFO } from "../actions/ActionType";
+import { ISDARKMODE, LOGOUT, USERINFO } from "../actions/ActionType";
 
 interface UserIdentity {
   created_at: string;
@@ -59,6 +59,7 @@ export interface AuthState {
   hasToken: boolean;
   accessToken: string;
   userInfo: any;
+  isDarkMode: boolean;
 }
 
 export interface AuthAction {
@@ -70,6 +71,7 @@ const initialState = {
   hasToken: false,
   accessToken: "",
   userInfo: "",
+  isDarkMode: false,
 };
 
 export const authReducer = (
@@ -83,6 +85,11 @@ export const authReducer = (
         userInfo: action.payload.userInfo,
         hasToken: action.payload.hasToken,
         accessToken: action.payload.accessToken,
+      };
+    case ISDARKMODE:
+      return {
+        ...state,
+        isDarkMode: action.payload,
       };
     case LOGOUT:
       return initialState;

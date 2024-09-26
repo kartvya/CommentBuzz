@@ -72,7 +72,7 @@ export const fetchPostDetails = async (postId) => {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select("*,user:users(id,name,image),postVotes(*),comments(*,user:users(id,name,image))")
+      .select("*,user:users(id,name,image),postVotes(*),commentVotes(*),comments(*,user:users(id,name,image))")
       .eq("id", postId)
       .order("created_at", {ascending:true,foreignTable:'comments'})
       .single()
@@ -222,5 +222,89 @@ export const deleteComment = async (commentId) => {
   } catch (error) {
     console.log(error);
     return { success: false, data: undefined, msg: "Could not delete comment" };
+  }
+};
+
+// comment add votes
+export const createCommentVote = async (commentVote) => {
+  try {
+    const { data: voteData, error: voteError } = await supabase
+      .from("commentsVotes")
+      .insert({
+        commentId: commentVote?.commentId,
+        userId: commentVote?.userId,
+        voteType: commentVote?.voteType,
+        voteCount: commentVote?.voteCount,
+        postId: commentVote?.postId,
+      })
+      .select()
+      .single();     
+    if (voteError) {
+      console.log(voteError.message,'voteErrovoteErrorr');
+      return { success: false, data: undefined, msg: "Could not upvote post" };
+    } else {
+      console.log("updated")
+    }
+
+    const { error: postError } = await supabase
+      .from("comments")
+      .update({
+        voteCount: commentVote.voteCount,
+        commentBuzz: commentVote.feedBuzzCoins,
+      })
+      .eq("id", commentVote.commentId)
+      .select()
+      .single();
+    if (postError) {
+      console.log(postError);
+      return {
+        success: false,
+        data: undefined,
+        msg: "Could not update vote count",
+      };
+    }
+
+    return { success: true, data: voteData, msg: "" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: "Could not upvote post" };
+  }
+};
+
+export const deleteCommentVote = async (deleteObj) => {
+  try {
+    const { error } = await supabase
+      .from("commentsVotes")
+      .delete()
+      .eq("userId", deleteObj?.userId)
+      .eq("postId", deleteObj?.postId);
+
+    if (error) {
+      console.log(error);
+      return { success: false, data: undefined, msg: "Could not delete post" };
+    }
+
+    // const { error: postError } = await supabase
+    //   .from("posts")
+    //   .update({
+    //     voteCount: deleteObj?.voteCount,
+    //     postBuzz: deleteObj?.feedBuzzCoins,
+    //   })
+    //   .eq("id", deleteObj?.postId)
+    //   .select()
+    //   .single();
+    // if (postError) {
+    //   console.log(postError);
+    //   return {
+    //     success: false,
+    //     data: undefined,
+    //     msg: "Could not update vote count",
+    //   };
+    // }
+
+    return { success: true, data: undefined, msg: "" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: "Could not delete  post" };
   }
 };

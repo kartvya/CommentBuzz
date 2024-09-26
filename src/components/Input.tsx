@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from "react-native";
 import React from "react";
-import { Colors, DarkColors } from "../constants/Colors";
+import { Colors, DarkColors, useThemeColors } from "../constants/Colors";
 import { hp, wp } from "../helpers/comman";
 import { NormalText } from "./Text";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -22,14 +22,21 @@ interface Iprops extends TextInputProps {
 }
 
 const Input: React.FC<Iprops> = (props) => {
+  const themeColors = useThemeColors();
   return (
     <>
-      <View style={[styles.container, props.containerStyle]}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: themeColors.lightBg },
+          props.containerStyle,
+        ]}
+      >
         {props.icon && props.icon}
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: themeColors.text }]}
           placeholder={props.placeholderText}
-          placeholderTextColor={Colors.icon}
+          placeholderTextColor={themeColors.icon}
           ref={props.inputRef && props.inputRef}
           {...props}
         />
@@ -46,7 +53,6 @@ export default Input;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: DarkColors.lightBg,
     padding: wp(2),
     borderRadius: 10,
     height: hp(7),
@@ -59,7 +65,6 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     paddingLeft: wp(2),
     fontFamily: "SpaceMono-Regular",
-    color: DarkColors.text,
   },
   errorText: {
     color: Colors.red,

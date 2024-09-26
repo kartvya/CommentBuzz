@@ -1,4 +1,4 @@
-import { DarkColors } from "@/src/constants/Colors";
+import { DarkColors, useThemeColors } from "@/src/constants/Colors";
 import Feather from "@expo/vector-icons/Feather";
 import { useEffect } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
@@ -18,6 +18,7 @@ const TabBarIcon = ({ onPress, isFocused, label }) => {
   const translateY = useSharedValue(0);
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
+  const themeColors = useThemeColors();
 
   useEffect(() => {
     opacity.value = withTiming(isFocused ? 0 : 1, { duration: 400 });
@@ -48,7 +49,9 @@ const TabBarIcon = ({ onPress, isFocused, label }) => {
       }}
     >
       <Animated.View style={rImage}>
-        {icons[label]({ color: isFocused ? DarkColors.primaryColor : "#fff" })}
+        {icons[label]({
+          color: isFocused ? themeColors.primaryColor : themeColors.white,
+        })}
       </Animated.View>
     </TouchableOpacity>
   );

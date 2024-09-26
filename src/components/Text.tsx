@@ -7,7 +7,7 @@ import {
   TextStyle,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { DarkColors } from "../constants/Colors";
+import { useThemeColors } from "../constants/Colors";
 
 interface CustomTextProps extends TextProps {
   numberOfLines?: number;
@@ -19,8 +19,12 @@ export const TitleText: React.FC<CustomTextProps> = ({
   style,
   numberOfLines,
 }) => {
+  const themeColors = useThemeColors();
   return (
-    <Text numberOfLines={numberOfLines} style={[styles.titleText, style]}>
+    <Text
+      numberOfLines={numberOfLines}
+      style={[styles.titleText, { color: themeColors.text }, style]}
+    >
       {children}
     </Text>
   );
@@ -31,8 +35,12 @@ export const NormalText: React.FC<CustomTextProps> = ({
   style,
   numberOfLines,
 }) => {
+  const themeColors = useThemeColors();
   return (
-    <Text numberOfLines={numberOfLines} style={[styles.normalText, style]}>
+    <Text
+      numberOfLines={numberOfLines}
+      style={[styles.normalText, { color: themeColors.text }, style]}
+    >
       {children}
     </Text>
   );
@@ -41,12 +49,10 @@ export const NormalText: React.FC<CustomTextProps> = ({
 const styles = StyleSheet.create({
   titleText: {
     fontSize: RFValue(16),
-    color: DarkColors.text,
     fontFamily: "SpaceMono-Regular",
   },
   normalText: {
     fontSize: RFValue(12),
-    color: DarkColors.text,
     fontFamily: "SpaceMono-Regular",
   },
 });

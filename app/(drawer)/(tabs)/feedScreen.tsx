@@ -4,7 +4,7 @@ import FeedHeader from "@/src/components/FeedHeader";
 import Loading from "@/src/components/Loading";
 import MemoizedPostView from "@/src/components/MemoizedPostView";
 import { TitleText } from "@/src/components/Text";
-import { DarkColors } from "@/src/constants/Colors";
+import { DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { fetchPost } from "@/src/services/postServices";
 import { getUserData } from "@/src/services/userService";
@@ -33,6 +33,7 @@ let limit = 0;
 const FeedScreen = () => {
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
+  const themeColors = useThemeColors();
   const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
   const paddingBottom = insets.bottom + 65;
   const flatlistRef = useRef<RNFlatList>(null);
@@ -180,7 +181,7 @@ const FeedScreen = () => {
   return (
     <>
       <MyStatusBar
-        backgroundColor={DarkColors.lightBg}
+        backgroundColor={themeColors.lightBg}
         barStyle="light-content"
       />
       <Animated.View
@@ -191,6 +192,7 @@ const FeedScreen = () => {
             opacity: headerOpacity,
             paddingTop: paddingTop,
             paddingBottom: wp(3),
+            backgroundColor: themeColors?.lightBg,
           },
         ]}
       >
@@ -202,13 +204,13 @@ const FeedScreen = () => {
           ref={flatlistRef}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
-          style={{ backgroundColor: DarkColors?.backGround }}
+          style={{ backgroundColor: themeColors?.backGround }}
           ItemSeparatorComponent={() => (
             <View
               style={{
                 width: "100%",
                 height: StyleSheet.hairlineWidth,
-                backgroundColor: DarkColors?.borderColor,
+                backgroundColor: themeColors?.borderColor,
               }}
             />
           )}
@@ -228,7 +230,7 @@ const FeedScreen = () => {
               refreshing={refreshing}
               onRefresh={() => refreshPulled()}
               progressViewOffset={paddingTop}
-              tintColor={DarkColors.primaryColor}
+              tintColor={themeColors.primaryColor}
             />
           }
           onEndReachedThreshold={0}
@@ -247,7 +249,7 @@ const FeedScreen = () => {
             flex: 1,
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: DarkColors?.backGround,
+            backgroundColor: themeColors?.backGround,
           }}
         >
           <TitleText>No post yet...</TitleText>
@@ -262,7 +264,6 @@ export default FeedScreen;
 const styles = StyleSheet.create({
   headerContainer: {
     zIndex: 1000,
-    backgroundColor: DarkColors?.lightBg,
     position: "absolute",
     left: 0,
     right: 0,

@@ -48,6 +48,9 @@ export interface CommentsData {
   text: string;
   user: PostUser;
   userId: string;
+  commentBuzz: number;
+  voteCount: number;
+  commentVotes: any;
 }
 
 interface CommentsCount {

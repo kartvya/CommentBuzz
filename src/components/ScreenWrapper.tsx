@@ -1,9 +1,8 @@
-import { StatusBar } from "expo-status-bar";
 import { ReactNode } from "react";
 import { View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useThemeColors } from "../constants/Colors";
 import MyStatusBar from "./CustomeStatusBar";
-import { Colors, DarkColors } from "../constants/Colors";
 
 interface ScreenWrapperProps {
   children: ReactNode;
@@ -19,17 +18,17 @@ const ScreenWrapper = ({
   statusBarColor,
 }: ScreenWrapperProps) => {
   const insets = useSafeAreaInsets();
-  const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
+  const themeColors = useThemeColors();
 
   return (
     <>
       <MyStatusBar
-        backgroundColor={statusBarColor ? statusBarColor : DarkColors.lightBg}
+        backgroundColor={statusBarColor ? statusBarColor : themeColors.lightBg}
         barStyle="light-content"
       />
       <View
         style={[
-          { flex: 1, backgroundColor: DarkColors.backGround },
+          { flex: 1, backgroundColor: themeColors.backGround },
           conatinerStyle,
         ]}
       >

@@ -4,7 +4,7 @@ import { TitleText } from "./Text";
 import SvgIcon from "../assets/icons";
 import { wp } from "../helpers/comman";
 import { useRouter } from "expo-router";
-import { DarkColors } from "../constants/Colors";
+import { DarkColors, useThemeColors } from "../constants/Colors";
 
 interface IProps {
   title?: string;
@@ -15,19 +15,25 @@ interface IProps {
 const Header = (props: IProps) => {
   const { title, showBackIcon, mb } = props;
   const navigation = useRouter();
+  const themeColors = useThemeColors();
   return (
-    <View style={[styles.headerConatiner, { marginBottom: mb }]}>
+    <View
+      style={[
+        styles.headerConatiner,
+        { marginBottom: mb, backgroundColor: themeColors?.lightBg },
+      ]}
+    >
       {showBackIcon ? (
         <Pressable
           style={[styles.backIconConatiner]}
           onPress={() => navigation.back()}
         >
-          <SvgIcon name={"arrowLeft"} color={DarkColors?.primaryColor} />
+          <SvgIcon name={"arrowLeft"} color={themeColors?.primaryColor} />
         </Pressable>
       ) : (
         <View style={{ width: wp(8) }} />
       )}
-      <TitleText style={{ color: DarkColors?.text }}>{title}</TitleText>
+      <TitleText style={{ color: themeColors?.text }}>{title}</TitleText>
       <View style={{ width: wp(8) }} />
     </View>
   );
@@ -42,10 +48,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: wp(3),
     paddingBottom: wp(3),
-    backgroundColor: DarkColors?.lightBg,
   },
   backIconConatiner: {
-    backgroundColor: "rgba(0,0,0,1)",
+    backgroundColor: "rgba(0,0,0,0.1)",
     alignSelf: "flex-start",
     borderRadius: 10,
     height: wp(8),

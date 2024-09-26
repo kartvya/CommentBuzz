@@ -1,12 +1,12 @@
-import { Colors, DarkColors } from "@/src/constants/Colors";
+import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { ResizeMode, Video } from "expo-av";
 import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  Share,
   StyleSheet,
   ToastAndroid,
   TouchableOpacity,
@@ -15,7 +15,7 @@ import {
 import { replaceMentionValues } from "react-native-controlled-mentions";
 import ParsedText from "react-native-parsed-text";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
 import { RootState } from "../redux/Store";
@@ -32,12 +32,11 @@ import {
 } from "../services/postServices";
 import { PostData } from "../utility/types";
 import Avatar from "./Avatar";
+import Button from "./Button";
+import GlobalCenterModal from "./GlobalCenterModal";
+import PostActionModal from "./PostActionModal";
 import Spacer from "./Spacer";
 import { NormalText, TitleText } from "./Text";
-import PostActionModal from "./PostActionModal";
-import moment from "moment";
-import GlobalCenterModal from "./GlobalCenterModal";
-import Button from "./Button";
 
 interface Iprops {
   item: PostData;
@@ -50,7 +49,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
   ({ item, isVisible, fetchAllPost, isCommentScreen }) => {
     const navigation = useNavigation();
     const router = useRouter();
-    const dispatch = useDispatch();
+    const themeColors = useThemeColors();
     const UserInfo = useSelector(
       (state: RootState) => state.root?.authReducer?.userInfo
     ) as Users;
@@ -65,8 +64,6 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     const [deleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [showProfilePitcture, setShowProfilePitcture] =
       useState<boolean>(false);
-    const [selectedProfilePitcture, setSelectedProfilePitcture] =
-      useState<string>("");
     const [shareLoad, setShareLoad] = useState(false);
 
     useEffect(() => {
@@ -124,14 +121,24 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
 
     const onPressShareImage = async () => {
       try {
-        let content = { message: item.body, url: "" };
+        let fileUrl = "";
+        let fileType = item.files.split(".").pop(); // Get the file type from the item
+        let shareOptions = {
+          mimeType: fileType !== "png" ? "video/mp4" : "image/jpeg",
+          dialogTitle:
+            fileType !== "png"
+              ? "Check out this video!"
+              : "Check out this image!",
+          UTI: fileType !== "png" ? "video/mp4" : "image/jpeg",
+          message: item.body, // Include the item body as a message
+        };
+
         if (item?.files) {
           setShareLoad(true);
           let url = await downloadImage(getSupaBaseFileUrl(item?.files).uri);
           setShareLoad(false);
-          content.url = url ?? "";
+          fileUrl = url ?? "";
         }
-        Share.share(content);
       } catch (error) {
         console.log(error);
       }
@@ -179,7 +186,6 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
         return item?.postBuzz;
       }
     }
-
     /* Upvote function */
     const onPressUpvote = async () => {
       try {
@@ -278,7 +284,12 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
 
     return (
       <>
-        <View style={styles.userContainer}>
+        <View
+          style={[
+            styles.userContainer,
+            { backgroundColor: themeColors?.lightBg },
+          ]}
+        >
           <View style={styles.avtarTitleConatiner}>
             <View style={styles.avtarTitleConatiner}>
               <Avatar
@@ -298,14 +309,14 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
             </View>
             {UserInfo?.id === item?.userId && (
               <Pressable onPress={() => setShowPostActionModal(true)}>
-                <SvgIcon name={"postMore"} color={DarkColors?.text} />
+                <SvgIcon name={"postMore"} color={themeColors?.text} />
               </Pressable>
             )}
           </View>
           {item?.body ? (
             <View>
               <ParsedText
-                style={styles.descriptionText}
+                style={[styles.descriptionText, { color: themeColors?.text }]}
                 parse={[
                   {
                     style: styles.username,
@@ -358,18 +369,25 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           </View>
           <View style={styles.footerConatiner}>
             <View style={[styles.flex]}>
-              <View style={styles.upvoteConatiner}>
+              <View
+                style={[
+                  styles.upvoteConatiner,
+                  { backgroundColor: themeColors?.votesBg },
+                ]}
+              >
                 <TouchableOpacity style={styles.flex} onPress={onPressUpvote}>
                   <SvgIcon
                     name={"upArrow"}
                     size={25}
-                    color={userVote === "upvote" ? Colors.red : DarkColors.text}
+                    color={
+                      userVote === "upvote" ? Colors.red : themeColors.text
+                    }
                   />
                   <NormalText
                     style={{
                       marginRight: RFPercentage(1),
                       color:
-                        userVote === "upvote" ? Colors.red : DarkColors.text,
+                        userVote === "upvote" ? Colors.red : themeColors.text,
                     }}
                   >
                     {voteCount}
@@ -387,7 +405,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                     color={
                       userVote === "downvote"
                         ? Colors.downvote
-                        : DarkColors.text
+                        : themeColors.text
                     }
                   />
                 </Pressable>
@@ -398,10 +416,17 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                   onPress={onPressComment}
                   style={[
                     styles.upvoteConatiner,
-                    { paddingHorizontal: RFPercentage(1) },
+                    {
+                      paddingHorizontal: RFPercentage(1),
+                      backgroundColor: themeColors?.votesBg,
+                    },
                   ]}
                 >
-                  <SvgIcon name={"comment"} size={16} color={DarkColors.text} />
+                  <SvgIcon
+                    name={"comment"}
+                    size={16}
+                    color={themeColors.text}
+                  />
                   <NormalText style={{ marginLeft: RFPercentage(1) }}>
                     {item?.comments[0]?.count}
                   </NormalText>
@@ -411,17 +436,20 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
             {shareLoad ? (
               <ActivityIndicator
                 size={"small"}
-                color={DarkColors.primaryColor}
+                color={themeColors.primaryColor}
               />
             ) : (
               <Pressable
                 onPress={onPressShareImage}
                 style={[
                   styles.upvoteConatiner,
-                  { paddingHorizontal: RFPercentage(1) },
+                  {
+                    paddingHorizontal: RFPercentage(1),
+                    backgroundColor: themeColors?.votesBg,
+                  },
                 ]}
               >
-                <SvgIcon name={"share"} size={15} color={DarkColors?.text} />
+                <SvgIcon name={"share"} size={15} color={themeColors?.text} />
               </Pressable>
             )}
           </View>
@@ -444,7 +472,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           childern={
             <View
               style={{
-                backgroundColor: DarkColors.lightBg,
+                backgroundColor: themeColors.lightBg,
                 borderRadius: 10,
                 padding: RFPercentage(1),
                 paddingHorizontal: RFPercentage(2),
@@ -466,7 +494,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                     borderRadius: 100,
                     height: hp(5),
                   }}
-                  textStyle={{ color: DarkColors.icon, fontSize: RFValue(13) }}
+                  textStyle={{ color: themeColors.icon, fontSize: RFValue(13) }}
                 />
                 <Spacer gap={RFPercentage(0.5)} />
                 <Button
@@ -497,7 +525,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                 width: RFPercentage(25),
                 borderRadius: 100,
                 alignSelf: "center",
-                backgroundColor: DarkColors.text,
+                backgroundColor: themeColors.text,
               }}
             />
           }
@@ -511,7 +539,6 @@ export default MemoizedPostView;
 
 const styles = StyleSheet.create({
   userContainer: {
-    backgroundColor: DarkColors?.lightBg,
     marginHorizontal: RFPercentage(1),
     marginVertical: RFPercentage(1),
     borderRadius: 12,
@@ -526,7 +553,6 @@ const styles = StyleSheet.create({
     marginHorizontal: RFPercentage(1),
   },
   descriptionText: {
-    color: DarkColors?.text,
     marginVertical: RFPercentage(0.5),
     marginTop: RFPercentage(1),
     fontFamily: "SpaceMono-Regular",
@@ -558,7 +584,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 30,
-    borderColor: Colors.icon,
     paddingHorizontal: RFPercentage(0.5),
     height: RFPercentage(3.6),
     shadowColor: "#000",
@@ -568,7 +593,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    backgroundColor: DarkColors?.votesBg,
     elevation: 5,
   },
   smallVerticalLine: {

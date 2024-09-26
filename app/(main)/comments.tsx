@@ -160,6 +160,7 @@ const Comments = () => {
         <MemoizedCommentView
           item={item}
           isUserComment={item?.userId == UserInfo?.id}
+          postId={postId as string}
           onDeleteComment={() => onDeleteComment(item?.id)}
         />
       </>
@@ -226,7 +227,9 @@ const Comments = () => {
               styles.textInputConatiner,
               {
                 bottom:
-                  Platform.OS === "ios" ? insets.bottom - 5 : insets.bottom,
+                  Platform.OS === "ios"
+                    ? insets.bottom - 5
+                    : insets.bottom + 10,
               },
             ]}
           >

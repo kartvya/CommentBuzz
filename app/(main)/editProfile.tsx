@@ -4,7 +4,7 @@ import Header from "@/src/components/Header";
 import Input from "@/src/components/Input";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
-import { Colors, DarkColors } from "@/src/constants/Colors";
+import { useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
@@ -32,6 +32,7 @@ interface UpdatedUsersData {
 const EditProfile = () => {
   const navigation = useRouter();
   const dispatch = useDispatch();
+  const themeColors = useThemeColors();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
@@ -146,7 +147,7 @@ const EditProfile = () => {
     : getUserImage(UserInfo.image);
 
   return (
-    <ScreenWrapper bg={Colors.white}>
+    <ScreenWrapper>
       <Header title={"Edit Profile"} showBackIcon={true} />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
@@ -155,14 +156,20 @@ const EditProfile = () => {
         <Spacer gap={wp(3)} />
         <View style={styles.avtarConatiner}>
           <Image style={styles.avatar} source={imageSource} />
-          <Pressable style={styles.editConatiner} onPress={pickImage}>
-            <SvgIcon name={"camera"} size={20} color={Colors.white} />
+          <Pressable
+            style={[
+              styles.editConatiner,
+              { backgroundColor: themeColors.votesBg },
+            ]}
+            onPress={pickImage}
+          >
+            <SvgIcon name={"camera"} size={20} color={themeColors?.text} />
           </Pressable>
         </View>
         <Spacer gap={RFPercentage(3)} />
         <Input
           containerStyle={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-          icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
+          icon={<SvgIcon name={"mail"} size={26} color={themeColors.icon} />}
           placeholderText="Enter your email"
           onChangeText={(txt) => setUser({ ...user, name: txt })}
           error={""}
@@ -173,7 +180,7 @@ const EditProfile = () => {
         <Spacer gap={wp(3)} />
         <Input
           containerStyle={{}}
-          icon={<SvgIcon name={"user"} size={26} color={Colors.icon} />}
+          icon={<SvgIcon name={"user"} size={26} color={themeColors.icon} />}
           placeholderText="Enter your username"
           onChangeText={(txt) => setUser({ ...user, name: txt })}
           error={errors?.name}
@@ -182,7 +189,7 @@ const EditProfile = () => {
         <Spacer gap={errors?.name ? wp(2) : wp(3)} />
         <Input
           containerStyle={{}}
-          icon={<SvgIcon name={"call"} size={26} color={Colors.icon} />}
+          icon={<SvgIcon name={"call"} size={26} color={themeColors.icon} />}
           placeholderText="Enter your phone number"
           onChangeText={(txt) => setUser({ ...user, phonNumber: txt })}
           error={errors?.phonNumber}
@@ -232,7 +239,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   editConatiner: {
-    backgroundColor: DarkColors.votesBg,
     borderRadius: 90,
     position: "absolute",
     bottom: -3,

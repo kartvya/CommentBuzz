@@ -5,7 +5,7 @@ import Input from "@/src/components/Input";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
-import { Colors, DarkColors } from "@/src/constants/Colors";
+import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { isEmailValid, isPasswordValid } from "@/src/helpers/validation";
 import { useRouter } from "expo-router";
@@ -16,6 +16,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const Signup = () => {
   const navigation = useRouter();
+  const themeColors = useThemeColors();
   const emailRef = useRef<string>("");
   const userNameRef = useRef<string>("");
   const passwordRef = useRef<string>("");
@@ -90,7 +91,7 @@ const Signup = () => {
 
   return (
     <ScreenWrapper
-      statusBarColor={DarkColors?.backGround}
+      statusBarColor={themeColors?.backGround}
       conatinerStyle={{ paddingHorizontal: wp(4) }}
     >
       <KeyboardAwareScrollView
@@ -104,7 +105,7 @@ const Signup = () => {
           style={styles.backIconConatiner}
           onPress={() => navigation.navigate("/welcome")}
         >
-          <SvgIcon name={"arrowLeft"} color={DarkColors?.primaryColor} />
+          <SvgIcon name={"arrowLeft"} color={themeColors?.primaryColor} />
         </Pressable>
         <Spacer gap={hp(2)} />
         <TitleText style={styles.greetingText}>Let's,</TitleText>
@@ -114,7 +115,7 @@ const Signup = () => {
         <Spacer gap={hp(1)} />
         <Input
           containerStyle={{}}
-          icon={<SvgIcon name={"user"} size={26} color={Colors.icon} />}
+          icon={<SvgIcon name={"user"} size={26} color={themeColors.icon} />}
           placeholderText="Enter your username"
           onChangeText={(txt) => (userNameRef.current = txt)}
           error={userNameError}
@@ -123,7 +124,7 @@ const Signup = () => {
         <Spacer gap={userNameError ? wp(2) : wp(3)} />
         <Input
           containerStyle={{}}
-          icon={<SvgIcon name={"mail"} size={26} color={Colors.icon} />}
+          icon={<SvgIcon name={"mail"} size={26} color={themeColors.icon} />}
           placeholderText="Enter your email"
           onChangeText={(txt) => (emailRef.current = txt)}
           error={emailError}
@@ -131,7 +132,7 @@ const Signup = () => {
         <Spacer gap={emailError ? wp(2) : wp(3)} />
         <Input
           containerStyle={{}}
-          icon={<SvgIcon name={"lock"} size={26} color={Colors.icon} />}
+          icon={<SvgIcon name={"lock"} size={26} color={themeColors.icon} />}
           placeholderText="Enter your password"
           secureTextEntry={showPass ? false : true}
           onChangeText={(txt) => (passwordRef.current = txt)}
@@ -141,7 +142,7 @@ const Signup = () => {
               <SvgIcon
                 name={showPass ? "eye" : "closeEye"}
                 size={22}
-                color={DarkColors.text}
+                color={themeColors.text}
               />
             </Pressable>
           }
@@ -152,6 +153,9 @@ const Signup = () => {
           btnStyle={{ alignItems: "center" }}
           onPress={() => onSignUp()}
           isLoading={isLoading}
+          textStyle={{
+            color: DarkColors.white,
+          }}
         />
         <NormalText style={styles.errorText}>{globalError}</NormalText>
         <Spacer gap={wp(3)} />
@@ -161,7 +165,7 @@ const Signup = () => {
             style={{ marginLeft: wp(1) }}
             onPress={() => navigation.navigate("/login")}
           >
-            <NormalText style={{ color: DarkColors.primaryColor }}>
+            <NormalText style={{ color: themeColors.primaryColor }}>
               Login
             </NormalText>
           </Pressable>
@@ -178,7 +182,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(30),
   },
   backIconConatiner: {
-    backgroundColor: "rgba(0,0,0,1)",
+    backgroundColor: "rgba(0,0,0,0.1)",
     alignSelf: "flex-start",
     borderRadius: 10,
     height: wp(8),
@@ -186,15 +190,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-
-    elevation: 5,
   },
   alreadyAccount: {
     flexDirection: "row",

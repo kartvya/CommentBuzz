@@ -52,7 +52,7 @@ export const downloadImage = async(url) => {
     return uri
   } catch (error) {
     console.log(error);
-    return null  
+    return null
   }
 }
 

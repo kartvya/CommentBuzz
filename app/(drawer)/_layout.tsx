@@ -1,9 +1,10 @@
 import CustomDrawer from "@/src/components/CustomDrawer";
-import { DarkColors } from "@/src/constants/Colors";
+import { DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { Drawer } from "expo-router/drawer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function Layout() {
+  const themeColors = useThemeColors();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
@@ -11,9 +12,9 @@ export default function Layout() {
           headerShown: false,
           drawerPosition: "right",
           swipeEnabled: false,
-          drawerActiveTintColor: DarkColors?.primaryColor,
+          drawerActiveTintColor: themeColors?.primaryColor,
           drawerStyle: {
-            backgroundColor: DarkColors?.lightBg,
+            backgroundColor: themeColors?.lightBg,
           },
         }}
         drawerContent={(props) => <CustomDrawer {...props} />}

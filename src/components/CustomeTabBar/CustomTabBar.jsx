@@ -1,4 +1,4 @@
-import { DarkColors } from "@/src/constants/Colors";
+import { useThemeColors } from "@/src/constants/Colors";
 import { useEffect, useState } from "react";
 import { Dimensions, Platform, StyleSheet, View } from "react-native";
 import Animated, {
@@ -15,6 +15,7 @@ const { width, height } = Dimensions.get("window");
 export default function CustomTabBar({ state, descriptors, navigation }) {
   const translateX = useSharedValue(0);
   const uploadNavigation = useRouter();
+  const themeColors = useThemeColors();
   const [dimentions, setDimentions] = useState({ width: 200, height: 100 });
 
   const buttonWidth = dimentions.width / state.routes.length;
@@ -43,7 +44,10 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
     <View
       style={[
         styles.tabBarContainer,
-        { bottom: Platform.OS === "ios" ? insets.bottom - 10 : insets.bottom },
+        {
+          bottom: Platform.OS === "ios" ? insets.bottom - 10 : insets.bottom,
+          backgroundColor: themeColors.votesBg,
+        },
       ]}
       onLayout={onTabBarLayout}
     >
@@ -54,7 +58,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
             width: buttonWidth - 12,
             height: dimentions.height - 15,
             position: "absolute",
-            backgroundColor: "#fff",
+            backgroundColor: themeColors.white,
             borderRadius: 40,
             zIndex: -1,
             marginHorizontal: 6,
@@ -122,7 +126,6 @@ const styles = StyleSheet.create({
     height: 60,
     position: "absolute",
     alignSelf: "center",
-    backgroundColor: DarkColors.votesBg,
     borderRadius: 100,
     alignItems: "center",
     justifyContent: "space-evenly",

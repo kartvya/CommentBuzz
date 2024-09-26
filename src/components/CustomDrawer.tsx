@@ -7,11 +7,11 @@ import {
 } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import SvgIcon from "../assets/icons";
-import { Colors, DarkColors } from "../constants/Colors";
+import { Colors, DarkColors, useThemeColors } from "../constants/Colors";
 import MyStatusBar from "./CustomeStatusBar";
 import Spacer from "./Spacer";
 import { NormalText, TitleText } from "./Text";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
 import {
   postDataAssociatedWithUser,
@@ -24,14 +24,31 @@ import GlobalCenterModal from "./GlobalCenterModal";
 import Button from "./Button";
 import { useRouter } from "expo-router";
 import { hp } from "../helpers/comman";
+import Switch from "./Switch";
+import { ISDARKMODE, LOGOUT } from "../redux/actions/ActionType";
 
 const CustomDrawer = (props: any) => {
+  const dispatch = useDispatch();
   const navigation = useRouter();
+  const themeColors = useThemeColors();
+  //@ts-ignore
+  const { isDarkMode } = useSelector(
+    (state: RootState) => state.root?.authReducer
+  );
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as Users;
 
   const [logoutModal, setLogoutModal] = useState(false);
+
+  const toggleSwitch = () => {
+    dispatch({
+      type: ISDARKMODE,
+      payload: {
+        isDarkMode: !isDarkMode?.isDarkMode,
+      },
+    });
+  };
 
   const formatedDate = (time: string) => {
     const givenDate = moment(time);
@@ -59,25 +76,10 @@ const CustomDrawer = (props: any) => {
     0
   );
 
-  const onPressLogout = () => {
-    try {
-      Alert.alert(
-        "Confirm",
-        "Are you sure want to log out?",
-        [
-          { text: "Cancel", onPress: () => console.log("Cancel Pressed!") },
-          { text: "OK", onPress: onLogoutYesBTN },
-        ],
-        { cancelable: false }
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const onLogoutYesBTN = async () => {
     try {
       const { error } = await supabase.auth.signOut();
+      // dispatch({ type: LOGOUT });
       if (error) {
         Alert.alert(
           "Sign out",
@@ -93,13 +95,13 @@ const CustomDrawer = (props: any) => {
   return (
     <>
       <MyStatusBar
-        backgroundColor={DarkColors.lightBg}
+        backgroundColor={themeColors.lightBg}
         barStyle="light-content"
       />
       <View style={styles.conatiner}>
         <View style={styles.coinesContainer}>
           <View style={styles.coinFlex}>
-            <SvgIcon name={"buzzCoin"} color={DarkColors.text} size={30} />
+            <SvgIcon name={"buzzCoin"} color={themeColors.text} size={30} />
             <Spacer gap={RFPercentage(0.5)} />
             <View>
               <TitleText style={styles.coinsValueStyle}>{postBuzz}</TitleText>
@@ -108,7 +110,7 @@ const CustomDrawer = (props: any) => {
           </View>
           <Spacer gap={RFPercentage(1)} />
           <View style={styles.coinFlex}>
-            <SvgIcon name={"cake"} color={DarkColors.text} size={30} />
+            <SvgIcon name={"cake"} color={themeColors.text} size={30} />
             <Spacer gap={RFPercentage(0.5)} />
             <View>
               <TitleText style={styles.coinsValueStyle}>
@@ -123,7 +125,7 @@ const CustomDrawer = (props: any) => {
           style={{
             width: "100%",
             height: 1,
-            backgroundColor: DarkColors?.borderColor,
+            backgroundColor: themeColors?.borderColor,
             marginVertical: RFPercentage(1),
           }}
         />
@@ -131,54 +133,92 @@ const CustomDrawer = (props: any) => {
         <TouchableHighlight
           onPress={() => navigation.navigate("/(main)/editProfile")}
           style={styles.listConatiner}
-          underlayColor={DarkColors.votesBg}
+          underlayColor={themeColors.votesBg}
         >
           <React.Fragment>
             <TitleText
-              style={{ color: DarkColors.text, fontSize: RFValue(13) }}
+              style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
               Edit profile
             </TitleText>
-            <SvgIcon name={"edit"} size={18} color={DarkColors?.text} />
+            <SvgIcon name={"edit"} size={18} color={themeColors?.text} />
           </React.Fragment>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={() => alert("Comming soon")}
           style={styles.listConatiner}
-          underlayColor={DarkColors.votesBg}
+          underlayColor={themeColors.votesBg}
         >
           <React.Fragment>
             <TitleText
-              style={{ color: DarkColors.text, fontSize: RFValue(13) }}
+              style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
               Refer & Earn
             </TitleText>
             <SvgIcon
               name={"refer"}
               size={18}
-              color={DarkColors?.text}
+              color={themeColors?.text}
               strokeWidth={3}
             />
           </React.Fragment>
         </TouchableHighlight>
 
-        <TouchableHighlight
+        {/* <TouchableHighlight
           onPress={() => alert("Comming soon")}
           style={styles.listConatiner}
-          underlayColor={DarkColors.votesBg}
+          underlayColor={themeColors.votesBg}
         >
           <React.Fragment>
             <TitleText
-              style={{ color: DarkColors.text, fontSize: RFValue(13) }}
+              style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
-              Buzz Leaderboard
+              Buzz leaderboard
             </TitleText>
             <SvgIcon
               name={"refer"}
               size={18}
-              color={DarkColors?.text}
+              color={themeColors?.text}
               strokeWidth={3}
+            />
+          </React.Fragment>
+        </TouchableHighlight> */}
+        <TouchableHighlight
+          onPress={toggleSwitch}
+          style={styles.listConatiner}
+          underlayColor={themeColors.votesBg}
+        >
+          <React.Fragment>
+            <TitleText
+              style={{ color: themeColors.text, fontSize: RFValue(13) }}
+            >
+              Dark mode
+            </TitleText>
+            <Switch
+              barHeight={20}
+              switchWidth={20}
+              switchHeight={20}
+              value={isDarkMode?.isDarkMode}
+              //@ts-ignore
+              onValueChange={toggleSwitch}
+              disabled={false}
+              backgroundActive={"#0095ff"}
+              backgroundInactive={"#d1d1d1"}
+              circleActiveColor={"white"}
+              circleInActiveColor={"white"}
+              changeValueImmediately={true}
+              innerCircleStyle={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              outerCircleStyle={{}}
+              renderActiveText={false}
+              renderInActiveText={false}
+              switchLeftPx={2}
+              switchRightPx={2}
+              switchWidthMultiplier={2}
+              switchBorderRadius={30}
             />
           </React.Fragment>
         </TouchableHighlight>
@@ -186,10 +226,14 @@ const CustomDrawer = (props: any) => {
         <TouchableHighlight
           onPress={() => setLogoutModal(true)}
           style={styles.listConatiner}
-          underlayColor={DarkColors.votesBg}
+          underlayColor={themeColors.votesBg}
         >
           <React.Fragment>
-            <TitleText style={styles.listTextStyle}>Logout</TitleText>
+            <TitleText
+              style={[styles.listTextStyle, { color: DarkColors.primaryColor }]}
+            >
+              Logout
+            </TitleText>
             <SvgIcon
               name={"logout"}
               size={18}
@@ -204,7 +248,7 @@ const CustomDrawer = (props: any) => {
         childern={
           <View
             style={{
-              backgroundColor: DarkColors.text,
+              backgroundColor: themeColors.text,
               borderRadius: 10,
               padding: RFPercentage(1),
               paddingHorizontal: RFPercentage(2),
@@ -222,7 +266,7 @@ const CustomDrawer = (props: any) => {
         childern={
           <View
             style={{
-              backgroundColor: DarkColors.lightBg,
+              backgroundColor: themeColors.lightBg,
               borderRadius: 10,
               padding: RFPercentage(1),
               paddingHorizontal: RFPercentage(2),
@@ -248,6 +292,9 @@ const CustomDrawer = (props: any) => {
                   borderRadius: 100,
                   height: hp(5),
                 }}
+                textStyle={{
+                  color: themeColors.white,
+                }}
               />
               <Spacer gap={RFPercentage(0.5)} />
               <Button
@@ -258,6 +305,9 @@ const CustomDrawer = (props: any) => {
                   backgroundColor: "red",
                   borderRadius: 100,
                   height: hp(5),
+                }}
+                textStyle={{
+                  color: DarkColors.white,
                 }}
               />
             </View>
@@ -292,7 +342,6 @@ const styles = StyleSheet.create({
     fontFamily: "SpaceMono-Bold",
   },
   listTextStyle: {
-    color: DarkColors.primaryColor,
     fontSize: RFValue(13),
   },
   listConatiner: {

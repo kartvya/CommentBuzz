@@ -551,7 +551,7 @@ import Avatar from "@/src/components/Avatar";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
-import { Colors, DarkColors } from "@/src/constants/Colors";
+import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { Users } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
@@ -584,36 +584,11 @@ const renderScene = SceneMap({
   third: () => <UserAbout />,
 });
 
-const renderTabBar = (props: any) => (
-  <TabBar
-    {...props}
-    renderLabel={() => null}
-    renderIcon={({ route }: { route: any }) => (
-      <View style={{}}>
-        <NormalText
-          style={{
-            marginVertical: RFPercentage(1),
-            fontSize: RFValue(10),
-          }}
-          numberOfLines={1}
-        >
-          {route.title}
-        </NormalText>
-      </View>
-    )}
-    style={{ backgroundColor: DarkColors.lightBg }}
-    labelStyle={{ fontSize: 12 }}
-    inactiveColor="gray"
-    indicatorStyle={{
-      backgroundColor: DarkColors?.primaryColor,
-    }}
-  />
-);
-
 const Profile = () => {
   const navigationDrawer = useNavigation();
   const navigation = useRouter();
   const layout = useWindowDimensions();
+  const themeColors = useThemeColors();
 
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
@@ -667,9 +642,14 @@ const Profile = () => {
 
   return (
     <>
-      <ScreenWrapper bg={Colors.white}>
-        <View style={styles.headerConatiner}>
-          <TitleText style={{ color: DarkColors.text }}>Profile</TitleText>
+      <ScreenWrapper>
+        <View
+          style={[
+            styles.headerConatiner,
+            { backgroundColor: themeColors?.lightBg },
+          ]}
+        >
+          <TitleText style={{ color: themeColors.text }}>Profile</TitleText>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Spacer gap={RFPercentage(0.5)} />
             <Pressable
@@ -678,7 +658,7 @@ const Profile = () => {
             >
               <SvgIcon
                 name={"hamburgerMenu"}
-                color={DarkColors.text}
+                color={themeColors.text}
                 strokeWidth={0.1}
                 size={20}
               />
@@ -687,7 +667,10 @@ const Profile = () => {
         </View>
         <View style={styles.avtarWithTextContainer}>
           <Pressable
-            style={styles.avtarConatiner}
+            style={[
+              styles.avtarConatiner,
+              { backgroundColor: themeColors.white },
+            ]}
             onPress={() => navigation.navigate("/(main)/editProfile")}
           >
             <Avatar
@@ -695,8 +678,13 @@ const Profile = () => {
               size={RFPercentage(10)}
               borderRadius={20}
             />
-            <View style={styles.editConatiner}>
-              <SvgIcon name={"edit"} size={18} color={DarkColors?.text} />
+            <View
+              style={[
+                styles.editConatiner,
+                { backgroundColor: themeColors?.votesBg },
+              ]}
+            >
+              <SvgIcon name={"edit"} size={18} color={themeColors?.text} />
             </View>
           </Pressable>
           <Spacer gap={RFPercentage(1)} />
@@ -715,7 +703,31 @@ const Profile = () => {
           renderScene={renderScene}
           onIndexChange={setIndex}
           initialLayout={{ width: layout.width }}
-          renderTabBar={renderTabBar}
+          renderTabBar={(props) => (
+            <TabBar
+              {...props}
+              renderLabel={() => null}
+              renderIcon={({ route }: { route: any }) => (
+                <View style={{}}>
+                  <NormalText
+                    style={{
+                      marginVertical: RFPercentage(1),
+                      fontSize: RFValue(10),
+                    }}
+                    numberOfLines={1}
+                  >
+                    {route.title}
+                  </NormalText>
+                </View>
+              )}
+              style={{ backgroundColor: themeColors.lightBg }}
+              labelStyle={{ fontSize: 12 }}
+              inactiveColor="gray"
+              indicatorStyle={{
+                backgroundColor: themeColors?.primaryColor,
+              }}
+            />
+          )}
         />
       </ScreenWrapper>
     </>
@@ -730,7 +742,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: wp(3),
-    backgroundColor: DarkColors?.lightBg,
     paddingBottom: wp(3),
   },
   backIconConatiner: {
@@ -752,12 +763,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
-    backgroundColor: Colors.white,
     borderRadius: 30,
     marginLeft: RFPercentage(1.3),
   },
   editConatiner: {
-    backgroundColor: DarkColors?.votesBg,
     borderRadius: 90,
     position: "absolute",
     bottom: -3,

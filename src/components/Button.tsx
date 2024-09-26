@@ -8,7 +8,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { TitleText } from "./Text";
-import { Colors, DarkColors } from "@/src/constants/Colors";
+import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "../helpers/comman";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -41,19 +41,35 @@ const Button = (props: btnProps) => {
 
     elevation: 3,
   };
+  const themeColors = useThemeColors();
   if (isLoading) {
     return (
-      <View style={[styles.button, btnStyle]}>
-        <ActivityIndicator color={Colors.white} />
+      <View
+        style={[
+          styles.button,
+          { backgroundColor: themeColors.primaryColor },
+          btnStyle,
+        ]}
+      >
+        <ActivityIndicator color={themeColors.white} />
       </View>
     );
   }
   return (
     <Pressable
-      style={[styles.button, btnStyle, hasShadow && shadowStyle]}
+      style={[
+        styles.button,
+        { backgroundColor: themeColors.primaryColor },
+        btnStyle,
+        hasShadow && shadowStyle,
+      ]}
       onPress={onPress}
     >
-      <TitleText style={[styles.txt, textStyle]}>{title}</TitleText>
+      <TitleText
+        style={[styles.txt, { color: themeColors.invertedWhite }, textStyle]}
+      >
+        {title}
+      </TitleText>
     </Pressable>
   );
 };
@@ -62,7 +78,6 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: DarkColors.primaryColor,
     height: hp(6),
     justifyContent: "center",
     borderRadius: wp(3),
@@ -70,6 +85,5 @@ const styles = StyleSheet.create({
   },
   txt: {
     fontSize: RFValue(17),
-    color: Colors.white,
   },
 });

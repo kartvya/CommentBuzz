@@ -1,26 +1,24 @@
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SvgIcon from "../assets/icons";
-import { DarkColors } from "../constants/Colors";
+import { DarkColors, useThemeColors } from "../constants/Colors";
 import { wp } from "../helpers/comman";
 import Spacer from "./Spacer";
 import { TitleText } from "./Text";
 
 const FeedHeader = () => {
-  const insets = useSafeAreaInsets();
   const navigation = useRouter();
-  const paddingTop = insets.top > 30 ? insets.top + 5 : 30;
+  const themeColors = useThemeColors();
   return (
     <>
       <View style={styles.conatiner}>
         <TitleText style={styles.headerTitleText}>Comment Buzz</TitleText>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <SvgIcon name={"heart"} color={DarkColors?.text} />
+          <SvgIcon name={"heart"} color={themeColors?.text} />
           <Spacer gap={wp(1)} />
           <Pressable onPress={() => navigation.navigate("/uploadPost")}>
-            <SvgIcon name={"plus"} color={DarkColors?.text} />
+            <SvgIcon name={"plus"} color={themeColors?.text} />
           </Pressable>
         </View>
       </View>

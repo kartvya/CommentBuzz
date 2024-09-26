@@ -1,5 +1,14 @@
+import { RootState } from "../redux/Store";
+import { useSelector } from "react-redux"; // Don't forget to import this
+import { useMemo } from "react";
+
 const tintColorLight = "#0a7ea4";
 const tintColorDark = "#fff";
+
+// Selector to get the theme state from Redux
+const useIsDarkMode = () => {
+  return useSelector((state: RootState) => state.root?.authReducer?.isDarkMode);
+};
 
 export const Colors = {
   text: "#11181C",
@@ -15,6 +24,17 @@ export const Colors = {
   upvoteBg: "#262C2F",
   downvote: "#5F56F7",
 };
+export const LightColors = {
+  text: "#000",
+  backGround: "#EDEDED",
+  lightBg: "#E4E3E8",
+  borderColor: "#DADADA",
+  primaryColor: "#0BB2C5",
+  votesBg: "#D9D3D0",
+  icon: "#3D3A37",
+  white: "black",
+  invertedWhite: "white",
+};
 
 export const DarkColors = {
   text: "#fff",
@@ -24,4 +44,17 @@ export const DarkColors = {
   primaryColor: "#F44D3A",
   votesBg: "#262C2F",
   icon: "#C2C5C8",
+  white: "white",
+  invertedWhite: "black",
+};
+
+// Create a function to handle dark mode
+export const useThemeColors = () => {
+  const isDarkMode = useIsDarkMode();
+  const themeColors = useMemo(() => {
+    //@ts-ignore
+    return isDarkMode?.isDarkMode ? DarkColors : LightColors;
+  }, [isDarkMode]);
+
+  return themeColors;
 };
