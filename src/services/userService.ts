@@ -1,0 +1,40 @@
+import { supabase } from "@/lib/supabase";
+
+export const getUserData = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select(
+        `
+        *, 
+        posts(id, postBuzz, created_at) 
+        `
+      )
+      .eq("id", userId)
+      .single();
+    if (error) {
+      return { success: false, msg: error?.message };
+    }
+    return { success: true, data };
+  } catch (error) {
+    console.log(error);
+    return { success: false, msg: error };
+  }
+};
+
+export const updateUser = async (userId: string, data: any) => {
+  try {
+    const { error } = await supabase
+      .from("users")
+      .update(data)
+      .eq("id", userId);
+    if (error) {
+      console.log(error);
+      return { success: false, data: undefined, msg: error };
+    }
+    return { success: true, data: data, msg: "" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: error };
+  }
+};
