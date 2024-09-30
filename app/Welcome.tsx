@@ -6,14 +6,41 @@ import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
-import { useRef } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Dimensions, Pressable, StyleSheet, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { RFValue } from "react-native-responsive-fontsize";
+
+const screenDimensions = Dimensions.get("screen");
 
 const Welcome = () => {
   const animation = useRef<LottieView>(null);
   const navigation = useRouter();
   const themeColors = useThemeColors();
+  const descriptionAnimation = useSharedValue(screenDimensions.height * 0.8);
+  const descriptionStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: withTiming(descriptionAnimation.value, {
+            duration: 1200,
+          }),
+        },
+      ],
+    };
+  });
+  const startAnimation = async () => {
+    descriptionAnimation.value = screenDimensions.height * 0.001;
+  };
+
+  useEffect(() => {
+    startAnimation();
+  }, []);
+
   return (
     <ScreenWrapper statusBarColor={themeColors.backGround}>
       <View style={styles.conatiner}>
@@ -27,7 +54,15 @@ const Welcome = () => {
           }}
           source={require("../src/assets/images/welcomeAnimation.json")}
         />
-        <View style={{ marginBottom: hp(5), marginHorizontal: wp(3) }}>
+        <Animated.View
+          style={[
+            {
+              paddingBottom: hp(5),
+              paddingHorizontal: wp(3),
+            },
+            descriptionStyle,
+          ]}
+        >
           <TitleText style={styles.appNameTextStyle}>CommentBuzz</TitleText>
           <NormalText style={styles.punchLine}>
             Buzz with Comments, Earn with Impact!
@@ -53,7 +88,7 @@ const Welcome = () => {
               </NormalText>
             </Pressable>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </ScreenWrapper>
   );
