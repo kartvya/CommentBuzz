@@ -34,6 +34,7 @@ export const LightColors = {
   icon: "#3D3A37",
   white: "black",
   invertedWhite: "white",
+  chartColor: "#808080",
 };
 
 export const DarkColors = {
@@ -46,6 +47,7 @@ export const DarkColors = {
   icon: "#C2C5C8",
   white: "white",
   invertedWhite: "black",
+  chartColor: "#d3d3d3",
 };
 
 // Create a function to handle dark mode

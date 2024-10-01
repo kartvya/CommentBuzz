@@ -21,7 +21,6 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
   const buttonWidth = dimentions.width / state.routes.length;
 
   const onTabBarLayout = (e) => {
-    console.log(e.nativeEvent);
     setDimentions({
       width: e.nativeEvent.layout.width,
       height: e.nativeEvent.layout.height,
@@ -45,7 +44,8 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
       style={[
         styles.tabBarContainer,
         {
-          bottom: Platform.OS === "ios" ? insets.bottom - 10 : insets.bottom + 5,
+          bottom:
+            Platform.OS === "ios" ? insets.bottom - 10 : insets.bottom + 5,
           backgroundColor: themeColors.votesBg,
         },
       ]}

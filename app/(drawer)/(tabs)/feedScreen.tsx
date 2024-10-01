@@ -6,6 +6,8 @@ import MemoizedPostView from "@/src/components/MemoizedPostView";
 import { TitleText } from "@/src/components/Text";
 import { DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
+import { Users } from "@/src/redux/reducers/AuthReducer";
+import { RootState } from "@/src/redux/Store";
 import { fetchPost } from "@/src/services/postServices";
 import { getUserData } from "@/src/services/userService";
 import { PostData } from "@/src/utility/types";
@@ -13,6 +15,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
+  AppState,
   FlatListProps,
   ListRenderItem,
   Platform,
@@ -23,6 +26,7 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 
 const AnimatedFlatList =
   Animated.createAnimatedComponent<
@@ -42,6 +46,51 @@ const FeedScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [Posts, setPosts] = useState<PostData[]>([]);
+
+  // const appState = useRef(AppState.currentState);
+  // const [startTime, setStartTime] = useState<Date | null>(null);
+
+  // const UserInfo = useSelector(
+  //   (state: RootState) => state.root?.authReducer?.userInfo
+  // ) as Users;
+
+  // useEffect(() => {
+  //   const subscription = AppState.addEventListener("change", (nextAppState) => {
+  //     if (
+  //       appState.current.match(/inactive|background/) &&
+  //       nextAppState === "active"
+  //     ) {
+  //       setStartTime(new Date());
+  //     } else if (appState.current.match(/inactive|background/)) {
+  //       if (startTime) {
+  //         const endTime = new Date();
+  //         const timeSpent =
+  //           (endTime.getTime() - startTime.getTime()) / 1000 / 60;
+  //         saveTimeSpentToSupabase(timeSpent);
+  //         setStartTime(null);
+  //       }
+  //     }
+  //     console.log(appState.current);
+  //     appState.current = nextAppState;
+  //   });
+
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, [startTime]);
+
+  // const saveTimeSpentToSupabase = async (timeSpent: number) => {
+  //   const userId = UserInfo.id;
+  //   const currentDate = new Date().toISOString().split("T")[0]; // Get only the date part
+  //   const { data, error } = await supabase.from("timeSpent").upsert({
+  //     user_id: userId,
+  //     date: currentDate,
+  //     time_spent: timeSpent,
+  //   });
+  //   if (error) {
+  //     console.error("Error saving time spent:", error.message);
+  //   }
+  // };
 
   const handlePost = async (payload: any) => {
     try {

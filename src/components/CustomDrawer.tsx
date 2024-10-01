@@ -165,25 +165,6 @@ const CustomDrawer = (props: any) => {
           </React.Fragment>
         </TouchableHighlight>
 
-        {/* <TouchableHighlight
-          onPress={() => alert("Comming soon")}
-          style={styles.listConatiner}
-          underlayColor={themeColors.votesBg}
-        >
-          <React.Fragment>
-            <TitleText
-              style={{ color: themeColors.text, fontSize: RFValue(13) }}
-            >
-              Buzz leaderboard
-            </TitleText>
-            <SvgIcon
-              name={"refer"}
-              size={18}
-              color={themeColors?.text}
-              strokeWidth={3}
-            />
-          </React.Fragment>
-        </TouchableHighlight> */}
         <TouchableHighlight
           onPress={toggleSwitch}
           style={styles.listConatiner}
@@ -219,6 +200,26 @@ const CustomDrawer = (props: any) => {
               switchRightPx={2}
               switchWidthMultiplier={2}
               switchBorderRadius={30}
+            />
+          </React.Fragment>
+        </TouchableHighlight>
+
+        <TouchableHighlight
+          onPress={() => navigation.navigate("/(main)/timeManagement")}
+          style={styles.listConatiner}
+          underlayColor={themeColors.votesBg}
+        >
+          <React.Fragment>
+            <TitleText
+              style={{ color: themeColors.text, fontSize: RFValue(13) }}
+            >
+              Time management
+            </TitleText>
+            <SvgIcon
+              name={"clock"}
+              size={18}
+              color={themeColors?.text}
+              strokeWidth={2}
             />
           </React.Fragment>
         </TouchableHighlight>
