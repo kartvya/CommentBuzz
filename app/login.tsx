@@ -9,7 +9,7 @@ import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import { Alert, Keyboard, Pressable, StyleSheet, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -45,22 +45,23 @@ const Login = () => {
       }
       if (isValid) {
         setLoading(true);
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password,
-        });
-        setLoading(false);
-        Keyboard.dismiss();
-        if (error) {
-          setGlobalError(error.message);
-        } else {
-          setGlobalError("");
-          navigation.navigate("/(tabs)/feedScreen");
-        }
+        // const {
+        //   data: { session },
+        //   error,
+        // } = await supabase.auth.signInWithPassword({
+        //   email: email,
+        //   password: password,
+        // });
+        // setLoading(false);
+        // Keyboard.dismiss();
+        // if (error) {
+        //   setGlobalError(error.message);
+        // } else {
+        //   setGlobalError("");
+        //   navigation.navigate("/(tabs)/feedScreen");
+        // }
       }
+      // navigation.navigate("/(tabs)/feedScreen");
     } catch (error) {
       console.log(error);
     }

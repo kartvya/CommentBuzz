@@ -31,9 +31,8 @@ export const createOrUpdatePost = async (post) => {
 };
 
 export const deletePost = async (postDeleteObj) => {
-    
-    try {
-     const { error } = await supabase
+  try {
+    const { error } = await supabase
       .from("posts")
       .delete()
       .eq("userId", postDeleteObj?.userId)
@@ -42,12 +41,12 @@ export const deletePost = async (postDeleteObj) => {
     if (error) {
       console.log(error);
       return { success: false, data: undefined, msg: "Could not delete post" };
-      }  
-    return { success: true, data: undefined, msg: "Post successfully deleted" };  
-    } catch (error) {
-        console.log(error);
-        return { success: false, data: undefined, msg: error?.message };
     }
+    return { success: true, data: undefined, msg: "Post successfully deleted" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, data: undefined, msg: error?.message };
+  }
 };
 
 export const fetchPost = async (limit = 10) => {
@@ -72,18 +71,28 @@ export const fetchPostDetails = async (postId) => {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select("*,user:users(id,name,image),postVotes(*),commentVotes(*),comments(*,user:users(id,name,image))")
+      .select(
+        "*,user:users(id,name,image),postVotes(*),comments(*,user:users(id,name,image),commentVotes(*))"
+      )
       .eq("id", postId)
-      .order("created_at", {ascending:true,foreignTable:'comments'})
-      .single()
+      .order("created_at", { ascending: true, foreignTable: "comments" })
+      .single();
     if (error) {
       console.log(error);
-      return { success: false, data: undefined, msg: "Could not fetch postdetails" };
+      return {
+        success: false,
+        data: undefined,
+        msg: "Could not fetch postdetails",
+      };
     }
     return { success: true, data: data, msg: "" };
   } catch (error) {
     console.log(error);
-    return { success: false, data: undefined, msg: "Could not fetch postdetails" };
+    return {
+      success: false,
+      data: undefined,
+      msg: "Could not fetch postdetails",
+    };
   }
 };
 
@@ -208,17 +217,21 @@ export const createComment = async (comment) => {
 
 export const deleteComment = async (commentId) => {
   try {
-    const {  error: commentError } = await supabase
+    const { error: commentError } = await supabase
       .from("comments")
       .delete()
-      .eq("id",commentId)
+      .eq("id", commentId);
 
     if (commentError) {
       console.log(commentError);
-      return { success: false, data: undefined, msg: "Could not delete comment" };
+      return {
+        success: false,
+        data: undefined,
+        msg: "Could not delete comment",
+      };
     }
 
-    return { success: true, data: {commentId}, msg: "" };
+    return { success: true, data: { commentId }, msg: "" };
   } catch (error) {
     console.log(error);
     return { success: false, data: undefined, msg: "Could not delete comment" };
@@ -229,8 +242,8 @@ export const deleteComment = async (commentId) => {
 export const createCommentVote = async (commentVote) => {
   try {
     const { data: voteData, error: voteError } = await supabase
-      .from("commentsVotes")
-      .insert({
+      .from("commentVotes")
+      .upsert({
         commentId: commentVote?.commentId,
         userId: commentVote?.userId,
         voteType: commentVote?.voteType,
@@ -238,12 +251,16 @@ export const createCommentVote = async (commentVote) => {
         postId: commentVote?.postId,
       })
       .select()
-      .single();     
-    if (voteError) {
-      console.log(voteError.message,'voteErrovoteErrorr');
+      .single();
+
+    if (voteError || !voteData) {
+      console.log(
+        voteError || "Error: No data returned from upsert",
+        "voteError"
+      );
       return { success: false, data: undefined, msg: "Could not upvote post" };
     } else {
-      console.log("updated")
+      console.log("Vote inserted or updated successfully.");
     }
 
     const { error: postError } = await supabase
@@ -255,6 +272,7 @@ export const createCommentVote = async (commentVote) => {
       .eq("id", commentVote.commentId)
       .select()
       .single();
+
     if (postError) {
       console.log(postError);
       return {
@@ -274,7 +292,7 @@ export const createCommentVote = async (commentVote) => {
 export const deleteCommentVote = async (deleteObj) => {
   try {
     const { error } = await supabase
-      .from("commentsVotes")
+      .from("commentVotes")
       .delete()
       .eq("userId", deleteObj?.userId)
       .eq("postId", deleteObj?.postId);
@@ -284,27 +302,45 @@ export const deleteCommentVote = async (deleteObj) => {
       return { success: false, data: undefined, msg: "Could not delete post" };
     }
 
-    // const { error: postError } = await supabase
-    //   .from("posts")
-    //   .update({
-    //     voteCount: deleteObj?.voteCount,
-    //     postBuzz: deleteObj?.feedBuzzCoins,
-    //   })
-    //   .eq("id", deleteObj?.postId)
-    //   .select()
-    //   .single();
-    // if (postError) {
-    //   console.log(postError);
-    //   return {
-    //     success: false,
-    //     data: undefined,
-    //     msg: "Could not update vote count",
-    //   };
-    // }
+    const { error: postError } = await supabase
+      .from("comments")
+      .update({
+        voteCount: deleteObj.voteCount,
+        commentBuzz: deleteObj.feedBuzzCoins,
+      })
+      .eq("id", deleteObj.commentId)
+      .select()
+      .single();
 
+    if (postError) {
+      console.log(postError);
+      return {
+        success: false,
+        data: undefined,
+        msg: "Could not update vote count",
+      };
+    }
     return { success: true, data: undefined, msg: "" };
   } catch (error) {
     console.log(error);
     return { success: false, data: undefined, msg: "Could not delete  post" };
+  }
+};
+
+export const fetchOnlyUserComments = async (limit = 10, userId) => {
+  try {
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*,user:users(id,name,image)")
+      .eq("userId", userId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) {
+      console.log(error);
+      return { success: false, data: undefined, msg: "Could not fetch post" };
+    }
+    return { success: true, data: data, msg: "" };
+  } catch (error) {
+    console.log(error);
   }
 };

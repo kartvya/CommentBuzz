@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
 import SvgIcon from "../assets/icons";
-import { Colors, DarkColors, useThemeColors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 import { hp } from "../helpers/comman";
 import { RootState } from "../redux/Store";
 import { Users } from "../redux/reducers/AuthReducer";
@@ -49,6 +49,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
       const currentUserVote = sortedData?.find(
         (vote: { userId: string }) => vote?.userId === UserInfo?.id
       );
+
       if (currentUserVote?.voteType === "upVote") {
         setUserVote("upvote");
       } else if (currentUserVote?.voteType === "downVote") {

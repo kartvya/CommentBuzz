@@ -18,11 +18,11 @@ export default function TabLayout() {
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        // tabBarActiveTintColor: DarkColors?.primaryColor,
-        // tabBarShowLabel: false,
-        // tabBarStyle: {
-        //   backgroundColor: DarkColors?.lightBg,
-        // },
+        tabBarActiveTintColor: DarkColors?.primaryColor,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: DarkColors?.lightBg,
+        },
       }}
     >
       <Tabs.Screen

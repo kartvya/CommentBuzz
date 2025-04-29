@@ -122,7 +122,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     const onPressShareImage = async () => {
       try {
         let fileUrl = "";
-        let fileType = item.files.split(".").pop(); // Get the file type from the item
+        let fileType = item.files.split(".").pop();
         let shareOptions = {
           mimeType: fileType !== "png" ? "video/mp4" : "image/jpeg",
           dialogTitle:
@@ -130,7 +130,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
               ? "Check out this video!"
               : "Check out this image!",
           UTI: fileType !== "png" ? "video/mp4" : "image/jpeg",
-          message: item.body, // Include the item body as a message
+          message: item.body,
         };
 
         if (item?.files) {
@@ -155,7 +155,6 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       }
     };
 
-    /* Math function that calculates buzzcoins based on post upvotes and downvotes */
     function buzzCoinMathFunction(
       type: "decreaseone" | "decreasetwo" | "increasetwo" | "increaseone"
     ) {

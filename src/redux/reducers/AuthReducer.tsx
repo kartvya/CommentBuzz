@@ -71,7 +71,7 @@ const initialState = {
   hasToken: false,
   accessToken: "",
   userInfo: "",
-  isDarkMode: false,
+  isDarkMode: true,
 };
 
 export const authReducer = (
