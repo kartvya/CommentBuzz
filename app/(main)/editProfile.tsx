@@ -4,7 +4,7 @@ import Header from "@/src/components/Header";
 import Input from "@/src/components/Input";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
 import Spacer from "@/src/components/Spacer";
-import { useThemeColors } from "@/src/constants/Colors";
+import { DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
 import { Users } from "@/src/redux/reducers/AuthReducer";
@@ -210,6 +210,9 @@ const EditProfile = () => {
           title="Update"
           onPress={() => onUpdateUserData()}
           isLoading={isLoading}
+          textStyle={{
+            color: DarkColors.white,
+          }}
         />
       </KeyboardAwareScrollView>
     </ScreenWrapper>

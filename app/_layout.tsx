@@ -5,7 +5,8 @@ import { getUserData } from "@/src/services/userService";
 import { User } from "@supabase/supabase-js";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider, useDispatch } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -73,6 +74,7 @@ function _layout() {
       SplashScreen.hideAsync();
     }
   }, [loaded, error]);
+
   if (!loaded) {
     return null;
   }
