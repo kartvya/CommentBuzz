@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons/index";
 import Button from "@/src/components/Button";
 import Input from "@/src/components/Input";
@@ -7,13 +6,21 @@ import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
 import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
+import { USERINFO } from "@/src/redux/actions/ActionType";
+import { useLoginMutation } from "@/src/services/AuthRequest/authApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import { Keyboard, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
+  const dispatch = useDispatch();
+
+  const [login] = useLoginMutation();
+
   const navigation = useRouter();
   const themeColors = useThemeColors();
   const emailRef = useRef<string>("");
@@ -45,23 +52,17 @@ const Login = () => {
       }
       if (isValid) {
         setLoading(true);
-        // const {
-        //   data: { session },
-        //   error,
-        // } = await supabase.auth.signInWithPassword({
-        //   email: email,
-        //   password: password,
-        // });
-        // setLoading(false);
-        // Keyboard.dismiss();
-        // if (error) {
-        //   setGlobalError(error.message);
-        // } else {
-        //   setGlobalError("");
-        //   navigation.navigate("/(tabs)/feedScreen");
-        // }
+        let loginCred = { email: email, password: password };
+        const loginResponse = await login(loginCred).unwrap();
+        await AsyncStorage.setItem("UserToken", loginResponse?.data?.token);
+        dispatch({
+          type: USERINFO,
+          payload: {
+            userInfo: loginResponse,
+          },
+        });
       }
-      // navigation.navigate("/(tabs)/feedScreen");
+      navigation.navigate("/(tabs)/feedScreen");
     } catch (error) {
       console.log(error);
     }

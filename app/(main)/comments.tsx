@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
 import Header from "@/src/components/Header";
 import Input from "@/src/components/Input";
@@ -70,26 +69,6 @@ const Comments = () => {
       });
     }
   };
-
-  useEffect(() => {
-    const commentsChannel = supabase
-      .channel("comments")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "comments",
-          filter: `postId=eq.${postId}`,
-        },
-        handleComment
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(commentsChannel);
-    };
-  }, []);
 
   useEffect(() => {
     getPostDetails();

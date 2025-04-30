@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
 import Button from "@/src/components/Button";
 import Input from "@/src/components/Input";
@@ -62,24 +61,6 @@ const Signup = () => {
       }
       setIsLoading(true);
       if (isValid) {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.signUp({
-          email: email,
-          password: password,
-          options: {
-            data: {
-              name: userName,
-              buzzCoins: 0,
-            },
-          },
-        });
-        if (error) {
-          setGlobalError(error?.message);
-        } else {
-          setGlobalError("");
-        }
         setIsLoading(false);
       } else {
         setIsLoading(false);

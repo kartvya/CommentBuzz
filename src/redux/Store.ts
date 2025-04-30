@@ -8,14 +8,17 @@ import { persistReducer, persistStore } from "redux-persist";
 import { ThunkDispatch } from "redux-thunk";
 
 import RootReducer from "./reducers/RootReducer";
+import backendBaseApi from "../services/BackendBaseApi";
 
 const rootReducer = combineReducers({
+  [backendBaseApi.reducerPath]: backendBaseApi.reducer,
   root: RootReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
+  blacklist: [backendBaseApi.reducerPath],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -24,11 +27,8 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      thunk: {
-        extraArgument: {},
-      },
       serializableCheck: false,
-    }),
+    }).concat(backendBaseApi.middleware),
 });
 
 const persistor = persistStore(store);

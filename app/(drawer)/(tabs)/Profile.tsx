@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
 import Avatar from "@/src/components/Avatar";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
@@ -71,13 +70,7 @@ const Profile = () => {
 
   const onLogoutYesBTN = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        Alert.alert(
-          "Sign out",
-          "Something went wrong. Please try again. leater"
-        );
-      }
+      Alert.alert("Sign out", "Something went wrong. Please try again. leater");
     } catch (error) {
       console.log(error);
     }

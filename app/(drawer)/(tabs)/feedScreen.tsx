@@ -1,13 +1,10 @@
-import { supabase } from "@/lib/supabase";
 import MyStatusBar from "@/src/components/CustomeStatusBar";
 import FeedHeader from "@/src/components/FeedHeader";
 import Loading from "@/src/components/Loading";
 import MemoizedPostView from "@/src/components/MemoizedPostView";
 import { TitleText } from "@/src/components/Text";
-import { DarkColors, useThemeColors } from "@/src/constants/Colors";
+import { useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
-import { Users } from "@/src/redux/reducers/AuthReducer";
-import { RootState } from "@/src/redux/Store";
 import { fetchPost } from "@/src/services/postServices";
 import { getUserData } from "@/src/services/userService";
 import { PostData } from "@/src/utility/types";
@@ -15,7 +12,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  AppState,
   FlatListProps,
   ListRenderItem,
   Platform,
@@ -26,7 +22,6 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
 
 const AnimatedFlatList =
   Animated.createAnimatedComponent<
@@ -78,19 +73,6 @@ const FeedScreen = () => {
   //     subscription.remove();
   //   };
   // }, [startTime]);
-
-  // const saveTimeSpentToSupabase = async (timeSpent: number) => {
-  //   const userId = UserInfo.id;
-  //   const currentDate = new Date().toISOString().split("T")[0]; // Get only the date part
-  //   const { data, error } = await supabase.from("timeSpent").upsert({
-  //     user_id: userId,
-  //     date: currentDate,
-  //     time_spent: timeSpent,
-  //   });
-  //   if (error) {
-  //     console.error("Error saving time spent:", error.message);
-  //   }
-  // };
 
   const handlePost = async (payload: any) => {
     try {
@@ -149,24 +131,6 @@ const FeedScreen = () => {
       }
     }
   };
-
-  useEffect(() => {
-    let postChannel = supabase
-      .channel("posts")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "posts",
-        },
-        handlePost
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(postChannel);
-    };
-  }, [isFocused]);
 
   useEffect(() => {
     getAllPost();

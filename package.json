@@ -23,7 +23,6 @@
     "@reduxjs/toolkit": "^2.2.7",
     "@rneui/themed": "^4.0.0-rc.8",
     "@shopify/flash-list": "1.6.4",
-    "@supabase/supabase-js": "^2.45.3",
     "base64-arraybuffer": "^1.0.2",
     "expo": "^51.0.38",
     "expo-av": "^14.0.7",

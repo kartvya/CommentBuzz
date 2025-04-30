@@ -19,7 +19,6 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import Spacer from "../components/Spacer";
 import { useRouter } from "expo-router";
-import { supabase } from "@/lib/supabase";
 import { getUserData } from "../services/userService";
 import { useIsFocused } from "@react-navigation/native";
 import Loading from "../components/Loading";
@@ -42,41 +41,41 @@ const UserPost = forwardRef<Props>((props, ref) => {
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  const handlePost = async (payload: any) => {
-    try {
-      if (payload.eventType === "INSERT" && payload?.new?.id) {
-        let newPost = { ...payload?.new };
-        let res = await getUserData(newPost.userId);
-        newPost.user = res.success ? res?.data : {};
-        setPosts((prevPost) => {
-          if (prevPost.some((post) => post.id === newPost.id)) {
-            return prevPost;
-          }
-          return [newPost, ...prevPost];
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handlePost = async (payload: any) => {
+  //   try {
+  //     if (payload.eventType === "INSERT" && payload?.new?.id) {
+  //       let newPost = { ...payload?.new };
+  //       let res = await getUserData(newPost.userId);
+  //       newPost.user = res.success ? res?.data : {};
+  //       setPosts((prevPost) => {
+  //         if (prevPost.some((post) => post.id === newPost.id)) {
+  //           return prevPost;
+  //         }
+  //         return [newPost, ...prevPost];
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    let postChannel = supabase
-      .channel("posts")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "posts",
-        },
-        handlePost
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(postChannel);
-    };
-  }, [isFocused]);
+  // useEffect(() => {
+  //   let postChannel = supabase
+  //     .channel("posts")
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "posts",
+  //       },
+  //       handlePost
+  //     )
+  //     .subscribe();
+  //   return () => {
+  //     supabase.removeChannel(postChannel);
+  //   };
+  // }, [isFocused]);
 
   useEffect(() => {
     getAllPost();

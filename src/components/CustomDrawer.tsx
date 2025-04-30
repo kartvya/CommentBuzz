@@ -18,7 +18,6 @@ import {
   Users,
 } from "../redux/reducers/AuthReducer";
 import moment from "moment";
-import { supabase } from "@/lib/supabase";
 import React, { useState } from "react";
 import GlobalCenterModal from "./GlobalCenterModal";
 import Button from "./Button";
@@ -78,14 +77,7 @@ const CustomDrawer = (props: any) => {
 
   const onLogoutYesBTN = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      // dispatch({ type: LOGOUT });
-      if (error) {
-        Alert.alert(
-          "Sign out",
-          "Something went wrong. Please try again. leater"
-        );
-      }
+      Alert.alert("Sign out", "Something went wrong. Please try again. leater");
       setLogoutModal(false);
     } catch (error) {
       console.log(error);
