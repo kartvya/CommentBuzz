@@ -5,7 +5,7 @@ import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
 import { useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
-import { Users } from "@/src/redux/reducers/AuthReducer";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
 import UserAbout from "@/src/tabsScreens/UserAbout";
 import UserComments from "@/src/tabsScreens/UserComments";
@@ -43,7 +43,7 @@ const Profile = () => {
 
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [index, setIndex] = useState<number>(0);
   const [routes] = useState<Routes[]>([
@@ -84,7 +84,7 @@ const Profile = () => {
       console.log(error);
     }
   };
-  console.log(UserInfo, "UserInfoUserInfo");
+
   return (
     <>
       <ScreenWrapper>
@@ -119,7 +119,7 @@ const Profile = () => {
             onPress={() => navigation.navigate("/(main)/editProfile")}
           >
             <Avatar
-              uri={UserInfo?.image}
+              uri={UserInfo?.profilePic}
               size={RFPercentage(10)}
               borderRadius={20}
             />

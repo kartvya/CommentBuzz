@@ -7,7 +7,6 @@ import Spacer from "@/src/components/Spacer";
 import { DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
-import { Users } from "@/src/redux/reducers/AuthReducer";
 import { getUserImage, uploadFile } from "@/src/services/imageServices";
 import * as ImagePicker from "expo-image-picker";
 
@@ -20,6 +19,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { useDispatch, useSelector } from "react-redux";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 
 interface UpdatedUsersData {
   email: string;
@@ -35,7 +35,7 @@ const EditProfile = () => {
   const themeColors = useThemeColors();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<UpdatedUsersData>({
@@ -55,12 +55,13 @@ const EditProfile = () => {
   useEffect(() => {
     if (UserInfo) {
       setUser({
-        name: UserInfo?.name || "",
+        name: UserInfo?.username || "",
         phonNumber: UserInfo?.phonNumber || "",
-        image: typeof UserInfo?.image === "object" ? UserInfo.image : {},
+        image:
+          typeof UserInfo?.profilePic === "object" ? UserInfo.profilePic : {},
         bio: UserInfo?.bio || "",
         address: UserInfo?.address || "",
-        email: UserInfo?.user_metadata?.email || "",
+        email: UserInfo?.email || "",
       });
     }
   }, [UserInfo]);
@@ -116,7 +117,7 @@ const EditProfile = () => {
           user.image = imageRes?.data;
         }
       }
-      let updateUserRes = await updateUser(UserInfo?.id, user);
+      let updateUserRes = await updateUser(UserInfo?._id, user);
       if (updateUserRes.success) {
         dispatch({
           type: USERINFO,

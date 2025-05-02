@@ -7,6 +7,8 @@ export interface UserInfo {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  gender: string;
+  profilePic: string;
 }
 
 export interface AuthState {

@@ -7,7 +7,6 @@ import { NormalText } from "@/src/components/Text";
 import { Colors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
-import { Users } from "@/src/redux/reducers/AuthReducer";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -30,6 +29,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { MentionInput } from "react-native-controlled-mentions";
 import { createOrUpdatePost } from "../../src/services/postServices";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 
 export interface Person {
   id: number;
@@ -58,7 +58,7 @@ const UploadPost = () => {
   const themeColors = useThemeColors();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [value, setValue] = useState<string>("");
   const [usedTags, setUsedTags] = useState<Person[]>([]);
@@ -144,7 +144,7 @@ const UploadPost = () => {
       const data = {
         files,
         body: value,
-        userId: UserInfo?.id,
+        userId: UserInfo?._id,
         voteCount: 0,
       };
       setLoading(true);

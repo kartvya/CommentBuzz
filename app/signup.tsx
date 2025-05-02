@@ -7,13 +7,16 @@ import { NormalText, TitleText } from "@/src/components/Text";
 import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { isEmailValid, isPasswordValid } from "@/src/helpers/validation";
-import { useRouter } from "expo-router";
+import { useRegisterMutation } from "@/src/services/AuthRequest/authApi";
+import { Href, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const Signup = () => {
+  const [Register] = useRegisterMutation();
+
   const navigation = useRouter();
   const themeColors = useThemeColors();
   const emailRef = useRef<string>("");
@@ -61,6 +64,17 @@ const Signup = () => {
       }
       setIsLoading(true);
       if (isValid) {
+        const userInfo = {
+          username: userName,
+          email: email,
+          password: password,
+        };
+        let res = await Register(userInfo).unwrap();
+        if (res.success) {
+          navigation.navigate("/login" as Href);
+          setIsLoading(false);
+          return;
+        }
         setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -84,7 +98,7 @@ const Signup = () => {
       >
         <Pressable
           style={styles.backIconConatiner}
-          onPress={() => navigation.navigate("/welcome")}
+          onPress={() => navigation.navigate("/welcome" as Href)}
         >
           <SvgIcon name={"arrowLeft"} color={themeColors?.primaryColor} />
         </Pressable>

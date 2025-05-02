@@ -1,31 +1,25 @@
-import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  TouchableHighlight,
-  View,
-} from "react-native";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import SvgIcon from "../assets/icons";
-import { Colors, DarkColors, useThemeColors } from "../constants/Colors";
-import MyStatusBar from "./CustomeStatusBar";
-import Spacer from "./Spacer";
-import { NormalText, TitleText } from "./Text";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/Store";
-import {
-  postDataAssociatedWithUser,
-  Users,
-} from "../redux/reducers/AuthReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Href, useRouter } from "expo-router";
 import moment from "moment";
 import React, { useState } from "react";
-import GlobalCenterModal from "./GlobalCenterModal";
-import Button from "./Button";
-import { Href, useRouter } from "expo-router";
+import { StyleSheet, TouchableHighlight, View } from "react-native";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { useDispatch, useSelector } from "react-redux";
+import SvgIcon from "../assets/icons";
+import { DarkColors, useThemeColors } from "../constants/Colors";
 import { hp } from "../helpers/comman";
-import Switch from "./Switch";
+import { RootState } from "../redux/Store";
 import { ISDARKMODE, LOGOUT } from "../redux/actions/ActionType";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  postDataAssociatedWithUser,
+  UserInfo,
+} from "../redux/reducers/AuthReducer";
+import Button from "./Button";
+import MyStatusBar from "./CustomeStatusBar";
+import GlobalCenterModal from "./GlobalCenterModal";
+import Spacer from "./Spacer";
+import Switch from "./Switch";
+import { NormalText, TitleText } from "./Text";
 
 const CustomDrawer = (props: any) => {
   const dispatch = useDispatch();
@@ -37,7 +31,7 @@ const CustomDrawer = (props: any) => {
   );
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [logoutModal, setLogoutModal] = useState(false);
 
@@ -112,7 +106,7 @@ const CustomDrawer = (props: any) => {
             <Spacer gap={RFPercentage(0.5)} />
             <View>
               <TitleText style={styles.coinsValueStyle}>
-                {formatedDate(UserInfo?.created_at)}
+                {formatedDate(UserInfo?.createdAt)}
               </TitleText>
               <NormalText style={styles.coinsTitleText}>Buzz age</NormalText>
             </View>

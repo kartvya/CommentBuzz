@@ -3,4 +3,5 @@ export const endPoints = {
   Login: "/auth/login",
   RefreshToken: "auth/refresh",
   GetUserProfileDetails: "/profile",
+  Register: "/auth/register",
 };

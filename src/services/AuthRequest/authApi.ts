@@ -47,7 +47,6 @@ const AuthApi = createApi({
       },
     }),
 
-    // Refresh Token API
     refreshToken: builder.mutation<
       { accessToken: string },
       { refreshToken: string }
@@ -61,8 +60,20 @@ const AuthApi = createApi({
         return { accessToken: response.accessToken };
       },
     }),
+
+    register: builder.mutation<any, any>({
+      query: (body) => ({
+        url: endPoints.Register,
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRefreshTokenMutation } = AuthApi;
+export const {
+  useLoginMutation,
+  useRefreshTokenMutation,
+  useRegisterMutation,
+} = AuthApi;
 export default AuthApi;
