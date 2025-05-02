@@ -1,5 +1,6 @@
 import { persistor, store } from "@/src/redux/Store";
 import { getUserData } from "@/src/services/userService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -19,8 +20,8 @@ const MainLayout = () => {
 
   const updateUserData = async () => {
     try {
-      const res = await getUserData();
-      if (res.success) {
+      const token = await AsyncStorage.getItem("UserToken");
+      if (token) {
         navigation.navigate("/(drawer)/(tabs)/feedScreen");
       } else {
         navigation.navigate("/welcome");

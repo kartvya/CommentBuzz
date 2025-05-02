@@ -265,7 +265,7 @@ const UploadPost = () => {
               />
             </View>
             <Spacer gap={RFPercentage(1)} />
-            <NormalText>{UserInfo?.name}</NormalText>
+            <NormalText>{UserInfo?.username}</NormalText>
           </View>
           <Spacer gap={RFPercentage(1.2)} />
           <View

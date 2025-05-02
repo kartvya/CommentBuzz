@@ -8,6 +8,7 @@ import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { USERINFO } from "@/src/redux/actions/ActionType";
 import { useLoginMutation } from "@/src/services/AuthRequest/authApi";
+import { useLazyGetUserProfileDetailsQuery } from "@/src/services/UserRequest/userApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -20,6 +21,7 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const [login] = useLoginMutation();
+  const [GetUserDetails] = useLazyGetUserProfileDetailsQuery();
 
   const navigation = useRouter();
   const themeColors = useThemeColors();
@@ -34,8 +36,10 @@ const Login = () => {
   const onLogin = async () => {
     try {
       let isValid = false;
-      let email = emailRef.current.trim();
-      let password = passwordRef.current.trim();
+      // let email = emailRef.current.trim();
+      // let password = passwordRef.current.trim();
+      let email = "kartvya@gmail.com";
+      let password = "Abc@1234";
       if (!email) {
         setEmailError("This field is required.");
         isValid = false;
@@ -54,17 +58,24 @@ const Login = () => {
         setLoading(true);
         let loginCred = { email: email, password: password };
         const loginResponse = await login(loginCred).unwrap();
-        await AsyncStorage.setItem("UserToken", loginResponse?.data?.token);
+        await AsyncStorage.setItem(
+          "UserToken",
+          loginResponse?.data?.accessToken
+        );
+        await AsyncStorage.setItem(
+          "RefreshToken",
+          loginResponse?.data?.refreshToken
+        );
+        let userProfileDetails = await GetUserDetails().unwrap();
         dispatch({
           type: USERINFO,
-          payload: {
-            userInfo: loginResponse,
-          },
+          payload: userProfileDetails?.user,
         });
       }
       navigation.navigate("/(tabs)/feedScreen");
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
   return (

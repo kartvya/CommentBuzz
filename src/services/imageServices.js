@@ -2,7 +2,9 @@ import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system";
 
 export const getUserImage = (imagePath) => {
-  return getSupaBaseFileUrl(imagePath);
+  return imagePath === undefined || imagePath === ""
+    ? "https://assets.promptbase.com/DALLE_IMAGES%2FbNjLXGHSPgPggdwVAgjUw83l2mi1%2Fresized%2F1686253973210_800x800.webp?alt=media&token=a293fac1-e5d0-4542-8094-88b7079b9155"
+    : imagePath;
 };
 
 export const getSupaBaseFileUrl = (filePath) => {

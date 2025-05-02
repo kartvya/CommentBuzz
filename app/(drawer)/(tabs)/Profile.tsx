@@ -84,7 +84,7 @@ const Profile = () => {
       console.log(error);
     }
   };
-
+  console.log(UserInfo, "UserInfoUserInfo");
   return (
     <>
       <ScreenWrapper>
@@ -134,7 +134,9 @@ const Profile = () => {
           </Pressable>
           <Spacer gap={RFPercentage(1)} />
           <View style={{ flex: 1 }}>
-            <TitleText style={styles.userNameText}>{UserInfo?.name}</TitleText>
+            <TitleText style={styles.userNameText}>
+              {UserInfo?.username}
+            </TitleText>
             {UserInfo?.bio && (
               <NormalText ellipsizeMode="tail" numberOfLines={2}>
                 {UserInfo?.bio}

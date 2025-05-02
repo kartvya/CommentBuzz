@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery, retry } from "@reduxjs/toolkit/query/react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseUrl } from "./endPoints";
+import { baseQueryWithAutoRefresh } from "./BaseQueryWithReauth";
 
 export const TAGS = Object.freeze({
   Stands: "Stands",
@@ -26,17 +27,17 @@ const baseQuery = fetchBaseQuery({
   timeout: 10000,
 });
 
-const baseQueryWithRetriesAndBailout = retry(
-  async (args, api, options) => {
-    const result = await baseQuery(args, api, options);
-    return result;
-  },
-  { maxRetries: 2 }
-);
+// const baseQueryWithRetriesAndBailout = retry(
+//   async (args, api, options) => {
+//     const result = await baseQuery(args, api, options);
+//     return result;
+//   },
+//   { maxRetries: 2 }
+// );
 
 const backendBaseApi = createApi({
   reducerPath: "commentBuzzBackend",
-  baseQuery: baseQueryWithRetriesAndBailout,
+  baseQuery: baseQueryWithAutoRefresh,
   endpoints: () => ({}),
   tagTypes: TAG_TYPES,
 });
@@ -44,4 +45,5 @@ const backendBaseApi = createApi({
 export const {
   util: { resetApiState: resetBackendApiState },
 } = backendBaseApi;
+
 export default backendBaseApi;

@@ -88,7 +88,6 @@ const FeedScreen = () => {
         // Check and update state
         setPosts((prevPosts) => {
           const postExists = prevPosts.some((post) => post.id === newPost.id);
-          console.log(postExists, "postExists");
 
           if (postExists) {
             // Post already exists, check if update is required

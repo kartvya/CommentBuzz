@@ -21,10 +21,11 @@ import moment from "moment";
 import React, { useState } from "react";
 import GlobalCenterModal from "./GlobalCenterModal";
 import Button from "./Button";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { hp } from "../helpers/comman";
 import Switch from "./Switch";
 import { ISDARKMODE, LOGOUT } from "../redux/actions/ActionType";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CustomDrawer = (props: any) => {
   const dispatch = useDispatch();
@@ -77,7 +78,12 @@ const CustomDrawer = (props: any) => {
 
   const onLogoutYesBTN = async () => {
     try {
-      Alert.alert("Sign out", "Something went wrong. Please try again. leater");
+      await AsyncStorage.removeItem("UserToken");
+      await AsyncStorage.removeItem("RefreshToken");
+      dispatch({
+        type: LOGOUT,
+      });
+      navigation.navigate("/welcome" as Href);
       setLogoutModal(false);
     } catch (error) {
       console.log(error);

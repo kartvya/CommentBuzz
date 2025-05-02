@@ -1,10 +1,12 @@
-import backendBaseApi from "../BackendBaseApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BaseUrl, endPoints } from "../endPoints";
 
 interface LoginResponse {
   success: boolean;
   message: string;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
   user: {
     id: string;
     username: string;
@@ -17,16 +19,26 @@ interface LoginApiResponse {
   authHeader: string;
 }
 
-const AuthApi = backendBaseApi.injectEndpoints({
-  overrideExisting: true,
-  endpoints: (build) => ({
-    login: build.mutation<LoginApiResponse, Record<string, any>>({
-      query: (credentials) => ({
-        url: BaseUrl + endPoints.Login,
+const AuthApi = createApi({
+  reducerPath: "authApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: BaseUrl,
+    prepareHeaders: async (headers, { getState }) => {
+      const token = await AsyncStorage.getItem("UserToken");
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  endpoints: (builder) => ({
+    login: builder.mutation<LoginApiResponse, Record<string, any>>({
+      query: (body) => ({
+        url: endPoints.Login,
         method: "POST",
-        body: credentials,
+        body,
       }),
-      transformResponse: (response: LoginResponse, meta): LoginApiResponse => {
+      transformResponse: (response: LoginResponse, meta) => {
         const authHeader = meta?.response?.headers.get("Authorization") || "";
         return {
           data: response,
@@ -34,7 +46,23 @@ const AuthApi = backendBaseApi.injectEndpoints({
         };
       },
     }),
+
+    // Refresh Token API
+    refreshToken: builder.mutation<
+      { accessToken: string },
+      { refreshToken: string }
+    >({
+      query: ({ refreshToken }) => ({
+        url: endPoints.RefreshToken,
+        method: "POST",
+        body: { refreshToken },
+      }),
+      transformResponse: (response: { accessToken: string }) => {
+        return { accessToken: response.accessToken };
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation } = AuthApi;
+export const { useLoginMutation, useRefreshTokenMutation } = AuthApi;
+export default AuthApi;
