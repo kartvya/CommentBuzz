@@ -1,6 +1,7 @@
 {
   "name": "comment-buzz",
   "main": "expo-router/entry",
+  "type":"commonjs",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",

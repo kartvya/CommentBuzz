@@ -259,7 +259,7 @@ const UploadPost = () => {
               ]}
             >
               <Avatar
-                uri={UserInfo?.image}
+                uri={UserInfo?.profilePic}
                 size={RFPercentage(6)}
                 borderRadius={10}
               />

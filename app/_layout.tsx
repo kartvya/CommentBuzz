@@ -2,7 +2,7 @@ import { persistor, store } from "@/src/redux/Store";
 import { getUserData } from "@/src/services/userService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, useRouter } from "expo-router";
+import { Href, SplashScreen, Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider, useDispatch } from "react-redux";
@@ -24,7 +24,7 @@ const MainLayout = () => {
       if (token) {
         navigation.navigate("/(drawer)/(tabs)/feedScreen");
       } else {
-        navigation.navigate("/welcome");
+        navigation.navigate("/welcome" as Href);
       }
     } catch (error) {
       console.log(error);

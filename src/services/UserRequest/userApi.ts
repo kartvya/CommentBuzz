@@ -11,7 +11,21 @@ const UserService = backendBaseApi.injectEndpoints({
       }),
       keepUnusedDataFor: 0,
     }),
+
+    editUserProfileDetails: build.mutation<any, any>({
+      query: (body) => {
+        console.log(body, "boduasduaosd");
+        return {
+          url: endPoints.EditProfile,
+          method: "PUT",
+          body,
+        };
+      },
+    }),
   }),
 });
 
-export const { useLazyGetUserProfileDetailsQuery } = UserService;
+export const {
+  useLazyGetUserProfileDetailsQuery,
+  useEditUserProfileDetailsMutation,
+} = UserService;

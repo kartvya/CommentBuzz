@@ -1,4 +1,4 @@
-import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
+import { Colors, useThemeColors } from "@/src/constants/Colors";
 import { ResizeMode, Video } from "expo-av";
 import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
@@ -18,8 +18,8 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
 import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
+import { UserInfo } from "../redux/reducers/AuthReducer";
 import { RootState } from "../redux/Store";
-import { Users } from "../redux/reducers/AuthReducer";
 import {
   downloadImage,
   getSupaBaseFileUrl,
@@ -52,7 +52,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     const themeColors = useThemeColors();
     const UserInfo = useSelector(
       (state: RootState) => state.root?.authReducer?.userInfo
-    ) as Users;
+    ) as UserInfo;
     const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
     const [isPause, setIsPause] = useState<boolean>(isVisible);
     const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
@@ -72,7 +72,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
       );
       const currentUserVote = sortedData?.find(
-        (vote) => vote?.userId === UserInfo?.id
+        (vote) => vote?.userId === UserInfo?._id
       );
       if (currentUserVote?.voteType === "upVote") {
         setUserVote("upvote");
@@ -159,7 +159,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       type: "decreaseone" | "decreasetwo" | "increasetwo" | "increaseone"
     ) {
       let coin = feedBuzzCoins ?? 0;
-      if (UserInfo?.id !== item?.userId) {
+      if (UserInfo?._id !== item?.userId) {
         if (type === "decreaseone") {
           coin -= 0.01;
           coin = parseFloat(coin.toFixed(2));
@@ -192,7 +192,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           setVoteCount(voteCount - 1);
           setUserVote("none");
           const delObj = {
-            userId: UserInfo?.id,
+            userId: UserInfo?._id,
             postId: item?.id,
             voteCount: voteCount - 1,
             feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
@@ -203,7 +203,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           setUserVote("upvote");
           await createPostUpvote({
             voteType: "upVote",
-            userId: UserInfo?.id,
+            userId: UserInfo?._id,
             postId: item?.id,
             voteCount: voteCount + 2,
             feedBuzzCoins: buzzCoinMathFunction("increasetwo"),
@@ -213,7 +213,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           setUserVote("upvote");
           await createPostUpvote({
             voteType: "upVote",
-            userId: UserInfo?.id,
+            userId: UserInfo?._id,
             postId: item?.id,
             voteCount: voteCount + 1,
             feedBuzzCoins: buzzCoinMathFunction("increaseone"),
@@ -231,7 +231,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           setVoteCount(voteCount + 1);
           setUserVote("none");
           const delObj = {
-            userId: UserInfo?.id,
+            userId: UserInfo?._id,
             postId: item?.id,
             voteCount: voteCount + 1,
             feedBuzzCoins: buzzCoinMathFunction("increaseone"),
@@ -242,7 +242,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           setUserVote("downvote");
           await createPostUpvote({
             voteType: "downVote",
-            userId: UserInfo?.id,
+            userId: UserInfo?._id,
             postId: item?.id,
             voteCount: voteCount - 2,
             feedBuzzCoins: buzzCoinMathFunction("decreasetwo"),
@@ -252,7 +252,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           setUserVote("downvote");
           await createPostUpvote({
             voteType: "downVote",
-            userId: UserInfo?.id,
+            userId: UserInfo?._id,
             postId: item?.id,
             voteCount: voteCount - 1,
             feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
@@ -266,7 +266,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     const onDeletePost = async () => {
       try {
         const delObj = {
-          userId: UserInfo?.id,
+          userId: UserInfo?._id,
           postId: item?.id,
         };
         let res = await deletePost(delObj);
@@ -306,7 +306,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                 </NormalText>
               </View>
             </View>
-            {UserInfo?.id === item?.userId && (
+            {UserInfo?._id === item?.userId && (
               <Pressable onPress={() => setShowPostActionModal(true)}>
                 <SvgIcon name={"postMore"} color={themeColors?.text} />
               </Pressable>

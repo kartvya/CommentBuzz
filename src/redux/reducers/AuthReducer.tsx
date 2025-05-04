@@ -1,5 +1,4 @@
 import { ISDARKMODE, LOGOUT, USERINFO } from "../actions/ActionType";
-
 export interface UserInfo {
   _id: string;
   username: string;
@@ -7,8 +6,12 @@ export interface UserInfo {
   createdAt: string;
   updatedAt: string;
   __v: number;
-  gender: string;
+  gender?: string;
   profilePic: string;
+  bio: string;
+  buzzCoins: number;
+  followers: string[];
+  following: string[];
 }
 
 export interface AuthState {

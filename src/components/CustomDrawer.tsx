@@ -10,10 +10,7 @@ import { DarkColors, useThemeColors } from "../constants/Colors";
 import { hp } from "../helpers/comman";
 import { RootState } from "../redux/Store";
 import { ISDARKMODE, LOGOUT } from "../redux/actions/ActionType";
-import {
-  postDataAssociatedWithUser,
-  UserInfo,
-} from "../redux/reducers/AuthReducer";
+import { UserInfo } from "../redux/reducers/AuthReducer";
 import Button from "./Button";
 import MyStatusBar from "./CustomeStatusBar";
 import GlobalCenterModal from "./GlobalCenterModal";
@@ -65,11 +62,6 @@ const CustomDrawer = (props: any) => {
     return formattedDuration;
   };
 
-  const postBuzz = UserInfo?.posts?.reduce(
-    (acc: number, post: postDataAssociatedWithUser) => acc + post.postBuzz,
-    0
-  );
-
   const onLogoutYesBTN = async () => {
     try {
       await AsyncStorage.removeItem("UserToken");
@@ -96,7 +88,9 @@ const CustomDrawer = (props: any) => {
             <SvgIcon name={"buzzCoin"} color={themeColors.text} size={30} />
             <Spacer gap={RFPercentage(0.5)} />
             <View>
-              <TitleText style={styles.coinsValueStyle}>{postBuzz}</TitleText>
+              <TitleText style={styles.coinsValueStyle}>
+                {UserInfo?.buzzCoins}
+              </TitleText>
               <NormalText style={styles.coinsTitleText}>Buzzcoins</NormalText>
             </View>
           </View>
