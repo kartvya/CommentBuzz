@@ -33,6 +33,7 @@ import GlobalCenterModal from "./GlobalCenterModal";
 import PostActionModal from "./PostActionModal";
 import Spacer from "./Spacer";
 import { NormalText, TitleText } from "./Text";
+import { useToggleVotePostMutation } from "../services/PostReqest/postApi";
 
 interface Iprops {
   item: PostData;
@@ -45,6 +46,8 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
   ({ item, isVisible, fetchAllPost, isCommentScreen }) => {
     const { createPostUpvote, deletePost, deletePostUpvote } =
       usePostServices();
+
+    const [toggleVotes] = useToggleVotePostMutation();
     const navigation = useNavigation();
     const router = useRouter();
     const themeColors = useThemeColors();
@@ -64,24 +67,22 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       useState<boolean>(false);
     const [shareLoad, setShareLoad] = useState(false);
 
-    // useEffect(() => {
-    //   const sortedData = item?.postVotes?.sort(
-    //     (a, b) =>
-    //       new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
-    //   );
-    //   const currentUserVote = sortedData?.find(
-    //     (vote) => vote?.userId === UserInfo?._id
-    //   );
-    //   if (currentUserVote?.voteType === "upVote") {
-    //     setUserVote("upvote");
-    //   } else if (currentUserVote?.voteType === "downVote") {
-    //     setUserVote("downvote");
-    //   } else {
-    //     setUserVote("none");
-    //   }
-    //   setVoteCount(item?.voteCount || 0);
-    //   setFeedBuzzCoins(item?.postBuzz);
-    // }, [item?.postVotes, item?.voteCount]);
+    useEffect(() => {
+      const upvotes = item?.upvotes ?? [];
+      const downvotes = item?.downvotes ?? [];
+      const currentUserId = UserInfo?._id;
+
+      setVoteCount(upvotes.length - downvotes.length);
+      setFeedBuzzCoins(item?.buzzCoinsEarned ?? 0);
+
+      if (upvotes.includes(currentUserId)) {
+        setUserVote("upvote");
+      } else if (downvotes.includes(currentUserId)) {
+        setUserVote("downvote");
+      } else {
+        setUserVote("none");
+      }
+    }, [item]);
 
     useEffect(() => {
       const unsubscribeFocus = navigation.addListener("focus", () => {
@@ -153,70 +154,25 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       }
     };
 
-    function buzzCoinMathFunction(
-      type: "decreaseone" | "decreasetwo" | "increasetwo" | "increaseone"
-    ) {
-      let coin = feedBuzzCoins ?? 0;
-      if (UserInfo?._id !== item?.user._id) {
-        if (type === "decreaseone") {
-          coin -= 0.01;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        } else if (type === "increasetwo") {
-          coin += 0.02;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        } else if (type === "decreasetwo") {
-          coin -= 0.02;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        } else {
-          coin += 0.01;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        }
-      } else {
-        return item?.postBuzz;
-      }
-    }
-    /* Upvote function */
     const onPressUpvote = async () => {
       try {
+        let voteType: "none" | "upvote" | "downvote" = "none";
+
         if (userVote === "upvote") {
-          setVoteCount(voteCount - 1);
+          setVoteCount((prev) => prev - 1);
           setUserVote("none");
-          // const delObj = {
-          //   userId: UserInfo?._id,
-          //   postId: item?._id,
-          //   voteCount: voteCount - 1,
-          //   feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
-          // };
-          // await deletePostUpvote(delObj);
+          voteType = "none";
         } else if (userVote === "downvote") {
-          setVoteCount(voteCount + 2);
+          setVoteCount((prev) => prev + 2);
           setUserVote("upvote");
-          // await createPostUpvote({
-          //   voteType: "upVote",
-          //   userId: UserInfo?._id,
-          //   postId: item?._id,
-          //   voteCount: voteCount + 2,
-          //   feedBuzzCoins: buzzCoinMathFunction("increasetwo"),
-          // });
+          voteType = "upvote";
         } else {
-          setVoteCount(voteCount + 1);
+          setVoteCount((prev) => prev + 1);
           setUserVote("upvote");
-          // await createPostUpvote({
-          //   voteType: "upVote",
-          //   userId: UserInfo?._id,
-          //   postId: item?._id,
-          //   voteCount: voteCount + 1,
-          //   feedBuzzCoins: buzzCoinMathFunction("increaseone"),
-          // });
+          voteType = "upvote";
         }
+
+        await updateVotesInBE(voteType);
       } catch (error) {
         console.log(error);
       }
@@ -225,40 +181,37 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     /* Downvote function */
     const onPressDownVote = async () => {
       try {
+        let voteType: "none" | "upvote" | "downvote" = "none";
+
         if (userVote === "downvote") {
-          setVoteCount(voteCount + 1);
+          setVoteCount((prev) => prev + 1);
           setUserVote("none");
-          // const delObj = {
-          //   userId: UserInfo?._id,
-          //   postId: item?._id,
-          //   voteCount: voteCount + 1,
-          //   feedBuzzCoins: buzzCoinMathFunction("increaseone"),
-          // };
-          // await deletePostUpvote(delObj);
+          voteType = "none";
         } else if (userVote === "upvote") {
-          setVoteCount(voteCount - 2);
+          setVoteCount((prev) => prev - 2);
           setUserVote("downvote");
-          // await createPostUpvote({
-          //   voteType: "downVote",
-          //   userId: UserInfo?._id,
-          //   postId: item?._id,
-          //   voteCount: voteCount - 2,
-          //   feedBuzzCoins: buzzCoinMathFunction("decreasetwo"),
-          // });
+          voteType = "downvote";
         } else {
-          setVoteCount(voteCount - 1);
+          setVoteCount((prev) => prev - 1);
           setUserVote("downvote");
-          // await createPostUpvote({
-          //   voteType: "downVote",
-          //   userId: UserInfo?._id,
-          //   postId: item?._id,
-          //   voteCount: voteCount - 1,
-          //   feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
-          // });
+          voteType = "downvote";
         }
+
+        await updateVotesInBE(voteType);
       } catch (error) {
         console.log(error);
       }
+    };
+
+    const updateVotesInBE = async (
+      voteType: "upvote" | "downvote" | "none"
+    ) => {
+      const votePayload = {
+        type: voteType,
+        userId: UserInfo._id,
+        postId: item?._id,
+      };
+      await toggleVotes(votePayload).unwrap();
     };
 
     const onDeletePost = async () => {

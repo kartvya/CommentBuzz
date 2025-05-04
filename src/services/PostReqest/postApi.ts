@@ -21,7 +21,21 @@ const PostService = backendBaseApi.injectEndpoints({
       }),
       keepUnusedDataFor: 0,
     }),
+
+    toggleVotePost: build.mutation<any, any>({
+      query: (body) => {
+        return {
+          url: endPoints.ToggleVote,
+          method: "PATCH",
+          body,
+        };
+      },
+    }),
   }),
 });
 
-export const { useCreatePostMutation, useLazyGetPostQuery } = PostService;
+export const {
+  useCreatePostMutation,
+  useLazyGetPostQuery,
+  useToggleVotePostMutation,
+} = PostService;

@@ -7,4 +7,5 @@ export const endPoints = {
   EditProfile: "/user/editProfile",
   CreatePost: "/post/createPost",
   GetAllPost: "/post/getPost",
+  ToggleVote: "/post/voteToggle",
 };
