@@ -31,6 +31,15 @@ const PostService = backendBaseApi.injectEndpoints({
         };
       },
     }),
+
+    deletePost: build.mutation<any, any>({
+      query: (postID) => {
+        return {
+          url: `${endPoints.DeletePost}/${postID}`,
+          method: "DELETE",
+        };
+      },
+    }),
   }),
 });
 
@@ -38,4 +47,5 @@ export const {
   useCreatePostMutation,
   useLazyGetPostQuery,
   useToggleVotePostMutation,
+  useDeletePostMutation,
 } = PostService;

@@ -1,8 +1,13 @@
 import { uploadFile } from "./imageServices";
-import { useLazyGetPostQuery } from "./PostReqest/postApi";
+import {
+  useDeletePostMutation,
+  useLazyGetPostQuery,
+} from "./PostReqest/postApi";
 
 const usePostServices = () => {
   const [getUserPost] = useLazyGetPostQuery();
+  const [deletePostApi] = useDeletePostMutation();
+
   const createOrUpdatePost = async (post) => {
     try {
       if (post.files && typeof post.files === "object") {
@@ -27,9 +32,16 @@ const usePostServices = () => {
     }
   };
 
-  const deletePost = async (postDeleteObj) => {
+  const deletePost = async (postId) => {
     try {
-      if (error) {
+      const res = await deletePostApi(postId).unwrap();
+      if (res.success) {
+        return {
+          success: true,
+          data: undefined,
+          msg: "Post successfully deleted",
+        };
+      } else {
         console.log(error);
         return {
           success: false,
@@ -37,11 +49,6 @@ const usePostServices = () => {
           msg: "Could not delete post",
         };
       }
-      return {
-        success: true,
-        data: undefined,
-        msg: "Post successfully deleted",
-      };
     } catch (error) {
       console.log(error);
       return { success: false, data: undefined, msg: error?.message };

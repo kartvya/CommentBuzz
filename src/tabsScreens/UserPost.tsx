@@ -12,7 +12,6 @@ import MemoizedPostView from "../components/MemoizedPostView";
 import { TitleText } from "../components/Text";
 import { Colors, DarkColors } from "../constants/Colors";
 import { RootState } from "../redux/Store";
-import { Users } from "../redux/reducers/AuthReducer";
 import { fetchOnlyUserPost } from "../services/postServices";
 import { PostData } from "../utility/types";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -23,6 +22,7 @@ import { getUserData } from "../services/userService";
 import { useIsFocused } from "@react-navigation/native";
 import Loading from "../components/Loading";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { UserInfo } from "../redux/reducers/AuthReducer";
 
 type Props = {};
 
@@ -35,7 +35,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
   const paddingBottom = insets.bottom + 65;
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
   const [refreshing, setRefreshing] = useState(false);
   const [Posts, setPosts] = useState<PostData[]>([]);
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
@@ -83,7 +83,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
 
   const getAllPost = async () => {
     limit = limit + 10;
-    const res = await fetchOnlyUserPost(limit, UserInfo?.id);
+    const res = await fetchOnlyUserPost(limit, UserInfo?._id);
 
     if (res.success) {
       // Ensure res.data is defined before checking its length
@@ -111,7 +111,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
 
   const refreshPulled = async () => {
     limit = 10;
-    const res = await fetchOnlyUserPost(limit, UserInfo?.id);
+    const res = await fetchOnlyUserPost(limit, UserInfo?._id);
     if (res.success) {
       setPosts(res.data ?? []);
     }
@@ -151,7 +151,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
         <FlatList
           data={Posts}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id?.toString()}
+          keyExtractor={(item) => item._id?.toString()}
           ItemSeparatorComponent={() => (
             <View
               style={{

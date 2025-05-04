@@ -216,11 +216,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
 
     const onDeletePost = async () => {
       try {
-        const delObj = {
-          userId: UserInfo?._id,
-          postId: item?._id,
-        };
-        let res = await deletePost(delObj);
+        let res = await deletePost(item?._id);
         if (res?.success) {
           setShowDeleteModal(false);
           if (fetchAllPost) {

@@ -6,7 +6,6 @@ import { TitleText } from "@/src/components/Text";
 import { useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import usePostServices from "@/src/services/postServices";
-import { getUserData } from "@/src/services/userService";
 import { PostData } from "@/src/utility/types";
 import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -140,7 +139,7 @@ const FeedScreen = () => {
     limit = 10;
     const res = await fetchPost(limit);
     if (res.success) {
-      setPosts(res.data ?? []);
+      setPosts(res.data?.posts ?? []);
     }
   };
 

@@ -8,4 +8,5 @@ export const endPoints = {
   CreatePost: "/post/createPost",
   GetAllPost: "/post/getPost",
   ToggleVote: "/post/voteToggle",
+  DeletePost: "/post/deletePost",
 };

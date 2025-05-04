@@ -1,3 +1,4 @@
+import { setNavigate } from "@/src/helpers/navigation";
 import { persistor, store } from "@/src/redux/Store";
 import { getUserData } from "@/src/services/userService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,8 +15,11 @@ const MainLayout = () => {
   const dispatch = useDispatch();
   const navigation = useRouter();
 
+  const router = useRouter();
+
   useEffect(() => {
     updateUserData();
+    setNavigate(router.replace);
   }, []);
 
   const updateUserData = async () => {

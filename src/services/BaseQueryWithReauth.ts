@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseUrl, endPoints } from "./endPoints";
 import type { FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { NavigationContainerRef } from "@react-navigation/native";
+import { navigateTo } from "../helpers/navigation";
 
 let navigationRef: NavigationContainerRef<any> | null = null;
 
@@ -58,6 +59,8 @@ const baseQueryWithReauth: BaseQueryFn<
         extraOptions
       );
 
+      console.log(refreshResult, "refreshResultrefreshResult");
+
       if (refreshResult.data) {
         const newAccessToken = (refreshResult.data as any).accessToken;
 
@@ -73,12 +76,7 @@ const baseQueryWithReauth: BaseQueryFn<
         await AsyncStorage.removeItem("RefreshToken");
 
         // Navigate to the welcome screen
-        if (navigationRef) {
-          navigationRef.reset({
-            index: 0,
-            routes: [{ name: "Welcome" }],
-          });
-        }
+        navigateTo("/welcome");
       }
     }
   }
