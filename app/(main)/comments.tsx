@@ -9,13 +9,9 @@ import Spacer from "@/src/components/Spacer";
 import { TitleText } from "@/src/components/Text";
 import { useThemeColors } from "@/src/constants/Colors";
 import { hp } from "@/src/helpers/comman";
-import { Users } from "@/src/redux/reducers/AuthReducer";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
-import {
-  createComment,
-  deleteComment,
-  fetchPostDetails,
-} from "@/src/services/postServices";
+import usePostServices from "@/src/services/postServices";
 import { getUserData } from "@/src/services/userService";
 import { CommentsData, CommentsPostData, PostData } from "@/src/utility/types";
 import { useLocalSearchParams } from "expo-router";
@@ -37,6 +33,7 @@ import { useSelector } from "react-redux";
 
 const Comments = () => {
   const { postId } = useLocalSearchParams();
+  const { createPostUpvote, deletePost, deletePostUpvote } = usePostServices();
   const themeColors = useThemeColors();
   const commentRef = useRef<string>("");
   const flatListRef = useRef<FlatList>(null);
@@ -50,7 +47,7 @@ const Comments = () => {
 
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const handleComment = async (payload: any) => {
     if (payload.new) {
@@ -94,7 +91,7 @@ const Comments = () => {
         return null;
       }
       let data = {
-        userId: UserInfo?.id,
+        userId: UserInfo?._id,
         postId: postDetails?.id,
         text: commentRef?.current,
       };
@@ -139,7 +136,7 @@ const Comments = () => {
       <>
         <MemoizedCommentView
           item={item}
-          isUserComment={item?.userId == UserInfo?.id}
+          isUserComment={item?.userId == UserInfo?._id}
           postId={postId as string}
           onDeleteComment={() => onDeleteComment(item?.id)}
         />

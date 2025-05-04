@@ -12,10 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 
 import { USERINFO } from "@/src/redux/actions/ActionType";
 import { UserInfo } from "@/src/redux/reducers/AuthReducer";
-import {
-  useEditUserProfileDetailsMutation,
-  useLazyGetUserProfileDetailsQuery,
-} from "@/src/services/UserRequest/userApi";
+import { useEditUserProfileDetailsMutation } from "@/src/services/UserRequest/userApi";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -32,7 +29,6 @@ interface UpdatedUsersData {
 }
 const EditProfile = () => {
   const [editUserProfileDetails] = useEditUserProfileDetailsMutation();
-  const [GetUserDetails] = useLazyGetUserProfileDetailsQuery();
   const navigation = useRouter();
   const dispatch = useDispatch();
   const themeColors = useThemeColors();

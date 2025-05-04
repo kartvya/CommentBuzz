@@ -58,16 +58,22 @@ interface CommentsCount {
 }
 
 export interface PostData {
-  body: string;
-  created_at: string;
-  files: string;
-  id: number;
-  user: PostUser;
-  userId: string;
-  postVotes: PostVotes[];
-  voteCount: number;
-  postBuzz: number;
-  comments: CommentsCount[];
+  _id: string;
+  user: {
+    _id: string;
+    username: string;
+    profilePic: string;
+  };
+  description: string;
+  media: string[];
+  upvotes: any[];
+  downvotes: any[];
+  views: number;
+  buzzCoinsEarned: number;
+  comments: any[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 export interface CommentsPostData {

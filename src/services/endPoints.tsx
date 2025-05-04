@@ -5,4 +5,6 @@ export const endPoints = {
   GetUserProfileDetails: "/user/profile",
   Register: "/auth/register",
   EditProfile: "/user/editProfile",
+  CreatePost: "/post/createPost",
+  GetAllPost: "/post/getPost",
 };

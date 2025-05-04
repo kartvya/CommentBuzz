@@ -6,6 +6,13 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseUrl, endPoints } from "./endPoints";
 import type { FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { NavigationContainerRef } from "@react-navigation/native";
+
+let navigationRef: NavigationContainerRef<any> | null = null;
+
+export const setNavigationRef = (ref: NavigationContainerRef<any>) => {
+  navigationRef = ref;
+};
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BaseUrl,
@@ -61,8 +68,17 @@ const baseQueryWithReauth: BaseQueryFn<
         result = await baseQuery(args, api, extraOptions);
       } else {
         console.log("Refresh token failed. Logging out.");
+
         await AsyncStorage.removeItem("UserToken");
         await AsyncStorage.removeItem("RefreshToken");
+
+        // Navigate to the welcome screen
+        if (navigationRef) {
+          navigationRef.reset({
+            index: 0,
+            routes: [{ name: "Welcome" }],
+          });
+        }
       }
     }
   }

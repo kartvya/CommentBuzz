@@ -14,7 +14,6 @@ const UserService = backendBaseApi.injectEndpoints({
 
     editUserProfileDetails: build.mutation<any, any>({
       query: (body) => {
-        console.log(body, "boduasduaosd");
         return {
           url: endPoints.EditProfile,
           method: "PUT",
