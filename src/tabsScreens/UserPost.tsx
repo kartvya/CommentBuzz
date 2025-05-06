@@ -12,7 +12,6 @@ import MemoizedPostView from "../components/MemoizedPostView";
 import { TitleText } from "../components/Text";
 import { Colors, DarkColors } from "../constants/Colors";
 import { RootState } from "../redux/Store";
-import { fetchOnlyUserPost } from "../services/postServices";
 import { PostData } from "../utility/types";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -23,12 +22,15 @@ import { useIsFocused } from "@react-navigation/native";
 import Loading from "../components/Loading";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UserInfo } from "../redux/reducers/AuthReducer";
+import usePostServices from "../services/postServices";
 
 type Props = {};
 
 let limit = 10;
 
 const UserPost = forwardRef<Props>((props, ref) => {
+  const { fetchOnlyUserPost } = usePostServices();
+
   const navigation = useRouter();
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
@@ -41,61 +43,22 @@ const UserPost = forwardRef<Props>((props, ref) => {
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  // const handlePost = async (payload: any) => {
-  //   try {
-  //     if (payload.eventType === "INSERT" && payload?.new?.id) {
-  //       let newPost = { ...payload?.new };
-  //       let res = await getUserData(newPost.userId);
-  //       newPost.user = res.success ? res?.data : {};
-  //       setPosts((prevPost) => {
-  //         if (prevPost.some((post) => post.id === newPost.id)) {
-  //           return prevPost;
-  //         }
-  //         return [newPost, ...prevPost];
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   let postChannel = supabase
-  //     .channel("posts")
-  //     .on(
-  //       "postgres_changes",
-  //       {
-  //         event: "*",
-  //         schema: "public",
-  //         table: "posts",
-  //       },
-  //       handlePost
-  //     )
-  //     .subscribe();
-  //   return () => {
-  //     supabase.removeChannel(postChannel);
-  //   };
-  // }, [isFocused]);
-
   useEffect(() => {
     getAllPost();
   }, [isFocused]);
 
   const getAllPost = async () => {
     limit = limit + 10;
-    const res = await fetchOnlyUserPost(limit, UserInfo?._id);
-
+    const res = await fetchOnlyUserPost(limit);
     if (res.success) {
-      // Ensure res.data is defined before checking its length
       const postsData = res.data ?? [];
 
       if (postsData.length > 0 && postsData.length <= 10) {
         setHasMore(false);
-        // Remove duplicates if needed
         setPosts((prevPosts) => {
           const uniquePosts = [
             ...new Map(
-              [...prevPosts, ...postsData].map((post) => [post.id, post])
+              [...postsData, ...prevPosts].map((post) => [post._id, post])
             ).values(),
           ];
           return uniquePosts;
@@ -111,7 +74,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
 
   const refreshPulled = async () => {
     limit = 10;
-    const res = await fetchOnlyUserPost(limit, UserInfo?._id);
+    const res = await fetchOnlyUserPost(limit);
     if (res.success) {
       setPosts(res.data ?? []);
     }

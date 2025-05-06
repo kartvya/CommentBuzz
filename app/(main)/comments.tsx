@@ -33,7 +33,7 @@ import { useSelector } from "react-redux";
 
 const Comments = () => {
   const { postId } = useLocalSearchParams();
-  const { createPostUpvote, deletePost, deletePostUpvote } = usePostServices();
+  const { createComment, fetchPostDetails } = usePostServices();
   const themeColors = useThemeColors();
   const commentRef = useRef<string>("");
   const flatListRef = useRef<FlatList>(null);

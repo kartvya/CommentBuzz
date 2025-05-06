@@ -40,6 +40,22 @@ const PostService = backendBaseApi.injectEndpoints({
         };
       },
     }),
+
+    getOnlyUserPost: build.query<any, void>({
+      query: (limit) => ({
+        url: endPoints.GetOnlyUserPost + `?page=1&limit=${limit}`,
+        method: "GET",
+      }),
+      keepUnusedDataFor: 0,
+    }),
+
+    getPostById: build.query<any, void>({
+      query: (postId) => ({
+        url: endPoints.GetAllPost + "/" + postId,
+        method: "GET",
+      }),
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
@@ -48,4 +64,6 @@ export const {
   useLazyGetPostQuery,
   useToggleVotePostMutation,
   useDeletePostMutation,
+  useLazyGetOnlyUserPostQuery,
+  useLazyGetPostByIdQuery,
 } = PostService;

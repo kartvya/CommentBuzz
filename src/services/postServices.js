@@ -1,12 +1,17 @@
 import { uploadFile } from "./imageServices";
 import {
   useDeletePostMutation,
+  useGetOnlyUserPostQuery,
+  useLazyGetOnlyUserPostQuery,
+  useLazyGetPostByIdQuery,
   useLazyGetPostQuery,
 } from "./PostReqest/postApi";
 
 const usePostServices = () => {
   const [getUserPost] = useLazyGetPostQuery();
   const [deletePostApi] = useDeletePostMutation();
+  const [getUserPostApi] = useLazyGetOnlyUserPostQuery();
+  const [getPostDetails] = useLazyGetPostByIdQuery();
 
   const createOrUpdatePost = async (post) => {
     try {
@@ -72,15 +77,13 @@ const usePostServices = () => {
 
   const fetchPostDetails = async (postId) => {
     try {
-      if (error) {
+      const res = await getPostDetails(postId).unwrap();
+      if (res.success) {
+        return { success: true, data: res.post, msg: "" };
+      } else {
         console.log(error);
-        return {
-          success: false,
-          data: undefined,
-          msg: "Could not fetch post details",
-        };
+        return { success: false, data: undefined, msg: "Could not fetch post" };
       }
-      return { success: true, data: data, msg: "" };
     } catch (error) {
       console.log(error);
       return {
@@ -91,14 +94,15 @@ const usePostServices = () => {
     }
   };
 
-  const fetchOnlyUserPost = async (limit = 10, userId) => {
+  const fetchOnlyUserPost = async (limit = 10) => {
     try {
-      console.log(limit);
-      if (error) {
+      const res = await getUserPostApi(limit).unwrap();
+      if (res.success) {
+        return { success: true, data: res.posts, msg: "" };
+      } else {
         console.log(error);
         return { success: false, data: undefined, msg: "Could not fetch post" };
       }
-      return { success: true, data: data, msg: "" };
     } catch (error) {
       console.log(error);
       return { success: false, data: undefined, msg: "Could not fetch post" };

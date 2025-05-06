@@ -9,4 +9,5 @@ export const endPoints = {
   GetAllPost: "/post/getPost",
   ToggleVote: "/post/voteToggle",
   DeletePost: "/post/deletePost",
+  GetOnlyUserPost: "/post/getOnlyUserPost",
 };
