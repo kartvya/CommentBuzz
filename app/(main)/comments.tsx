@@ -23,7 +23,6 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
@@ -33,7 +32,8 @@ import { useSelector } from "react-redux";
 
 const Comments = () => {
   const { postId } = useLocalSearchParams();
-  const { createComment, fetchPostDetails } = usePostServices();
+  const { createComment, fetchPostDetails, fetchPostComments } =
+    usePostServices();
   const themeColors = useThemeColors();
   const commentRef = useRef<string>("");
   const flatListRef = useRef<FlatList>(null);
@@ -73,7 +73,7 @@ const Comments = () => {
 
   const getPostDetails = async () => {
     try {
-      const res = await fetchPostDetails(postId);
+      const res = await fetchPostComments(postId);
       if (res.success) {
         setPostDetails(res.data);
         inputRef.current?.focus();
@@ -92,7 +92,7 @@ const Comments = () => {
       }
       let data = {
         userId: UserInfo?._id,
-        postId: postDetails?.id,
+        postId: postDetails?.post?._id,
         text: commentRef?.current,
       };
       setSendCommentLoad(true);
@@ -111,7 +111,7 @@ const Comments = () => {
     }
   };
 
-  const onDeleteComment = async (commentId: number) => {
+  const onDeleteComment = async (commentId: string) => {
     try {
       let res = await deleteComment(commentId);
       if (res.success) {
@@ -119,7 +119,7 @@ const Comments = () => {
           if (prevPost) {
             let updatedPost = { ...prevPost };
             updatedPost.comments = updatedPost.comments?.filter(
-              (c) => c.id != commentId
+              (c) => c._id != commentId
             );
             return updatedPost;
           }
@@ -136,9 +136,9 @@ const Comments = () => {
       <>
         <MemoizedCommentView
           item={item}
-          isUserComment={item?.userId == UserInfo?._id}
+          isUserComment={item?.user?._id == UserInfo?._id}
           postId={postId as string}
-          onDeleteComment={() => onDeleteComment(item?.id)}
+          onDeleteComment={() => onDeleteComment(item?._id)}
         />
       </>
     ),
@@ -169,12 +169,12 @@ const Comments = () => {
             ListHeaderComponent={() => (
               <MemoizedPostView
                 //@ts-ignore
-                item={postDetails as PostData}
+                item={postDetails?.post}
                 isVisible={true}
                 isCommentScreen={true}
               />
             )}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item._id.toString()}
             renderItem={renderItem}
             contentContainerStyle={{
               paddingBottom: paddingBottom,

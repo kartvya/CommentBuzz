@@ -374,7 +374,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                     color={themeColors.text}
                   />
                   <NormalText style={{ marginLeft: RFPercentage(1) }}>
-                    {item?.comments?.length}
+                    {item?.commentCount > 0 ? item?.commentCount : 0}
                   </NormalText>
                 </Pressable>
               )}

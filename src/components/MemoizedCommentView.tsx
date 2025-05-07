@@ -35,37 +35,37 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
     );
     const [showCommentActionModal, setShowCommentActionModal] = useState(false);
     const [deleteModal, setShowDeleteModal] = useState<boolean>(false);
-    const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.commentBuzz);
+    const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.buzzCoins);
     const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
 
-    useEffect(() => {
-      const sortedData = item?.commentVotes?.sort(
-        (
-          a: { created_at: string | number | Date },
-          b: { created_at: string | number | Date }
-        ) =>
-          new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
-      );
-      const currentUserVote = sortedData?.find(
-        (vote: { userId: string }) => vote?.userId === UserInfo?.id
-      );
+    // useEffect(() => {
+    //   const sortedData = item?.commentVotes?.sort(
+    //     (
+    //       a: { created_at: string | number | Date },
+    //       b: { created_at: string | number | Date }
+    //     ) =>
+    //       new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
+    //   );
+    //   const currentUserVote = sortedData?.find(
+    //     (vote: { userId: string }) => vote?.userId === UserInfo?.id
+    //   );
 
-      if (currentUserVote?.voteType === "upVote") {
-        setUserVote("upvote");
-      } else if (currentUserVote?.voteType === "downVote") {
-        setUserVote("downvote");
-      } else {
-        setUserVote("none");
-      }
-      setVoteCount(item?.voteCount || 0);
-      setFeedBuzzCoins(item?.commentBuzz);
-    }, [item?.commentVotes, item?.voteCount]);
+    //   if (currentUserVote?.voteType === "upVote") {
+    //     setUserVote("upvote");
+    //   } else if (currentUserVote?.voteType === "downVote") {
+    //     setUserVote("downvote");
+    //   } else {
+    //     setUserVote("none");
+    //   }
+    //   setVoteCount(item?.voteCount || 0);
+    //   setFeedBuzzCoins(item?.commentBuzz);
+    // }, [item?.commentVotes, item?.voteCount]);
 
     function buzzCoinMathFunction(
       type: "decreaseone" | "decreasetwo" | "increasetwo" | "increaseone"
     ) {
       let coin = feedBuzzCoins ?? 0;
-      if (UserInfo?.id !== item?.userId) {
+      if (UserInfo?.id !== item?.user?._id) {
         if (type === "decreaseone") {
           coin -= 0.01;
           coin = parseFloat(coin.toFixed(2));
@@ -181,7 +181,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
           }}
         >
           <Avatar
-            uri={item?.user?.image}
+            uri={item?.user?.profilePic}
             size={RFPercentage(5)}
             borderRadius={100}
           />
@@ -193,7 +193,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
               <NormalText
                 style={{ color: themeColors.text, fontSize: RFValue(10) }}
               >
-                {item?.user?.name}
+                {item?.user?.username}
               </NormalText>
               <TitleText
                 style={{
@@ -210,7 +210,7 @@ const MemoizedCommentView: React.FC<Iprops> = React.memo(
                   top: 1,
                 }}
               >
-                {moment(item?.created_at).fromNow()}
+                {moment(item?.createdAt).fromNow()}
               </NormalText>
             </View>
             <Spacer gap={RFPercentage(0.2)} />

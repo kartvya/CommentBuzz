@@ -4,6 +4,7 @@ import {
   useGetOnlyUserPostQuery,
   useLazyGetOnlyUserPostQuery,
   useLazyGetPostByIdQuery,
+  useLazyGetPostCommentsQuery,
   useLazyGetPostQuery,
 } from "./PostReqest/postApi";
 
@@ -12,6 +13,7 @@ const usePostServices = () => {
   const [deletePostApi] = useDeletePostMutation();
   const [getUserPostApi] = useLazyGetOnlyUserPostQuery();
   const [getPostDetails] = useLazyGetPostByIdQuery();
+  const [getPostComments] = useLazyGetPostCommentsQuery();
 
   const createOrUpdatePost = async (post) => {
     try {
@@ -80,6 +82,25 @@ const usePostServices = () => {
       const res = await getPostDetails(postId).unwrap();
       if (res.success) {
         return { success: true, data: res.post, msg: "" };
+      } else {
+        console.log(error);
+        return { success: false, data: undefined, msg: "Could not fetch post" };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        success: false,
+        data: undefined,
+        msg: "Could not fetch post details",
+      };
+    }
+  };
+
+  const fetchPostComments = async (postId) => {
+    try {
+      const res = await getPostComments(postId).unwrap();
+      if (res.success) {
+        return { success: true, data: res, msg: "" };
       } else {
         console.log(error);
         return { success: false, data: undefined, msg: "Could not fetch post" };
@@ -285,6 +306,7 @@ const usePostServices = () => {
     createCommentVote,
     deleteCommentVote,
     fetchOnlyUserComments,
+    fetchPostComments,
   };
 };
 

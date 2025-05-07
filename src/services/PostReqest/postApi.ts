@@ -56,6 +56,14 @@ const PostService = backendBaseApi.injectEndpoints({
       }),
       keepUnusedDataFor: 0,
     }),
+
+    getPostComments: build.query<any, void>({
+      query: (postId) => ({
+        url: endPoints.GetPostComments + "/" + postId,
+        method: "GET",
+      }),
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
@@ -66,4 +74,5 @@ export const {
   useDeletePostMutation,
   useLazyGetOnlyUserPostQuery,
   useLazyGetPostByIdQuery,
+  useLazyGetPostCommentsQuery,
 } = PostService;
