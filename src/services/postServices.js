@@ -1,11 +1,13 @@
 import { uploadFile } from "./imageServices";
 import {
+  useDeleteCommentMutation,
   useDeletePostMutation,
   useGetOnlyUserPostQuery,
   useLazyGetOnlyUserPostQuery,
   useLazyGetPostByIdQuery,
   useLazyGetPostCommentsQuery,
   useLazyGetPostQuery,
+  useUploadCommentMutation,
 } from "./PostReqest/postApi";
 
 const usePostServices = () => {
@@ -14,6 +16,8 @@ const usePostServices = () => {
   const [getUserPostApi] = useLazyGetOnlyUserPostQuery();
   const [getPostDetails] = useLazyGetPostByIdQuery();
   const [getPostComments] = useLazyGetPostCommentsQuery();
+  const [uploadComment] = useUploadCommentMutation();
+  const [deleteCommentApi] = useDeleteCommentMutation();
 
   const createOrUpdatePost = async (post) => {
     try {
@@ -185,16 +189,13 @@ const usePostServices = () => {
 
   const createComment = async (comment) => {
     try {
-      if (commentError) {
-        console.log(commentError);
-        return {
-          success: false,
-          data: undefined,
-          msg: "Could not comment post",
-        };
+      const res = await uploadComment(comment).unwrap();
+      if (res.success) {
+        return { success: true, data: res, msg: "" };
+      } else {
+        console.log(error);
+        return { success: false, data: undefined, msg: "Could not fetch post" };
       }
-
-      return { success: true, data: voteData, msg: "" };
     } catch (error) {
       console.log(error);
       return { success: false, data: undefined, msg: "Could not comment post" };
@@ -203,16 +204,14 @@ const usePostServices = () => {
 
   const deleteComment = async (commentId) => {
     try {
-      if (commentError) {
-        console.log(commentError);
-        return {
-          success: false,
-          data: undefined,
-          msg: "Could not delete comment",
-        };
+      const res = await deleteCommentApi(commentId).unwrap();
+      console.log(res, "rearaerae");
+      if (res.success) {
+        return { success: true, data: res, msg: "" };
+      } else {
+        console.log(error);
+        return { success: false, data: undefined, msg: "Could not fetch post" };
       }
-
-      return { success: true, data: { commentId }, msg: "" };
     } catch (error) {
       console.log(error);
       return {

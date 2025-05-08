@@ -32,8 +32,8 @@ import { useSelector } from "react-redux";
 
 const Comments = () => {
   const { postId } = useLocalSearchParams();
-  const { createComment, fetchPostDetails, fetchPostComments } =
-    usePostServices();
+  const { createComment, fetchPostComments, deleteComment } = usePostServices();
+
   const themeColors = useThemeColors();
   const commentRef = useRef<string>("");
   const flatListRef = useRef<FlatList>(null);
@@ -49,23 +49,11 @@ const Comments = () => {
     (state: RootState) => state.root?.authReducer?.userInfo
   ) as UserInfo;
 
-  const handleComment = async (payload: any) => {
-    if (payload.new) {
-      let newComment = { ...payload.new };
-      let res = await getUserData(newComment.userId);
-      newComment.user = res.success ? res.data : {};
-
-      setPostDetails((prevPost) => {
-        if (prevPost) {
-          return {
-            ...prevPost,
-            comments: [...prevPost.comments, newComment],
-          };
-        }
-        return prevPost;
-      });
+  useEffect(() => {
+    if (postDetails?.comments?.length) {
+      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     }
-  };
+  }, [postDetails?.comments]);
 
   useEffect(() => {
     getPostDetails();
@@ -91,19 +79,18 @@ const Comments = () => {
         return null;
       }
       let data = {
-        userId: UserInfo?._id,
         postId: postDetails?.post?._id,
-        text: commentRef?.current,
+        description: commentRef?.current,
       };
       setSendCommentLoad(true);
       const res = await createComment(data);
       if (res.success) {
         inputRef.current?.clear();
         commentRef.current = "";
+        getPostDetails();
         setSendCommentLoad(false);
       } else {
         setSendCommentLoad(false);
-        alert(res.msg);
       }
     } catch (error) {
       setSendCommentLoad(false);
@@ -157,15 +144,10 @@ const Comments = () => {
     <ScreenWrapper>
       <View style={{ flex: 1 }}>
         <Header showBackIcon={true} />
-        <KeyboardAvoidingView
-          behavior="padding"
-          style={styles.keyboard}
-          //   keyboardVerticalOffset={height - 1000}
-        >
+        <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
           <FlatList
             ref={flatListRef}
             data={postDetails?.comments ?? []}
-            onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
             ListHeaderComponent={() => (
               <MemoizedPostView
                 //@ts-ignore
@@ -218,6 +200,7 @@ const Comments = () => {
                 flex: 1,
               }}
               onChangeText={(txt: string) => (commentRef.current = txt)}
+              autoCorrect={false}
             />
             <Spacer gap={RFPercentage(0.5)} />
             {sendCommentLoad ? (

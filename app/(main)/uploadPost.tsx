@@ -323,7 +323,7 @@ const UploadPost = () => {
                 color={themeColors.white}
               />
             </Pressable>
-            <Spacer gap={RFPercentage(0.5)} />
+            {/* <Spacer gap={RFPercentage(0.5)} />
             <Pressable onPress={() => onPick(false)}>
               <SvgIcon
                 name={"video"}
@@ -331,7 +331,7 @@ const UploadPost = () => {
                 strokeWidth={1.5}
                 color={themeColors.white}
               />
-            </Pressable>
+            </Pressable> */}
           </View>
           {files && (
             <View style={styles.files}>

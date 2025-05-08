@@ -51,8 +51,8 @@ export interface CommentsData {
   };
   text: string;
   parentComment: string | null;
-  upvotes: number;
-  downvotes: number;
+  upvotes: any[];
+  downvotes: any[];
   buzzCoins: number;
   createdAt: string;
   updatedAt: string;

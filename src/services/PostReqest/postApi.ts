@@ -64,6 +64,35 @@ const PostService = backendBaseApi.injectEndpoints({
       }),
       keepUnusedDataFor: 0,
     }),
+
+    uploadComment: build.mutation<any, any>({
+      query: (body) => {
+        return {
+          url: endPoints.CreateComment,
+          method: "POST",
+          body,
+        };
+      },
+    }),
+
+    deleteComment: build.mutation<any, any>({
+      query: (commentID) => {
+        return {
+          url: `${endPoints.DeleteComment}/${commentID}`,
+          method: "DELETE",
+        };
+      },
+    }),
+
+    toggleCommentVote: build.mutation<any, any>({
+      query: (body) => {
+        return {
+          url: endPoints.ToggleCommentVote,
+          method: "PATCH",
+          body,
+        };
+      },
+    }),
   }),
 });
 
@@ -75,4 +104,7 @@ export const {
   useLazyGetOnlyUserPostQuery,
   useLazyGetPostByIdQuery,
   useLazyGetPostCommentsQuery,
+  useUploadCommentMutation,
+  useDeleteCommentMutation,
+  useToggleCommentVoteMutation,
 } = PostService;

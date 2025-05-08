@@ -44,8 +44,7 @@ interface Iprops {
 
 const MemoizedPostView: React.FC<Iprops> = React.memo(
   ({ item, isVisible, fetchAllPost, isCommentScreen }) => {
-    const { createPostUpvote, deletePost, deletePostUpvote } =
-      usePostServices();
+    const { deletePost } = usePostServices();
 
     const [toggleVotes] = useToggleVotePostMutation();
     const navigation = useNavigation();
@@ -143,17 +142,6 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       }
     };
 
-    const onPressComment = () => {
-      try {
-        router.push({
-          pathname: "/(main)/comments",
-          params: { postId: item._id },
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     const onPressUpvote = async () => {
       try {
         let voteType: "none" | "upvote" | "downvote" = "none";
@@ -223,6 +211,20 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
             fetchAllPost();
           }
         }
+        if (isCommentScreen) {
+          navigation.goBack();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const onPressComment = () => {
+      try {
+        router.push({
+          pathname: "/(main)/comments",
+          params: { postId: item._id },
+        });
       } catch (error) {
         console.log(error);
       }
