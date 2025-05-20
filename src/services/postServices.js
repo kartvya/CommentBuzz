@@ -4,6 +4,7 @@ import {
   useDeletePostMutation,
   useGetOnlyUserPostQuery,
   useLazyGetOnlyUserPostQuery,
+  useLazyGetOnlyUsersCommentsQuery,
   useLazyGetPostByIdQuery,
   useLazyGetPostCommentsQuery,
   useLazyGetPostQuery,
@@ -18,6 +19,7 @@ const usePostServices = () => {
   const [getPostComments] = useLazyGetPostCommentsQuery();
   const [uploadComment] = useUploadCommentMutation();
   const [deleteCommentApi] = useDeleteCommentMutation();
+  const [getUsersComments] = useLazyGetOnlyUsersCommentsQuery();
 
   const createOrUpdatePost = async (post) => {
     try {
@@ -280,13 +282,15 @@ const usePostServices = () => {
     }
   };
 
-  const fetchOnlyUserComments = async (limit = 10, userId) => {
+  const fetchOnlyUserComments = async (limit = 10) => {
     try {
-      if (error) {
+      const res = await getUsersComments(limit).unwrap();
+      if (res.success) {
+        return { success: true, data: res.comments, msg: "" };
+      } else {
         console.log(error);
         return { success: false, data: undefined, msg: "Could not fetch post" };
       }
-      return { success: true, data: data, msg: "" };
     } catch (error) {
       console.log(error);
     }

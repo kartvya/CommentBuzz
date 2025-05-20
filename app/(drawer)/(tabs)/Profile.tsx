@@ -7,7 +7,6 @@ import { useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
-import UserAbout from "@/src/tabsScreens/UserAbout";
 import UserComments from "@/src/tabsScreens/UserComments";
 import UserPost from "@/src/tabsScreens/UserPost";
 import { useNavigation } from "@react-navigation/native";
@@ -32,7 +31,6 @@ interface Routes {
 const renderScene = SceneMap({
   first: () => <UserPost />,
   second: () => <UserComments />,
-  third: () => <UserAbout />,
 });
 
 const Profile = () => {
@@ -49,7 +47,6 @@ const Profile = () => {
   const [routes] = useState<Routes[]>([
     { key: "first", title: "Posts" },
     { key: "second", title: "Comments" },
-    { key: "third", title: "About" },
   ]);
 
   const onPressLogout = () => {

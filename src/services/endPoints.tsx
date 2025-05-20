@@ -14,4 +14,5 @@ export const endPoints = {
   CreateComment: "/comment/createComment",
   DeleteComment: "/comment/deleteComment",
   ToggleCommentVote: "/comment/commentVoteToggle",
+  GetOnlyUserComments: "/comment/getOnlyUserComments",
 };

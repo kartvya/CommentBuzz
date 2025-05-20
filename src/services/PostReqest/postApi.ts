@@ -93,6 +93,14 @@ const PostService = backendBaseApi.injectEndpoints({
         };
       },
     }),
+
+    getOnlyUsersComments: build.query<any, void>({
+      query: (limit) => ({
+        url: endPoints.GetOnlyUserComments + `?page=1&limit=${limit}`,
+        method: "GET",
+      }),
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
@@ -107,4 +115,5 @@ export const {
   useUploadCommentMutation,
   useDeleteCommentMutation,
   useToggleCommentVoteMutation,
+  useLazyGetOnlyUsersCommentsQuery,
 } = PostService;
