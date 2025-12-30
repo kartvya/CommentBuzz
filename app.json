@@ -18,7 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#121212"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
@@ -54,6 +54,7 @@
       "eas": {
         "projectId": "ad1eaac8-2dcb-422a-ba7e-789128982859"
       }
-    }
+    },
+    "owner": "kartvya"
   }
 }

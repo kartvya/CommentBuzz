@@ -36,10 +36,10 @@ const Login = () => {
   const onLogin = async () => {
     try {
       let isValid = false;
-      // let email = emailRef.current.trim();
-      // let password = passwordRef.current.trim();
-      let email = "kartvya@gmail.com";
-      let password = "Abc@1234";
+      let email = emailRef.current.trim();
+      let password = passwordRef.current.trim();
+      // let email = "kartvya@gmail.com";
+      // let password = "Abc@1234";
       if (!email) {
         setEmailError("This field is required.");
         isValid = false;
