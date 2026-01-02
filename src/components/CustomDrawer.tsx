@@ -118,25 +118,23 @@ const CustomDrawer = (props: any) => {
 
         <TouchableHighlight
           onPress={() => navigation.navigate("/(main)/editProfile")}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
               Edit profile
             </TitleText>
             <SvgIcon name={"edit"} size={18} color={themeColors?.text} />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={() => alert("Comming soon")}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
@@ -148,15 +146,14 @@ const CustomDrawer = (props: any) => {
               color={themeColors?.text}
               strokeWidth={3}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={toggleSwitch}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
@@ -187,15 +184,14 @@ const CustomDrawer = (props: any) => {
               switchWidthMultiplier={2}
               switchBorderRadius={30}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={() => navigation.navigate("/(main)/timeManagement")}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
@@ -207,15 +203,14 @@ const CustomDrawer = (props: any) => {
               color={themeColors?.text}
               strokeWidth={2}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={() => setLogoutModal(true)}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={[styles.listTextStyle, { color: DarkColors.primaryColor }]}
             >
@@ -226,7 +221,7 @@ const CustomDrawer = (props: any) => {
               size={18}
               color={DarkColors?.primaryColor}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
       </View>
 

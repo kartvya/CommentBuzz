@@ -10,7 +10,7 @@ import { USERINFO } from "@/src/redux/actions/ActionType";
 import { useLoginMutation } from "@/src/services/AuthRequest/authApi";
 import { useLazyGetUserProfileDetailsQuery } from "@/src/services/UserRequest/userApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -36,10 +36,10 @@ const Login = () => {
   const onLogin = async () => {
     try {
       let isValid = false;
-      let email = emailRef.current.trim();
-      let password = passwordRef.current.trim();
-      // let email = "kartvya@gmail.com";
-      // let password = "Abc@1234";
+      // let email = emailRef.current.trim();
+      // let password = passwordRef.current.trim();
+      let email = "kartvya@gmail.com";
+      let password = "Abc@1234";
       if (!email) {
         setEmailError("This field is required.");
         isValid = false;
@@ -71,8 +71,9 @@ const Login = () => {
           type: USERINFO,
           payload: userProfileDetails?.user,
         });
+        navigation.navigate("/(drawer)/(tabs)/feedScreen" as Href);
+        setLoading(false);
       }
-      navigation.navigate("/(tabs)/feedScreen");
     } catch (error) {
       console.log(error);
       setLoading(false);

@@ -7,6 +7,7 @@ import { useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
 import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
+import { getUserImage } from "@/src/services/imageServices";
 import UserComments from "@/src/tabsScreens/UserComments";
 import UserPost from "@/src/tabsScreens/UserPost";
 import { useNavigation } from "@react-navigation/native";
@@ -14,12 +15,13 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Image,
   Pressable,
   StyleSheet,
   useWindowDimensions,
   View,
 } from "react-native";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { RFPercentage } from "react-native-responsive-fontsize";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 import { useSelector } from "react-redux";
 
@@ -150,25 +152,11 @@ const Profile = () => {
           renderTabBar={(props) => (
             <TabBar
               {...props}
-              renderLabel={() => null}
-              renderIcon={({ route }: { route: any }) => (
-                <View style={{}}>
-                  <NormalText
-                    style={{
-                      marginVertical: RFPercentage(1),
-                      fontSize: RFValue(10),
-                    }}
-                    numberOfLines={1}
-                  >
-                    {route.title}
-                  </NormalText>
-                </View>
-              )}
               style={{ backgroundColor: themeColors.lightBg }}
-              labelStyle={{ fontSize: 12 }}
+              activeColor={themeColors.primaryColor}
               inactiveColor="gray"
               indicatorStyle={{
-                backgroundColor: themeColors?.primaryColor,
+                backgroundColor: themeColors.primaryColor,
               }}
             />
           )}

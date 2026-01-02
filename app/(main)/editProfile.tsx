@@ -96,6 +96,10 @@ const EditProfile = () => {
       return;
     }
 
+    if (isLoading) {
+      return;
+    }
+
     try {
       setIsLoading(true);
       let formData = new FormData();
@@ -116,6 +120,7 @@ const EditProfile = () => {
         } as any);
       }
       let res = await editUserProfileDetails(formData).unwrap();
+      console.log("res", res);
       if (res.success) {
         dispatch({
           type: USERINFO,

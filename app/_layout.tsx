@@ -1,6 +1,5 @@
 import { setNavigate } from "@/src/helpers/navigation";
 import { persistor, store } from "@/src/redux/Store";
-import { getUserData } from "@/src/services/userService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
 import { Href, SplashScreen, Stack, useRouter } from "expo-router";
@@ -12,14 +11,13 @@ import { PersistGate } from "redux-persist/integration/react";
 SplashScreen.preventAutoHideAsync();
 
 const MainLayout = () => {
-  const dispatch = useDispatch();
   const navigation = useRouter();
 
   const router = useRouter();
 
   useEffect(() => {
     updateUserData();
-    setNavigate(router.replace);
+    setNavigate(router.replace as any);
   }, []);
 
   const updateUserData = async () => {

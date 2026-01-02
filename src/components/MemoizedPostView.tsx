@@ -1,5 +1,4 @@
 import { Colors, useThemeColors } from "@/src/constants/Colors";
-import { ResizeMode, Video } from "expo-av";
 import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
 import moment from "moment";
@@ -25,6 +24,7 @@ import {
   getSupaBaseFileUrl,
   getUserImage,
 } from "../services/imageServices";
+import { useToggleVotePostMutation } from "../services/PostReqest/postApi";
 import usePostServices from "../services/postServices";
 import { PostData } from "../utility/types";
 import Avatar from "./Avatar";
@@ -33,7 +33,6 @@ import GlobalCenterModal from "./GlobalCenterModal";
 import PostActionModal from "./PostActionModal";
 import Spacer from "./Spacer";
 import { NormalText, TitleText } from "./Text";
-import { useToggleVotePostMutation } from "../services/PostReqest/postApi";
 
 interface Iprops {
   item: PostData;

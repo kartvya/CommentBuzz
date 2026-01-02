@@ -153,7 +153,7 @@ const UserPost = forwardRef<Props>((props, ref) => {
         >
           <Pressable onPress={() => navigation.navigate("/(main)/uploadPost")}>
             <AntDesign
-              name="pluscircleo"
+              name="plus-circle"
               size={RFPercentage(5)}
               color={Colors.icon}
             />

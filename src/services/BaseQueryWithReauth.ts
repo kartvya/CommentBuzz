@@ -17,11 +17,18 @@ export const setNavigationRef = (ref: NavigationContainerRef<any>) => {
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BaseUrl,
-  prepareHeaders: async (headers, { type }) => {
+  prepareHeaders: async (headers, { type, extra }) => {
     headers.set("Accept", "application/json");
 
-    if (type === "mutation" && !headers.has("Content-Type")) {
-      headers.set("Content-Type", "application/json");
+    // Only set Content-Type for JSON, not for FormData
+    // FormData will be detected by checking if body is FormData instance
+    if (type === "mutation") {
+      const body = (extra as any)?.body;
+      const isFormData = body instanceof FormData;
+
+      if (!isFormData && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+      }
     }
 
     const token = await AsyncStorage.getItem("UserToken");
@@ -31,7 +38,7 @@ const baseQuery = fetchBaseQuery({
 
     return headers;
   },
-  timeout: 10000,
+  timeout: 60000, // Increase timeout to 60 seconds for file uploads
 });
 
 const baseQueryWithReauth: BaseQueryFn<

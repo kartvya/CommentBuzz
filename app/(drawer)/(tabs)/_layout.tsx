@@ -1,17 +1,17 @@
 import SvgIcon from "@/src/assets/icons";
 import Avatar from "@/src/components/Avatar";
+import CustomTabBar from "@/src/components/CustomeTabBar/CustomTabBar";
 import { DarkColors } from "@/src/constants/Colors";
-import { Users } from "@/src/redux/reducers/AuthReducer";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
 import { Tabs } from "expo-router";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
-import CustomTabBar from "@/src/components/CustomeTabBar/CustomTabBar";
 
 export default function TabLayout() {
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   return (
     <Tabs
@@ -27,7 +27,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen
         name="feedScreen"
-        options={({ navigation, route }) => ({
+        options={() => ({
           tabBarIcon: ({ color, focused }) => (
             <SvgIcon
               size={RFPercentage(3.4)}
@@ -40,7 +40,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="createPost"
-        options={({ navigation, route }) => ({
+        options={() => ({
           tabBarIcon: ({ color, focused }) => (
             <SvgIcon
               size={RFPercentage(3.4)}
@@ -53,10 +53,10 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="Profile"
-        options={({ navigation, route }) => ({
+        options={() => ({
           tabBarIcon: ({ color, focused }) => (
             <Avatar
-              uri={UserInfo?.image}
+              uri={UserInfo?.profilePic}
               size={RFPercentage(3.8)}
               borderRadius={100}
               avatarImgStyle={{

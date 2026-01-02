@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TabBarIcon from "./TabBarIcon";
 import { useRouter } from "expo-router";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default function CustomTabBar({ state, descriptors, navigation }) {
   const translateX = useSharedValue(0);
@@ -28,17 +28,21 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
   };
 
   useEffect(() => {
-    translateX.value = withSpring(buttonWidth * state.index, {
-      duration: 1300,
-    });
-  }, [state.index]);
+    if (dimentions.width > 200) {
+      translateX.value = withSpring(buttonWidth * state.index, {
+        duration: 800,
+      });
+    }
+  }, [state.index, buttonWidth, dimentions.width]);
 
   const rCircle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: translateX.value }],
+      left: translateX.value,
     };
   });
+
   const insets = useSafeAreaInsets();
+
   return (
     <View
       style={[
@@ -61,7 +65,6 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
             backgroundColor: themeColors.white,
             borderRadius: 40,
             zIndex: -1,
-            marginHorizontal: 6,
           },
         ]}
       />
@@ -98,13 +101,6 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
               navigation.navigate(route.name, route.params);
             }
           }
-        };
-
-        const onLongPress = () => {
-          navigation.emit({
-            type: "tabLongPress",
-            target: route.key,
-          });
         };
 
         return (

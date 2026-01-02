@@ -1,4 +1,4 @@
-export const BaseUrl = "https://514a36426079.ngrok-free.app/api";
+export const BaseUrl = "https://be15a97bfd3b.ngrok-free.app/api";
 export const endPoints = {
   Login: "/auth/login",
   RefreshToken: "/auth/refresh",
