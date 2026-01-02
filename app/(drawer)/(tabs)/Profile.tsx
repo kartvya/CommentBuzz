@@ -51,22 +51,6 @@ const Profile = () => {
     { key: "second", title: "Comments" },
   ]);
 
-  const onPressLogout = () => {
-    try {
-      Alert.alert(
-        "Confirm",
-        "Are you sure want to log out?",
-        [
-          { text: "Cancel", onPress: () => console.log("Cancel Pressed!") },
-          { text: "OK", onPress: onLogoutYesBTN },
-        ],
-        { cancelable: false }
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const onLogoutYesBTN = async () => {
     try {
       Alert.alert("Sign out", "Something went wrong. Please try again. leater");

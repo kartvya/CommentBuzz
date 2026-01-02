@@ -12,7 +12,6 @@ interface Iprops extends PressableProps {
 
 const Avatar = (props: Iprops) => {
   const { size, borderRadius, avatarImgStyle, uri, ...rest } = props;
-  console.log("uri", getUserImage(uri));
 
   return (
     <Pressable {...rest}>

@@ -29,7 +29,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
 
   useEffect(() => {
     if (dimentions.width > 200) {
-      translateX.value = withSpring(buttonWidth * state.index, {
+      translateX.value = withSpring(buttonWidth * state.index + 6, {
         duration: 800,
       });
     }

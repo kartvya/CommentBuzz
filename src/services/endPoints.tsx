@@ -15,4 +15,6 @@ export const endPoints = {
   DeleteComment: "/comment/deleteComment",
   ToggleCommentVote: "/comment/commentVoteToggle",
   GetOnlyUserComments: "/comment/getOnlyUserComments",
+  TrackSessionTime: "/user/trackSession",
+  GetWeeklyAverageTime: "/user/weeklyAverageTime",
 };

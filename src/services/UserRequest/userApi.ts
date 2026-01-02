@@ -21,10 +21,34 @@ const UserService = backendBaseApi.injectEndpoints({
         };
       },
     }),
+
+    trackSessionTime: build.mutation<
+      any,
+      { duration: number; sessionType?: "login" | "app_open" }
+    >({
+      query: (body) => {
+        return {
+          url: endPoints.TrackSessionTime,
+          method: "POST",
+          body,
+        };
+      },
+    }),
+
+    getWeeklyAverageTime: build.query<any, void>({
+      query: () => ({
+        url: endPoints.GetWeeklyAverageTime,
+        method: "GET",
+      }),
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
 export const {
   useLazyGetUserProfileDetailsQuery,
   useEditUserProfileDetailsMutation,
+  useTrackSessionTimeMutation,
+  useGetWeeklyAverageTimeQuery,
+  useLazyGetWeeklyAverageTimeQuery,
 } = UserService;

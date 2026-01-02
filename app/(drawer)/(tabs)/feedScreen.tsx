@@ -21,6 +21,7 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAppSessionTracker } from "@/src/hooks/useAppSessionTracker";
 
 const AnimatedFlatList =
   Animated.createAnimatedComponent<
@@ -41,6 +42,9 @@ const FeedScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [Posts, setPosts] = useState<PostData[]>([]);
+
+  // Track app session time
+  useAppSessionTracker();
 
   // const appState = useRef(AppState.currentState);
   // const [startTime, setStartTime] = useState<Date | null>(null);
