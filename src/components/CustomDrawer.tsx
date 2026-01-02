@@ -1,31 +1,22 @@
-import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  TouchableHighlight,
-  View,
-} from "react-native";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import SvgIcon from "../assets/icons";
-import { Colors, DarkColors, useThemeColors } from "../constants/Colors";
-import MyStatusBar from "./CustomeStatusBar";
-import Spacer from "./Spacer";
-import { NormalText, TitleText } from "./Text";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/Store";
-import {
-  postDataAssociatedWithUser,
-  Users,
-} from "../redux/reducers/AuthReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Href, useRouter } from "expo-router";
 import moment from "moment";
-import { supabase } from "@/lib/supabase";
 import React, { useState } from "react";
-import GlobalCenterModal from "./GlobalCenterModal";
-import Button from "./Button";
-import { useRouter } from "expo-router";
+import { StyleSheet, TouchableHighlight, View } from "react-native";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { useDispatch, useSelector } from "react-redux";
+import SvgIcon from "../assets/icons";
+import { DarkColors, useThemeColors } from "../constants/Colors";
 import { hp } from "../helpers/comman";
-import Switch from "./Switch";
+import { RootState } from "../redux/Store";
 import { ISDARKMODE, LOGOUT } from "../redux/actions/ActionType";
+import { UserInfo } from "../redux/reducers/AuthReducer";
+import Button from "./Button";
+import MyStatusBar from "./CustomeStatusBar";
+import GlobalCenterModal from "./GlobalCenterModal";
+import Spacer from "./Spacer";
+import Switch from "./Switch";
+import { NormalText, TitleText } from "./Text";
 
 const CustomDrawer = (props: any) => {
   const dispatch = useDispatch();
@@ -37,7 +28,7 @@ const CustomDrawer = (props: any) => {
   );
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [logoutModal, setLogoutModal] = useState(false);
 
@@ -71,21 +62,14 @@ const CustomDrawer = (props: any) => {
     return formattedDuration;
   };
 
-  const postBuzz = UserInfo?.posts?.reduce(
-    (acc: number, post: postDataAssociatedWithUser) => acc + post.postBuzz,
-    0
-  );
-
   const onLogoutYesBTN = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      // dispatch({ type: LOGOUT });
-      if (error) {
-        Alert.alert(
-          "Sign out",
-          "Something went wrong. Please try again. leater"
-        );
-      }
+      await AsyncStorage.removeItem("UserToken");
+      await AsyncStorage.removeItem("RefreshToken");
+      dispatch({
+        type: LOGOUT,
+      });
+      navigation.navigate("/welcome" as Href);
       setLogoutModal(false);
     } catch (error) {
       console.log(error);
@@ -104,7 +88,9 @@ const CustomDrawer = (props: any) => {
             <SvgIcon name={"buzzCoin"} color={themeColors.text} size={30} />
             <Spacer gap={RFPercentage(0.5)} />
             <View>
-              <TitleText style={styles.coinsValueStyle}>{postBuzz}</TitleText>
+              <TitleText style={styles.coinsValueStyle}>
+                {UserInfo?.buzzCoins}
+              </TitleText>
               <NormalText style={styles.coinsTitleText}>Buzzcoins</NormalText>
             </View>
           </View>
@@ -114,7 +100,7 @@ const CustomDrawer = (props: any) => {
             <Spacer gap={RFPercentage(0.5)} />
             <View>
               <TitleText style={styles.coinsValueStyle}>
-                {formatedDate(UserInfo?.created_at)}
+                {formatedDate(UserInfo?.createdAt)}
               </TitleText>
               <NormalText style={styles.coinsTitleText}>Buzz age</NormalText>
             </View>
@@ -132,25 +118,23 @@ const CustomDrawer = (props: any) => {
 
         <TouchableHighlight
           onPress={() => navigation.navigate("/(main)/editProfile")}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
               Edit profile
             </TitleText>
             <SvgIcon name={"edit"} size={18} color={themeColors?.text} />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={() => alert("Comming soon")}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
@@ -162,15 +146,14 @@ const CustomDrawer = (props: any) => {
               color={themeColors?.text}
               strokeWidth={3}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={toggleSwitch}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
@@ -201,15 +184,14 @@ const CustomDrawer = (props: any) => {
               switchWidthMultiplier={2}
               switchBorderRadius={30}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={() => navigation.navigate("/(main)/timeManagement")}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={{ color: themeColors.text, fontSize: RFValue(13) }}
             >
@@ -221,15 +203,14 @@ const CustomDrawer = (props: any) => {
               color={themeColors?.text}
               strokeWidth={2}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
 
         <TouchableHighlight
           onPress={() => setLogoutModal(true)}
-          style={styles.listConatiner}
           underlayColor={themeColors.votesBg}
         >
-          <React.Fragment>
+          <View style={styles.listConatiner}>
             <TitleText
               style={[styles.listTextStyle, { color: DarkColors.primaryColor }]}
             >
@@ -240,7 +221,7 @@ const CustomDrawer = (props: any) => {
               size={18}
               color={DarkColors?.primaryColor}
             />
-          </React.Fragment>
+          </View>
         </TouchableHighlight>
       </View>
 

@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
 import Header from "@/src/components/Header";
 import Input from "@/src/components/Input";
@@ -10,13 +9,9 @@ import Spacer from "@/src/components/Spacer";
 import { TitleText } from "@/src/components/Text";
 import { useThemeColors } from "@/src/constants/Colors";
 import { hp } from "@/src/helpers/comman";
-import { Users } from "@/src/redux/reducers/AuthReducer";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
-import {
-  createComment,
-  deleteComment,
-  fetchPostDetails,
-} from "@/src/services/postServices";
+import usePostServices from "@/src/services/postServices";
 import { getUserData } from "@/src/services/userService";
 import { CommentsData, CommentsPostData, PostData } from "@/src/utility/types";
 import { useLocalSearchParams } from "expo-router";
@@ -28,7 +23,6 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
@@ -38,6 +32,8 @@ import { useSelector } from "react-redux";
 
 const Comments = () => {
   const { postId } = useLocalSearchParams();
+  const { createComment, fetchPostComments, deleteComment } = usePostServices();
+
   const themeColors = useThemeColors();
   const commentRef = useRef<string>("");
   const flatListRef = useRef<FlatList>(null);
@@ -51,45 +47,13 @@ const Comments = () => {
 
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
-
-  const handleComment = async (payload: any) => {
-    if (payload.new) {
-      let newComment = { ...payload.new };
-      let res = await getUserData(newComment.userId);
-      newComment.user = res.success ? res.data : {};
-
-      setPostDetails((prevPost) => {
-        if (prevPost) {
-          return {
-            ...prevPost,
-            comments: [...prevPost.comments, newComment],
-          };
-        }
-        return prevPost;
-      });
-    }
-  };
+  ) as UserInfo;
 
   useEffect(() => {
-    const commentsChannel = supabase
-      .channel("comments")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "comments",
-          filter: `postId=eq.${postId}`,
-        },
-        handleComment
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(commentsChannel);
-    };
-  }, []);
+    if (postDetails?.comments?.length) {
+      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    }
+  }, [postDetails?.comments]);
 
   useEffect(() => {
     getPostDetails();
@@ -97,7 +61,7 @@ const Comments = () => {
 
   const getPostDetails = async () => {
     try {
-      const res = await fetchPostDetails(postId);
+      const res = await fetchPostComments(postId);
       if (res.success) {
         setPostDetails(res.data);
         inputRef.current?.focus();
@@ -115,19 +79,18 @@ const Comments = () => {
         return null;
       }
       let data = {
-        userId: UserInfo?.id,
-        postId: postDetails?.id,
-        text: commentRef?.current,
+        postId: postDetails?.post?._id,
+        description: commentRef?.current,
       };
       setSendCommentLoad(true);
       const res = await createComment(data);
       if (res.success) {
         inputRef.current?.clear();
         commentRef.current = "";
+        getPostDetails();
         setSendCommentLoad(false);
       } else {
         setSendCommentLoad(false);
-        alert(res.msg);
       }
     } catch (error) {
       setSendCommentLoad(false);
@@ -135,7 +98,7 @@ const Comments = () => {
     }
   };
 
-  const onDeleteComment = async (commentId: number) => {
+  const onDeleteComment = async (commentId: string) => {
     try {
       let res = await deleteComment(commentId);
       if (res.success) {
@@ -143,7 +106,7 @@ const Comments = () => {
           if (prevPost) {
             let updatedPost = { ...prevPost };
             updatedPost.comments = updatedPost.comments?.filter(
-              (c) => c.id != commentId
+              (c) => c._id != commentId
             );
             return updatedPost;
           }
@@ -160,9 +123,9 @@ const Comments = () => {
       <>
         <MemoizedCommentView
           item={item}
-          isUserComment={item?.userId == UserInfo?.id}
+          isUserComment={item?.user?._id == UserInfo?._id}
           postId={postId as string}
-          onDeleteComment={() => onDeleteComment(item?.id)}
+          onDeleteComment={() => onDeleteComment(item?._id)}
         />
       </>
     ),
@@ -181,24 +144,19 @@ const Comments = () => {
     <ScreenWrapper>
       <View style={{ flex: 1 }}>
         <Header showBackIcon={true} />
-        <KeyboardAvoidingView
-          behavior="padding"
-          style={styles.keyboard}
-          //   keyboardVerticalOffset={height - 1000}
-        >
+        <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
           <FlatList
             ref={flatListRef}
             data={postDetails?.comments ?? []}
-            onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
             ListHeaderComponent={() => (
               <MemoizedPostView
                 //@ts-ignore
-                item={postDetails as PostData}
+                item={postDetails?.post}
                 isVisible={true}
                 isCommentScreen={true}
               />
             )}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item._id.toString()}
             renderItem={renderItem}
             contentContainerStyle={{
               paddingBottom: paddingBottom,
@@ -242,6 +200,7 @@ const Comments = () => {
                 flex: 1,
               }}
               onChangeText={(txt: string) => (commentRef.current = txt)}
+              autoCorrect={false}
             />
             <Spacer gap={RFPercentage(0.5)} />
             {sendCommentLoad ? (

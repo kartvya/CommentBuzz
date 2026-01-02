@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons/index";
 import Button from "@/src/components/Button";
 import Input from "@/src/components/Input";
@@ -7,13 +6,23 @@ import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
 import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
-import { useRouter } from "expo-router";
+import { USERINFO } from "@/src/redux/actions/ActionType";
+import { useLoginMutation } from "@/src/services/AuthRequest/authApi";
+import { useLazyGetUserProfileDetailsQuery } from "@/src/services/UserRequest/userApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Href, useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import { Keyboard, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
+  const dispatch = useDispatch();
+
+  const [login] = useLoginMutation();
+  const [GetUserDetails] = useLazyGetUserProfileDetailsQuery();
+
   const navigation = useRouter();
   const themeColors = useThemeColors();
   const emailRef = useRef<string>("");
@@ -27,8 +36,10 @@ const Login = () => {
   const onLogin = async () => {
     try {
       let isValid = false;
-      let email = emailRef.current.trim();
-      let password = passwordRef.current.trim();
+      // let email = emailRef.current.trim();
+      // let password = passwordRef.current.trim();
+      let email = "vishal@gmail.com";
+      let password = "Abc@1234";
       if (!email) {
         setEmailError("This field is required.");
         isValid = false;
@@ -45,25 +56,27 @@ const Login = () => {
       }
       if (isValid) {
         setLoading(true);
-        // const {
-        //   data: { session },
-        //   error,
-        // } = await supabase.auth.signInWithPassword({
-        //   email: email,
-        //   password: password,
-        // });
-        // setLoading(false);
-        // Keyboard.dismiss();
-        // if (error) {
-        //   setGlobalError(error.message);
-        // } else {
-        //   setGlobalError("");
-        //   navigation.navigate("/(tabs)/feedScreen");
-        // }
+        let loginCred = { email: email, password: password };
+        const loginResponse = await login(loginCred).unwrap();
+        await AsyncStorage.setItem(
+          "UserToken",
+          loginResponse?.data?.accessToken
+        );
+        await AsyncStorage.setItem(
+          "RefreshToken",
+          loginResponse?.data?.refreshToken
+        );
+        let userProfileDetails = await GetUserDetails().unwrap();
+        dispatch({
+          type: USERINFO,
+          payload: userProfileDetails?.user,
+        });
+        navigation.navigate("/(drawer)/(tabs)/feedScreen" as Href);
+        setLoading(false);
       }
-      // navigation.navigate("/(tabs)/feedScreen");
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
   return (

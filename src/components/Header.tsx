@@ -25,7 +25,10 @@ const Header = (props: IProps) => {
     >
       {showBackIcon ? (
         <Pressable
-          style={[styles.backIconConatiner]}
+          style={[
+            styles.backIconConatiner,
+            { backgroundColor: themeColors?.backGround },
+          ]}
           onPress={() => navigation.back()}
         >
           <SvgIcon name={"arrowLeft"} color={themeColors?.primaryColor} />
@@ -50,7 +53,6 @@ const styles = StyleSheet.create({
     paddingBottom: wp(3),
   },
   backIconConatiner: {
-    backgroundColor: "rgba(0,0,0,0.1)",
     alignSelf: "flex-start",
     borderRadius: 10,
     height: wp(8),

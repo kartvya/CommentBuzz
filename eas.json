@@ -9,27 +9,26 @@
       "distribution": "internal"
     },
     "preview": {
+      "node": "20.19.4",
       "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
       }
-    },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
-      }
-    },
-    "preview3": {
-      "developmentClient": true
-    },
-    "preview4": {
-      "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "node": "20.19.4",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {
+        "simulator": false
+      }
     }
   },
   "submit": {
     "production": {}
   }
 }
-

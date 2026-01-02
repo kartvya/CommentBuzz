@@ -1,16 +1,15 @@
+import React from "react";
 import {
   StyleSheet,
-  Text,
   TextInput,
   TextInputProps,
   View,
   ViewStyle,
 } from "react-native";
-import React from "react";
-import { Colors, DarkColors, useThemeColors } from "../constants/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
+import { Colors, useThemeColors } from "../constants/Colors";
 import { hp, wp } from "../helpers/comman";
 import { NormalText } from "./Text";
-import { RFValue } from "react-native-responsive-fontsize";
 
 interface Iprops extends TextInputProps {
   icon?: React.ReactNode;
@@ -53,7 +52,6 @@ export default Input;
 
 const styles = StyleSheet.create({
   container: {
-    padding: wp(2),
     borderRadius: 10,
     height: hp(7),
     flexDirection: "row",
@@ -62,9 +60,10 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: "transparent",
+    backgroundColor: "trasparent",
     paddingLeft: wp(2),
     fontFamily: "SpaceMono-Regular",
+    height: hp(7),
   },
   errorText: {
     color: Colors.red,

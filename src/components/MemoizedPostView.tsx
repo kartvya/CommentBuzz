@@ -1,5 +1,4 @@
-import { Colors, DarkColors, useThemeColors } from "@/src/constants/Colors";
-import { ResizeMode, Video } from "expo-av";
+import { Colors, useThemeColors } from "@/src/constants/Colors";
 import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
 import moment from "moment";
@@ -18,18 +17,15 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
 import SvgIcon from "../assets/icons";
 import { hp } from "../helpers/comman";
+import { UserInfo } from "../redux/reducers/AuthReducer";
 import { RootState } from "../redux/Store";
-import { Users } from "../redux/reducers/AuthReducer";
 import {
   downloadImage,
   getSupaBaseFileUrl,
   getUserImage,
 } from "../services/imageServices";
-import {
-  createPostUpvote,
-  deletePost,
-  deletePostUpvote,
-} from "../services/postServices";
+import { useToggleVotePostMutation } from "../services/PostReqest/postApi";
+import usePostServices from "../services/postServices";
 import { PostData } from "../utility/types";
 import Avatar from "./Avatar";
 import Button from "./Button";
@@ -47,19 +43,22 @@ interface Iprops {
 
 const MemoizedPostView: React.FC<Iprops> = React.memo(
   ({ item, isVisible, fetchAllPost, isCommentScreen }) => {
+    const { deletePost } = usePostServices();
+
+    const [toggleVotes] = useToggleVotePostMutation();
     const navigation = useNavigation();
     const router = useRouter();
     const themeColors = useThemeColors();
     const UserInfo = useSelector(
       (state: RootState) => state.root?.authReducer?.userInfo
-    ) as Users;
+    ) as UserInfo;
     const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
     const [isPause, setIsPause] = useState<boolean>(isVisible);
     const [userVote, setUserVote] = useState<"upvote" | "downvote" | "none">(
       "none"
     );
-    const [voteCount, setVoteCount] = useState(item?.voteCount || 0);
-    const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.postBuzz);
+    const [voteCount, setVoteCount] = useState(0);
+    const [feedBuzzCoins, setFeedBuzzCoins] = useState(item?.buzzCoinsEarned);
     const [postActionModal, setShowPostActionModal] = useState<boolean>(false);
     const [deleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [showProfilePitcture, setShowProfilePitcture] =
@@ -67,23 +66,21 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     const [shareLoad, setShareLoad] = useState(false);
 
     useEffect(() => {
-      const sortedData = item?.postVotes?.sort(
-        (a, b) =>
-          new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
-      );
-      const currentUserVote = sortedData?.find(
-        (vote) => vote?.userId === UserInfo?.id
-      );
-      if (currentUserVote?.voteType === "upVote") {
+      const upvotes = item?.upvotes ?? [];
+      const downvotes = item?.downvotes ?? [];
+      const currentUserId = UserInfo?._id;
+
+      setVoteCount(upvotes.length - downvotes.length);
+      setFeedBuzzCoins(item?.buzzCoinsEarned ?? 0);
+
+      if (upvotes.includes(currentUserId)) {
         setUserVote("upvote");
-      } else if (currentUserVote?.voteType === "downVote") {
+      } else if (downvotes.includes(currentUserId)) {
         setUserVote("downvote");
       } else {
         setUserVote("none");
       }
-      setVoteCount(item?.voteCount || 0);
-      setFeedBuzzCoins(item?.postBuzz);
-    }, [item?.postVotes, item?.voteCount]);
+    }, [item]);
 
     useEffect(() => {
       const unsubscribeFocus = navigation.addListener("focus", () => {
@@ -122,7 +119,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     const onPressShareImage = async () => {
       try {
         let fileUrl = "";
-        let fileType = item.files.split(".").pop();
+        let fileType = item.media[0]?.split(".").pop();
         let shareOptions = {
           mimeType: fileType !== "png" ? "video/mp4" : "image/jpeg",
           dialogTitle:
@@ -130,14 +127,91 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
               ? "Check out this video!"
               : "Check out this image!",
           UTI: fileType !== "png" ? "video/mp4" : "image/jpeg",
-          message: item.body,
+          message: item.description,
         };
 
-        if (item?.files) {
+        if (item?.media?.length > 0) {
           setShareLoad(true);
-          let url = await downloadImage(getSupaBaseFileUrl(item?.files).uri);
+          let url = await downloadImage(getSupaBaseFileUrl(item?.media).uri);
           setShareLoad(false);
           fileUrl = url ?? "";
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const onPressUpvote = async () => {
+      try {
+        let voteType: "none" | "upvote" | "downvote" = "none";
+
+        if (userVote === "upvote") {
+          setVoteCount((prev) => prev - 1);
+          setUserVote("none");
+          voteType = "none";
+        } else if (userVote === "downvote") {
+          setVoteCount((prev) => prev + 2);
+          setUserVote("upvote");
+          voteType = "upvote";
+        } else {
+          setVoteCount((prev) => prev + 1);
+          setUserVote("upvote");
+          voteType = "upvote";
+        }
+
+        await updateVotesInBE(voteType);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    /* Downvote function */
+    const onPressDownVote = async () => {
+      try {
+        let voteType: "none" | "upvote" | "downvote" = "none";
+
+        if (userVote === "downvote") {
+          setVoteCount((prev) => prev + 1);
+          setUserVote("none");
+          voteType = "none";
+        } else if (userVote === "upvote") {
+          setVoteCount((prev) => prev - 2);
+          setUserVote("downvote");
+          voteType = "downvote";
+        } else {
+          setVoteCount((prev) => prev - 1);
+          setUserVote("downvote");
+          voteType = "downvote";
+        }
+
+        await updateVotesInBE(voteType);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const updateVotesInBE = async (
+      voteType: "upvote" | "downvote" | "none"
+    ) => {
+      const votePayload = {
+        type: voteType,
+        userId: UserInfo._id,
+        postId: item?._id,
+      };
+      await toggleVotes(votePayload).unwrap();
+    };
+
+    const onDeletePost = async () => {
+      try {
+        let res = await deletePost(item?._id);
+        if (res?.success) {
+          setShowDeleteModal(false);
+          if (fetchAllPost) {
+            fetchAllPost();
+          }
+        }
+        if (isCommentScreen) {
+          navigation.goBack();
         }
       } catch (error) {
         console.log(error);
@@ -148,134 +222,8 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
       try {
         router.push({
           pathname: "/(main)/comments",
-          params: { postId: item.id },
+          params: { postId: item._id },
         });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    function buzzCoinMathFunction(
-      type: "decreaseone" | "decreasetwo" | "increasetwo" | "increaseone"
-    ) {
-      let coin = feedBuzzCoins ?? 0;
-      if (UserInfo?.id !== item?.userId) {
-        if (type === "decreaseone") {
-          coin -= 0.01;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        } else if (type === "increasetwo") {
-          coin += 0.02;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        } else if (type === "decreasetwo") {
-          coin -= 0.02;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        } else {
-          coin += 0.01;
-          coin = parseFloat(coin.toFixed(2));
-          setFeedBuzzCoins(coin);
-          return coin;
-        }
-      } else {
-        return item?.postBuzz;
-      }
-    }
-    /* Upvote function */
-    const onPressUpvote = async () => {
-      try {
-        if (userVote === "upvote") {
-          setVoteCount(voteCount - 1);
-          setUserVote("none");
-          const delObj = {
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount - 1,
-            feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
-          };
-          await deletePostUpvote(delObj);
-        } else if (userVote === "downvote") {
-          setVoteCount(voteCount + 2);
-          setUserVote("upvote");
-          await createPostUpvote({
-            voteType: "upVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount + 2,
-            feedBuzzCoins: buzzCoinMathFunction("increasetwo"),
-          });
-        } else {
-          setVoteCount(voteCount + 1);
-          setUserVote("upvote");
-          await createPostUpvote({
-            voteType: "upVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount + 1,
-            feedBuzzCoins: buzzCoinMathFunction("increaseone"),
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    /* Downvote function */
-    const onPressDownVote = async () => {
-      try {
-        if (userVote === "downvote") {
-          setVoteCount(voteCount + 1);
-          setUserVote("none");
-          const delObj = {
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount + 1,
-            feedBuzzCoins: buzzCoinMathFunction("increaseone"),
-          };
-          await deletePostUpvote(delObj);
-        } else if (userVote === "upvote") {
-          setVoteCount(voteCount - 2);
-          setUserVote("downvote");
-          await createPostUpvote({
-            voteType: "downVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount - 2,
-            feedBuzzCoins: buzzCoinMathFunction("decreasetwo"),
-          });
-        } else {
-          setVoteCount(voteCount - 1);
-          setUserVote("downvote");
-          await createPostUpvote({
-            voteType: "downVote",
-            userId: UserInfo?.id,
-            postId: item?.id,
-            voteCount: voteCount - 1,
-            feedBuzzCoins: buzzCoinMathFunction("decreaseone"),
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const onDeletePost = async () => {
-      try {
-        const delObj = {
-          userId: UserInfo?.id,
-          postId: item?.id,
-        };
-        let res = await deletePost(delObj);
-        if (res?.success) {
-          setShowDeleteModal(false);
-          if (fetchAllPost) {
-            fetchAllPost();
-          }
-        }
       } catch (error) {
         console.log(error);
       }
@@ -292,7 +240,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           <View style={styles.avtarTitleConatiner}>
             <View style={styles.avtarTitleConatiner}>
               <Avatar
-                uri={item?.user?.image}
+                uri={item?.user?.profilePic}
                 size={hp(5)}
                 borderRadius={50}
                 onLongPress={() => {
@@ -300,19 +248,19 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                 }}
               />
               <View style={styles.userNameContainer}>
-                <NormalText>{item?.user?.name}</NormalText>
+                <NormalText>{item?.user?.username}</NormalText>
                 <NormalText style={styles.subText}>
-                  {moment(item?.created_at).fromNow()}
+                  {moment(item?.createdAt).fromNow()}
                 </NormalText>
               </View>
             </View>
-            {UserInfo?.id === item?.userId && (
+            {UserInfo?._id === item?.user?._id && (
               <Pressable onPress={() => setShowPostActionModal(true)}>
                 <SvgIcon name={"postMore"} color={themeColors?.text} />
               </Pressable>
             )}
           </View>
-          {item?.body ? (
+          {item?.description ? (
             <View>
               <ParsedText
                 style={[styles.descriptionText, { color: themeColors?.text }]}
@@ -326,22 +274,22 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                 ]}
                 childrenProps={{ allowFontScaling: false }}
               >
-                {item?.body}
+                {item?.description}
               </ParsedText>
             </View>
           ) : (
             <Spacer gap={RFPercentage(0.8)} />
           )}
           <View>
-            {item?.files && item?.files?.includes("postImages") && (
+            {item?.media?.length > 0 && (
               <Image
-                source={getSupaBaseFileUrl(item?.files)}
+                source={item?.media}
                 transition={100}
                 contentFit="cover"
                 style={{ aspectRatio: 4 / 5, borderRadius: 12 }}
               />
             )}
-            {item?.files && item?.files?.includes("postVideos") && (
+            {/* {item?.media && item?.media?.includes("postVideos") && (
               <View>
                 <Pressable onPress={() => setIsSoundOn(!isSoundOn)}>
                   <Video
@@ -364,7 +312,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                   />
                 </Pressable>
               </View>
-            )}
+            )} */}
           </View>
           <View style={styles.footerConatiner}>
             <View style={[styles.flex]}>
@@ -427,7 +375,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
                     color={themeColors.text}
                   />
                   <NormalText style={{ marginLeft: RFPercentage(1) }}>
-                    {item?.comments[0]?.count}
+                    {item?.commentCount > 0 ? item?.commentCount : 0}
                   </NormalText>
                 </Pressable>
               )}
@@ -517,7 +465,7 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
           onDismiss={() => setShowProfilePitcture(false)}
           childern={
             <Image
-              source={getUserImage(item?.user?.image)}
+              source={getUserImage(item?.user?.profilePic)}
               contentFit="contain"
               style={{
                 height: RFPercentage(25),

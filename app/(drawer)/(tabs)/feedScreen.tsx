@@ -1,21 +1,16 @@
-import { supabase } from "@/lib/supabase";
 import MyStatusBar from "@/src/components/CustomeStatusBar";
 import FeedHeader from "@/src/components/FeedHeader";
 import Loading from "@/src/components/Loading";
 import MemoizedPostView from "@/src/components/MemoizedPostView";
 import { TitleText } from "@/src/components/Text";
-import { DarkColors, useThemeColors } from "@/src/constants/Colors";
+import { useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
-import { Users } from "@/src/redux/reducers/AuthReducer";
-import { RootState } from "@/src/redux/Store";
-import { fetchPost } from "@/src/services/postServices";
-import { getUserData } from "@/src/services/userService";
+import usePostServices from "@/src/services/postServices";
 import { PostData } from "@/src/utility/types";
 import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  AppState,
   FlatListProps,
   ListRenderItem,
   Platform,
@@ -26,7 +21,7 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
+import { useAppSessionTracker } from "@/src/hooks/useAppSessionTracker";
 
 const AnimatedFlatList =
   Animated.createAnimatedComponent<
@@ -35,6 +30,7 @@ const AnimatedFlatList =
 
 let limit = 0;
 const FeedScreen = () => {
+  const { fetchPost } = usePostServices();
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
   const themeColors = useThemeColors();
@@ -46,6 +42,9 @@ const FeedScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [Posts, setPosts] = useState<PostData[]>([]);
+
+  // Track app session time
+  useAppSessionTracker();
 
   // const appState = useRef(AppState.currentState);
   // const [startTime, setStartTime] = useState<Date | null>(null);
@@ -79,19 +78,6 @@ const FeedScreen = () => {
   //   };
   // }, [startTime]);
 
-  // const saveTimeSpentToSupabase = async (timeSpent: number) => {
-  //   const userId = UserInfo.id;
-  //   const currentDate = new Date().toISOString().split("T")[0]; // Get only the date part
-  //   const { data, error } = await supabase.from("timeSpent").upsert({
-  //     user_id: userId,
-  //     date: currentDate,
-  //     time_spent: timeSpent,
-  //   });
-  //   if (error) {
-  //     console.error("Error saving time spent:", error.message);
-  //   }
-  // };
-
   const handlePost = async (payload: any) => {
     try {
       console.log("Payload received:", payload);
@@ -100,18 +86,17 @@ const FeedScreen = () => {
         let newPost = { ...payload?.new };
 
         // Fetch user data
-        let res = await getUserData(newPost.userId);
-        newPost.user = res.success ? res?.data : {};
+        // let res = await getUserData(newPost.userId);
+        // newPost.user = res.success ? res?.data : {};
 
         // Check and update state
         setPosts((prevPosts) => {
-          const postExists = prevPosts.some((post) => post.id === newPost.id);
-          console.log(postExists, "postExists");
+          const postExists = prevPosts.some((post) => post._id === newPost.id);
 
           if (postExists) {
             // Post already exists, check if update is required
             const updatedPosts = prevPosts.map((post) =>
-              post.id === newPost.id ? newPost : post
+              post._id === newPost.id ? newPost : post
             );
             return updatedPosts;
           }
@@ -129,14 +114,14 @@ const FeedScreen = () => {
     limit = limit + 10;
     const res = await fetchPost(limit);
     if (res.success) {
-      const postsData = res.data ?? [];
+      const postsData = res.data.posts ?? [];
 
       if (postsData.length > 0 && postsData.length <= 10) {
         setHasMore(false);
         setPosts((prevPosts) => {
           const uniquePosts = [
             ...new Map(
-              [...prevPosts, ...postsData].map((post) => [post.id, post])
+              [...postsData, ...prevPosts].map((post) => [post._id, post])
             ).values(),
           ];
           return uniquePosts;
@@ -151,24 +136,6 @@ const FeedScreen = () => {
   };
 
   useEffect(() => {
-    let postChannel = supabase
-      .channel("posts")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "posts",
-        },
-        handlePost
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(postChannel);
-    };
-  }, [isFocused]);
-
-  useEffect(() => {
     getAllPost();
   }, [isFocused]);
 
@@ -176,7 +143,7 @@ const FeedScreen = () => {
     limit = 10;
     const res = await fetchPost(limit);
     if (res.success) {
-      setPosts(res.data ?? []);
+      setPosts(res.data?.posts ?? []);
     }
   };
 
@@ -252,7 +219,7 @@ const FeedScreen = () => {
           data={Posts}
           ref={flatlistRef}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item._id.toString()}
           style={{ backgroundColor: themeColors?.backGround }}
           ItemSeparatorComponent={() => (
             <View

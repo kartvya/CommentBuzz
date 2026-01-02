@@ -7,7 +7,6 @@ import { NormalText } from "@/src/components/Text";
 import { Colors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
-import { Users } from "@/src/redux/reducers/AuthReducer";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -29,7 +28,8 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { MentionInput } from "react-native-controlled-mentions";
-import { createOrUpdatePost } from "../../src/services/postServices";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
+import { useCreatePostMutation } from "@/src/services/PostReqest/postApi";
 
 export interface Person {
   id: number;
@@ -54,11 +54,13 @@ interface PostData {
 }
 
 const UploadPost = () => {
+  const [createPost] = useCreatePostMutation();
+
   const navigation = useRouter();
   const themeColors = useThemeColors();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [value, setValue] = useState<string>("");
   const [usedTags, setUsedTags] = useState<Person[]>([]);
@@ -141,24 +143,37 @@ const UploadPost = () => {
         Alert.alert("Post", "please share you thoughts or share some memory");
         return;
       }
-      const data = {
-        files,
-        body: value,
-        userId: UserInfo?.id,
-        voteCount: 0,
-      };
       setLoading(true);
-      const res = await createOrUpdatePost(data);
+      let formData = new FormData();
+      formData.append("description", value);
+
+      if (files) {
+        const file = {
+          uri: files.uri,
+          name: files.uri.split("/").pop() || "profile.jpg",
+          type: files.type || "image/jpeg",
+        };
+
+        formData.append("media", {
+          uri: file.uri,
+          type: file.type,
+          name: file.name,
+        } as any);
+      }
+      const res = await createPost(formData).unwrap();
       setLoading(false);
       if (res.success) {
         setValue("");
         setFiles(null);
         navigation.back();
+        setLoading(false);
       } else {
         Alert.alert("Post", res.msg);
+        setLoading(false);
       }
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -259,13 +274,13 @@ const UploadPost = () => {
               ]}
             >
               <Avatar
-                uri={UserInfo?.image}
+                uri={UserInfo?.profilePic}
                 size={RFPercentage(6)}
                 borderRadius={10}
               />
             </View>
             <Spacer gap={RFPercentage(1)} />
-            <NormalText>{UserInfo?.name}</NormalText>
+            <NormalText>{UserInfo?.username}</NormalText>
           </View>
           <Spacer gap={RFPercentage(1.2)} />
           <View
@@ -308,7 +323,7 @@ const UploadPost = () => {
                 color={themeColors.white}
               />
             </Pressable>
-            <Spacer gap={RFPercentage(0.5)} />
+            {/* <Spacer gap={RFPercentage(0.5)} />
             <Pressable onPress={() => onPick(false)}>
               <SvgIcon
                 name={"video"}
@@ -316,7 +331,7 @@ const UploadPost = () => {
                 strokeWidth={1.5}
                 color={themeColors.white}
               />
-            </Pressable>
+            </Pressable> */}
           </View>
           {files && (
             <View style={styles.files}>

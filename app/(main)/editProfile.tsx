@@ -7,12 +7,12 @@ import Spacer from "@/src/components/Spacer";
 import { DarkColors, useThemeColors } from "@/src/constants/Colors";
 import { hp, wp } from "@/src/helpers/comman";
 import { RootState } from "@/src/redux/Store";
-import { Users } from "@/src/redux/reducers/AuthReducer";
-import { getUserImage, uploadFile } from "@/src/services/imageServices";
+import { getUserImage } from "@/src/services/imageServices";
 import * as ImagePicker from "expo-image-picker";
 
 import { USERINFO } from "@/src/redux/actions/ActionType";
-import { updateUser } from "@/src/services/userService";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
+import { useEditUserProfileDetailsMutation } from "@/src/services/UserRequest/userApi";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -24,43 +24,38 @@ import { useDispatch, useSelector } from "react-redux";
 interface UpdatedUsersData {
   email: string;
   name: string;
-  phonNumber: string;
   image: Partial<any>;
   bio: string;
-  address: string;
 }
 const EditProfile = () => {
+  const [editUserProfileDetails] = useEditUserProfileDetailsMutation();
   const navigation = useRouter();
   const dispatch = useDispatch();
   const themeColors = useThemeColors();
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<UpdatedUsersData>({
     email: "",
     name: "",
-    phonNumber: "",
     image: {},
     bio: "",
-    address: "",
   });
   const [errors, setErrors] = useState({
     name: "",
-    phonNumber: "",
     bio: "",
   });
 
   useEffect(() => {
     if (UserInfo) {
       setUser({
-        name: UserInfo?.name || "",
-        phonNumber: UserInfo?.phonNumber || "",
-        image: typeof UserInfo?.image === "object" ? UserInfo.image : {},
+        name: UserInfo?.username || "",
+        image:
+          typeof UserInfo?.profilePic === "object" ? UserInfo.profilePic : {},
         bio: UserInfo?.bio || "",
-        address: UserInfo?.address || "",
-        email: UserInfo?.user_metadata?.email || "",
+        email: UserInfo?.email || "",
       });
     }
   }, [UserInfo]);
@@ -87,13 +82,6 @@ const EditProfile = () => {
       isValid = false;
     }
 
-    if (user.phonNumber?.length > 0) {
-      if (!/^\d{10}$/.test(user.phonNumber)) {
-        newErrors.phonNumber = "Phone number must be 10 digits";
-        isValid = false;
-      }
-    }
-
     if (user.bio.length > 200) {
       newErrors.bio = "Bio must be less than 200 characters";
       isValid = false;
@@ -108,30 +96,39 @@ const EditProfile = () => {
       return;
     }
 
+    if (isLoading) {
+      return;
+    }
+
     try {
       setIsLoading(true);
-      if (typeof user.image === "object") {
-        let imageRes = await uploadFile("profiles", user?.image?.uri, true);
-        if (imageRes?.success) {
-          user.image = imageRes?.data;
-        }
+      let formData = new FormData();
+      formData.append("username", user.name);
+      formData.append("bio", user.bio);
+
+      if (user.image?.uri) {
+        const file = {
+          uri: user.image.uri,
+          name: user.image.uri.split("/").pop() || "profile.jpg",
+          type: user.image.type || "image/jpeg",
+        };
+
+        formData.append("profilePic", {
+          uri: file.uri,
+          type: file.type,
+          name: file.name,
+        } as any);
       }
-      let updateUserRes = await updateUser(UserInfo?.id, user);
-      if (updateUserRes.success) {
+      let res = await editUserProfileDetails(formData).unwrap();
+      console.log("res", res);
+      if (res.success) {
         dispatch({
           type: USERINFO,
-          payload: {
-            userInfo: {
-              ...UserInfo,
-              ...updateUserRes?.data,
-            },
-          },
+          payload: res?.user,
         });
-        navigation.back();
-        setIsLoading(false);
-      } else {
-        console.log("Update user error");
       }
+      navigation.back();
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       console.log("Error", error);
@@ -144,7 +141,7 @@ const EditProfile = () => {
 
   const imageSource = checkObj(user.image, "uri")
     ? user.image?.uri
-    : getUserImage(UserInfo.image);
+    : getUserImage(UserInfo.profilePic);
 
   return (
     <ScreenWrapper>
@@ -187,16 +184,6 @@ const EditProfile = () => {
           value={user.name}
         />
         <Spacer gap={errors?.name ? wp(2) : wp(3)} />
-        <Input
-          containerStyle={{}}
-          icon={<SvgIcon name={"call"} size={26} color={themeColors.icon} />}
-          placeholderText="Enter your phone number"
-          onChangeText={(txt) => setUser({ ...user, phonNumber: txt })}
-          error={errors?.phonNumber}
-          value={user.phonNumber}
-          maxLength={10}
-        />
-        <Spacer gap={errors?.phonNumber ? wp(2) : wp(3)} />
         <Input
           containerStyle={styles.textAreaStyle}
           placeholderText="Enter your bio"

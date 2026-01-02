@@ -8,14 +8,19 @@ import { persistReducer, persistStore } from "redux-persist";
 import { ThunkDispatch } from "redux-thunk";
 
 import RootReducer from "./reducers/RootReducer";
+import backendBaseApi from "../services/BackendBaseApi";
+import AuthApi from "../services/AuthRequest/authApi";
 
 const rootReducer = combineReducers({
+  [backendBaseApi.reducerPath]: backendBaseApi.reducer,
+  [AuthApi.reducerPath]: AuthApi.reducer,
   root: RootReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
+  blacklist: [backendBaseApi.reducerPath, AuthApi.reducerPath],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -24,11 +29,8 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      thunk: {
-        extraArgument: {},
-      },
       serializableCheck: false,
-    }),
+    }).concat(backendBaseApi.middleware, AuthApi.middleware),
 });
 
 const persistor = persistStore(store);

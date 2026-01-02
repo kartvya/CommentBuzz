@@ -29,11 +29,11 @@ export default function PostActionModal(props: Iprops) {
     >
       <View style={[styles.modalContent, { paddingBottom: paddingBottom }]}>
         <View style={styles.modalConatiner}>
-          <Pressable style={styles.itemConatiner}>
+          {/* <Pressable style={styles.itemConatiner}>
             <SvgIcon name={"edit"} color={DarkColors.text} />
             <Spacer gap={RFPercentage(0.5)} />
             <NormalText style={{ color: DarkColors.text }}>Edit</NormalText>
-          </Pressable>
+          </Pressable> */}
           <Pressable style={styles.itemConatiner} onPress={props.onPressDelete}>
             <SvgIcon name={"delete"} color={DarkColors.primaryColor} />
             <Spacer gap={RFPercentage(0.5)} />

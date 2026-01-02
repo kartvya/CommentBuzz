@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import SvgIcon from "@/src/assets/icons";
 import Avatar from "@/src/components/Avatar";
 import ScreenWrapper from "@/src/components/ScreenWrapper";
@@ -6,9 +5,9 @@ import Spacer from "@/src/components/Spacer";
 import { NormalText, TitleText } from "@/src/components/Text";
 import { useThemeColors } from "@/src/constants/Colors";
 import { wp } from "@/src/helpers/comman";
-import { Users } from "@/src/redux/reducers/AuthReducer";
+import { UserInfo } from "@/src/redux/reducers/AuthReducer";
 import { RootState } from "@/src/redux/Store";
-import UserAbout from "@/src/tabsScreens/UserAbout";
+import { getUserImage } from "@/src/services/imageServices";
 import UserComments from "@/src/tabsScreens/UserComments";
 import UserPost from "@/src/tabsScreens/UserPost";
 import { useNavigation } from "@react-navigation/native";
@@ -16,12 +15,13 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Image,
   Pressable,
   StyleSheet,
   useWindowDimensions,
   View,
 } from "react-native";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { RFPercentage } from "react-native-responsive-fontsize";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 import { useSelector } from "react-redux";
 
@@ -33,7 +33,6 @@ interface Routes {
 const renderScene = SceneMap({
   first: () => <UserPost />,
   second: () => <UserComments />,
-  third: () => <UserAbout />,
 });
 
 const Profile = () => {
@@ -44,40 +43,17 @@ const Profile = () => {
 
   const UserInfo = useSelector(
     (state: RootState) => state.root?.authReducer?.userInfo
-  ) as Users;
+  ) as UserInfo;
 
   const [index, setIndex] = useState<number>(0);
   const [routes] = useState<Routes[]>([
     { key: "first", title: "Posts" },
     { key: "second", title: "Comments" },
-    { key: "third", title: "About" },
   ]);
-
-  const onPressLogout = () => {
-    try {
-      Alert.alert(
-        "Confirm",
-        "Are you sure want to log out?",
-        [
-          { text: "Cancel", onPress: () => console.log("Cancel Pressed!") },
-          { text: "OK", onPress: onLogoutYesBTN },
-        ],
-        { cancelable: false }
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const onLogoutYesBTN = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        Alert.alert(
-          "Sign out",
-          "Something went wrong. Please try again. leater"
-        );
-      }
+      Alert.alert("Sign out", "Something went wrong. Please try again. leater");
     } catch (error) {
       console.log(error);
     }
@@ -126,7 +102,7 @@ const Profile = () => {
             onPress={() => navigation.navigate("/(main)/editProfile")}
           >
             <Avatar
-              uri={UserInfo?.image}
+              uri={UserInfo?.profilePic}
               size={RFPercentage(10)}
               borderRadius={20}
             />
@@ -141,7 +117,9 @@ const Profile = () => {
           </Pressable>
           <Spacer gap={RFPercentage(1)} />
           <View style={{ flex: 1 }}>
-            <TitleText style={styles.userNameText}>{UserInfo?.name}</TitleText>
+            <TitleText style={styles.userNameText}>
+              {UserInfo?.username}
+            </TitleText>
             {UserInfo?.bio && (
               <NormalText ellipsizeMode="tail" numberOfLines={2}>
                 {UserInfo?.bio}
@@ -158,25 +136,11 @@ const Profile = () => {
           renderTabBar={(props) => (
             <TabBar
               {...props}
-              renderLabel={() => null}
-              renderIcon={({ route }: { route: any }) => (
-                <View style={{}}>
-                  <NormalText
-                    style={{
-                      marginVertical: RFPercentage(1),
-                      fontSize: RFValue(10),
-                    }}
-                    numberOfLines={1}
-                  >
-                    {route.title}
-                  </NormalText>
-                </View>
-              )}
               style={{ backgroundColor: themeColors.lightBg }}
-              labelStyle={{ fontSize: 12 }}
+              activeColor={themeColors.primaryColor}
               inactiveColor="gray"
               indicatorStyle={{
-                backgroundColor: themeColors?.primaryColor,
+                backgroundColor: themeColors.primaryColor,
               }}
             />
           )}

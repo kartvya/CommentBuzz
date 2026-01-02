@@ -42,44 +42,46 @@ interface PostUser {
 }
 
 export interface CommentsData {
-  created_at: string;
-  id: number;
-  postId: number;
+  _id: string;
+  post: string;
+  user: {
+    _id: string;
+    username: string;
+    profilePic: string;
+  };
   text: string;
-  user: PostUser;
-  userId: string;
-  commentBuzz: number;
-  voteCount: number;
-  commentVotes: any;
-}
-
-interface CommentsCount {
-  count: number;
+  parentComment: string | null;
+  upvotes: any[];
+  downvotes: any[];
+  buzzCoins: number;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 export interface PostData {
-  body: string;
-  created_at: string;
-  files: string;
-  id: number;
-  user: PostUser;
-  userId: string;
-  postVotes: PostVotes[];
-  voteCount: number;
-  postBuzz: number;
-  comments: CommentsCount[];
+  _id: string;
+  user: {
+    _id: string;
+    username: string;
+    profilePic: string;
+  };
+  description: string;
+  media: string[];
+  upvotes: any[];
+  downvotes: any[];
+  views: number;
+  buzzCoinsEarned: number;
+  comments: any[];
+  createdAt: string;
+  updatedAt: string;
+  commentCount: number;
+  __v: number;
 }
 
 export interface CommentsPostData {
-  body: string;
-  created_at: string;
-  files: string;
-  id: number;
-  user: PostUser;
-  userId: string;
-  postVotes: PostVotes[];
-  voteCount: number;
-  postBuzz: number;
+  success: boolean;
+  post: PostData;
   comments: CommentsData[];
 }
 
