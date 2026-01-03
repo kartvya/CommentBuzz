@@ -1,12 +1,12 @@
-import MyStatusBar from "@/src/components/CustomeStatusBar";
-import FeedHeader from "@/src/components/FeedHeader";
-import Loading from "@/src/components/Loading";
-import MemoizedPostView from "@/src/components/MemoizedPostView";
-import { TitleText } from "@/src/components/Text";
-import { useThemeColors } from "@/src/constants/Colors";
-import { wp } from "@/src/helpers/comman";
+import MyStatusBar from "@/src/shared/ui/CustomeStatusBar";
+import FeedHeader from "@/src/shared/ui/FeedHeader";
+import Loading from "@/src/shared/ui/Loading";
+import MemoizedPostView from "@/src/shared/ui/MemoizedPostView";
+import { TitleText } from "@/src/shared/ui/Text";
+import { useThemeColors } from "@/src/shared/constants/colors";
+import { wp } from "@/src/shared/utils/comman";
 import usePostServices from "@/src/services/postServices";
-import { PostData } from "@/src/utility/types";
+import { PostData } from "@/src/shared/types";
 import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -21,7 +21,7 @@ import {
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAppSessionTracker } from "@/src/hooks/useAppSessionTracker";
+import { useAppSessionTracker } from "@/src/shared/hooks/useAppSessionTracker";
 
 const AnimatedFlatList =
   Animated.createAnimatedComponent<
@@ -50,7 +50,7 @@ const FeedScreen = () => {
   // const [startTime, setStartTime] = useState<Date | null>(null);
 
   // const UserInfo = useSelector(
-  //   (state: RootState) => state.root?.authReducer?.userInfo
+  //   (state: RootState) => state.auth?.userInfo
   // ) as Users;
 
   // useEffect(() => {

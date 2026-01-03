@@ -1,4 +1,4 @@
-import { Colors } from "@/src/constants/Colors";
+import { Colors } from "@/src/shared/constants/colors";
 import ArrowLeft from "./ArrowLeft";
 import Call from "./Call";
 import Camera from "./Camera";

@@ -1,18 +1,18 @@
 import SvgIcon from "@/src/assets/icons";
-import Button from "@/src/components/Button";
-import Header from "@/src/components/Header";
-import Input from "@/src/components/Input";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
-import Spacer from "@/src/components/Spacer";
-import { DarkColors, useThemeColors } from "@/src/constants/Colors";
-import { hp, wp } from "@/src/helpers/comman";
+import Button from "@/src/shared/ui/Button";
+import Header from "@/src/shared/ui/Header";
+import Input from "@/src/shared/ui/Input";
+import ScreenWrapper from "@/src/shared/ui/ScreenWrapper";
+import Spacer from "@/src/shared/ui/Spacer";
+import { DarkColors, useThemeColors } from "@/src/shared/constants/colors";
+import { hp, wp } from "@/src/shared/utils/comman";
 import { RootState } from "@/src/redux/Store";
-import { getUserImage } from "@/src/services/imageServices";
+import { getUserImage } from "@/src/shared/utils/imageServices";
 import * as ImagePicker from "expo-image-picker";
 
 import { USERINFO } from "@/src/redux/actions/ActionType";
-import { UserInfo } from "@/src/redux/reducers/AuthReducer";
-import { useEditUserProfileDetailsMutation } from "@/src/services/UserRequest/userApi";
+import { UserInfo } from "@/src/modules/auth";
+import { useEditUserProfileDetailsMutation } from "@/src/infrastructure/api/userApi";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ const EditProfile = () => {
   const dispatch = useDispatch();
   const themeColors = useThemeColors();
   const UserInfo = useSelector(
-    (state: RootState) => state.root?.authReducer?.userInfo
+    (state: RootState) => state.auth?.userInfo
   ) as UserInfo;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);

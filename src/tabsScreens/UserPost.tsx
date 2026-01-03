@@ -1,3 +1,7 @@
+import { Colors, DarkColors } from "@/src/shared/constants/colors";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useIsFocused } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
@@ -7,22 +11,14 @@ import {
   View,
 } from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
-import { useSelector } from "react-redux";
-import MemoizedPostView from "../components/MemoizedPostView";
-import { TitleText } from "../components/Text";
-import { Colors, DarkColors } from "../constants/Colors";
-import { RootState } from "../redux/Store";
-import { PostData } from "../utility/types";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { RFPercentage } from "react-native-responsive-fontsize";
-import Spacer from "../components/Spacer";
-import { useRouter } from "expo-router";
-import { getUserData } from "../services/userService";
-import { useIsFocused } from "@react-navigation/native";
-import Loading from "../components/Loading";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { UserInfo } from "../redux/reducers/AuthReducer";
+import Loading from "../shared/ui/Loading";
+import MemoizedPostView from "../shared/ui/MemoizedPostView";
+import Spacer from "../shared/ui/Spacer";
+import { TitleText } from "../shared/ui/Text";
 import usePostServices from "../services/postServices";
+import { PostData } from "../shared/types";
 
 type Props = {};
 
@@ -35,9 +31,6 @@ const UserPost = forwardRef<Props>((props, ref) => {
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const paddingBottom = insets.bottom + 65;
-  const UserInfo = useSelector(
-    (state: RootState) => state.root?.authReducer?.userInfo
-  ) as UserInfo;
   const [refreshing, setRefreshing] = useState(false);
   const [Posts, setPosts] = useState<PostData[]>([]);
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);

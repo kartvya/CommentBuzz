@@ -1,8 +1,8 @@
 import SvgIcon from "@/src/assets/icons";
-import Avatar from "@/src/components/Avatar";
-import CustomTabBar from "@/src/components/CustomeTabBar/CustomTabBar";
-import { DarkColors } from "@/src/constants/Colors";
-import { UserInfo } from "@/src/redux/reducers/AuthReducer";
+import Avatar from "@/src/shared/ui/Avatar";
+import CustomTabBar from "@/src/shared/ui/CustomeTabBar/CustomTabBar";
+import { DarkColors } from "@/src/shared/constants/colors";
+import { UserInfo } from "@/src/modules/auth";
 import { RootState } from "@/src/redux/Store";
 import { Tabs } from "expo-router";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 
 export default function TabLayout() {
   const UserInfo = useSelector(
-    (state: RootState) => state.root?.authReducer?.userInfo
+    (state: RootState) => state.auth?.userInfo
   ) as UserInfo;
 
   return (

@@ -1,11 +1,11 @@
 import SvgIcon from "@/src/assets/icons";
-import Avatar from "@/src/components/Avatar";
-import Header from "@/src/components/Header";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
-import Spacer from "@/src/components/Spacer";
-import { NormalText } from "@/src/components/Text";
-import { Colors, useThemeColors } from "@/src/constants/Colors";
-import { hp, wp } from "@/src/helpers/comman";
+import Avatar from "@/src/shared/ui/Avatar";
+import Header from "@/src/shared/ui/Header";
+import ScreenWrapper from "@/src/shared/ui/ScreenWrapper";
+import Spacer from "@/src/shared/ui/Spacer";
+import { NormalText } from "@/src/shared/ui/Text";
+import { Colors, useThemeColors } from "@/src/shared/constants/colors";
+import { hp, wp } from "@/src/shared/utils/comman";
 import { RootState } from "@/src/redux/Store";
 import { useCallback, useState } from "react";
 import {
@@ -21,15 +21,15 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector } from "react-redux";
 
-import Button from "@/src/components/Button";
-import { getSupaBaseFileUrl } from "@/src/services/imageServices";
+import Button from "@/src/shared/ui/Button";
+import { getSupaBaseFileUrl } from "@/src/shared/utils/imageServices";
 import { ResizeMode, Video } from "expo-av";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { MentionInput } from "react-native-controlled-mentions";
-import { UserInfo } from "@/src/redux/reducers/AuthReducer";
-import { useCreatePostMutation } from "@/src/services/PostReqest/postApi";
+import { UserInfo } from "@/src/modules/auth";
+import { useCreatePostMutation } from "@/src/infrastructure/api/postApi";
 
 export interface Person {
   id: number;
@@ -59,7 +59,7 @@ const UploadPost = () => {
   const navigation = useRouter();
   const themeColors = useThemeColors();
   const UserInfo = useSelector(
-    (state: RootState) => state.root?.authReducer?.userInfo
+    (state: RootState) => state.auth?.userInfo
   ) as UserInfo;
 
   const [value, setValue] = useState<string>("");

@@ -1,19 +1,18 @@
 import SvgIcon from "@/src/assets/icons";
-import Header from "@/src/components/Header";
-import Input from "@/src/components/Input";
-import Loading from "@/src/components/Loading";
-import MemoizedCommentView from "@/src/components/MemoizedCommentView";
-import MemoizedPostView from "@/src/components/MemoizedPostView";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
-import Spacer from "@/src/components/Spacer";
-import { TitleText } from "@/src/components/Text";
-import { useThemeColors } from "@/src/constants/Colors";
-import { hp } from "@/src/helpers/comman";
-import { UserInfo } from "@/src/redux/reducers/AuthReducer";
+import Header from "@/src/shared/ui/Header";
+import Input from "@/src/shared/ui/Input";
+import Loading from "@/src/shared/ui/Loading";
+import MemoizedCommentView from "@/src/shared/ui/MemoizedCommentView";
+import MemoizedPostView from "@/src/shared/ui/MemoizedPostView";
+import ScreenWrapper from "@/src/shared/ui/ScreenWrapper";
+import Spacer from "@/src/shared/ui/Spacer";
+import { TitleText } from "@/src/shared/ui/Text";
+import { useThemeColors } from "@/src/shared/constants/colors";
+import { hp } from "@/src/shared/utils/comman";
+import { UserInfo } from "@/src/modules/auth";
 import { RootState } from "@/src/redux/Store";
 import usePostServices from "@/src/services/postServices";
-import { getUserData } from "@/src/services/userService";
-import { CommentsData, CommentsPostData, PostData } from "@/src/utility/types";
+import { CommentsData, CommentsPostData } from "@/src/shared/types";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -46,7 +45,7 @@ const Comments = () => {
   const [sendCommentLoad, setSendCommentLoad] = useState<boolean>(false);
 
   const UserInfo = useSelector(
-    (state: RootState) => state.root?.authReducer?.userInfo
+    (state: RootState) => state.auth?.userInfo
   ) as UserInfo;
 
   useEffect(() => {

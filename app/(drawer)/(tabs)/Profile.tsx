@@ -1,13 +1,12 @@
 import SvgIcon from "@/src/assets/icons";
-import Avatar from "@/src/components/Avatar";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
-import Spacer from "@/src/components/Spacer";
-import { NormalText, TitleText } from "@/src/components/Text";
-import { useThemeColors } from "@/src/constants/Colors";
-import { wp } from "@/src/helpers/comman";
-import { UserInfo } from "@/src/redux/reducers/AuthReducer";
+import Avatar from "@/src/shared/ui/Avatar";
+import ScreenWrapper from "@/src/shared/ui/ScreenWrapper";
+import Spacer from "@/src/shared/ui/Spacer";
+import { NormalText, TitleText } from "@/src/shared/ui/Text";
+import { useThemeColors } from "@/src/shared/constants/colors";
+import { wp } from "@/src/shared/utils/comman";
+import { UserInfo } from "@/src/modules/auth";
 import { RootState } from "@/src/redux/Store";
-import { getUserImage } from "@/src/services/imageServices";
 import UserComments from "@/src/tabsScreens/UserComments";
 import UserPost from "@/src/tabsScreens/UserPost";
 import { useNavigation } from "@react-navigation/native";
@@ -15,7 +14,6 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
-  Image,
   Pressable,
   StyleSheet,
   useWindowDimensions,
@@ -42,7 +40,7 @@ const Profile = () => {
   const themeColors = useThemeColors();
 
   const UserInfo = useSelector(
-    (state: RootState) => state.root?.authReducer?.userInfo
+    (state: RootState) => state.auth?.userInfo
   ) as UserInfo;
 
   const [index, setIndex] = useState<number>(0);

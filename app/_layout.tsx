@@ -1,11 +1,11 @@
-import { setNavigate } from "@/src/helpers/navigation";
+import { setNavigate } from "@/src/shared/utils/navigation";
 import { persistor, store } from "@/src/redux/Store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { tokenStorage } from "@/src/infrastructure/storage/tokenStorage";
 import { useFonts } from "expo-font";
 import { Href, SplashScreen, Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 SplashScreen.preventAutoHideAsync();
@@ -22,7 +22,7 @@ const MainLayout = () => {
 
   const updateUserData = async () => {
     try {
-      const token = await AsyncStorage.getItem("UserToken");
+      const token = await tokenStorage.getAccessToken();
       if (token) {
         navigation.navigate("/(drawer)/(tabs)/feedScreen");
       } else {

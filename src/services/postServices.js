@@ -1,4 +1,4 @@
-import { uploadFile } from "./imageServices";
+import { uploadFile } from "../shared/utils/imageServices";
 import {
   useDeleteCommentMutation,
   useDeletePostMutation,
@@ -9,7 +9,7 @@ import {
   useLazyGetPostCommentsQuery,
   useLazyGetPostQuery,
   useUploadCommentMutation,
-} from "./PostReqest/postApi";
+} from "../infrastructure/api/postApi";
 
 const usePostServices = () => {
   const [getUserPost] = useLazyGetPostQuery();

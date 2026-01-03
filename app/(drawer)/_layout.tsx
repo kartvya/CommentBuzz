@@ -1,5 +1,5 @@
-import CustomDrawer from "@/src/components/CustomDrawer";
-import { DarkColors, useThemeColors } from "@/src/constants/Colors";
+import CustomDrawer from "@/src/shared/ui/CustomDrawer";
+import { useThemeColors } from "@/src/shared/constants/colors";
 import { Drawer } from "expo-router/drawer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 

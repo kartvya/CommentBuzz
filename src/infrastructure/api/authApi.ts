@@ -1,0 +1,80 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { BaseUrl, endPoints } from "./endPoints";
+import { tokenStorage } from "../storage/tokenStorage";
+
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+  };
+}
+
+interface LoginApiResponse {
+  data: LoginResponse;
+  authHeader: string;
+}
+
+const AuthApi = createApi({
+  reducerPath: "authApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: BaseUrl,
+    prepareHeaders: async (headers, { getState }) => {
+      const token = await tokenStorage.getAccessToken();
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  endpoints: (builder) => ({
+    login: builder.mutation<LoginApiResponse, Record<string, any>>({
+      query: (body) => ({
+        url: endPoints.Login,
+        method: "POST",
+        body,
+      }),
+      transformResponse: (response: LoginResponse, meta) => {
+        const authHeader = meta?.response?.headers.get("Authorization") || "";
+        return {
+          data: response,
+          authHeader,
+        };
+      },
+    }),
+
+    refreshToken: builder.mutation<
+      { accessToken: string },
+      { refreshToken: string }
+    >({
+      query: ({ refreshToken }) => ({
+        url: endPoints.RefreshToken,
+        method: "POST",
+        body: { refreshToken },
+      }),
+      transformResponse: (response: { accessToken: string }) => {
+        return { accessToken: response.accessToken };
+      },
+    }),
+
+    register: builder.mutation<any, any>({
+      query: (body) => ({
+        url: endPoints.Register,
+        method: "POST",
+        body,
+      }),
+    }),
+  }),
+});
+
+export const {
+  useLoginMutation,
+  useRefreshTokenMutation,
+  useRegisterMutation,
+} = AuthApi;
+export default AuthApi;
+

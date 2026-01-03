@@ -1,4 +1,7 @@
-// store.ts
+/**
+ * Root Store Configuration
+ * Consolidates all modules and maintains backward compatibility.
+ */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query/react";
@@ -7,14 +10,23 @@ import { AnyAction, combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 import { ThunkDispatch } from "redux-thunk";
 
-import RootReducer from "./reducers/RootReducer";
-import backendBaseApi from "../services/BackendBaseApi";
-import AuthApi from "../services/AuthRequest/authApi";
+import backendBaseApi from "../infrastructure/api/baseApi";
+import AuthApi from "../infrastructure/api/authApi";
+import "../infrastructure/api/postApi";
+import "../infrastructure/api/userApi";
+
+import authReducer from "../modules/auth/ui/auth.slice";
+import postReducer from "../modules/post/ui/post.slice";
+import commentReducer from "../modules/comment/ui/comment.slice";
+import profileReducer from "../modules/profile/ui/profile.slice";
 
 const rootReducer = combineReducers({
   [backendBaseApi.reducerPath]: backendBaseApi.reducer,
   [AuthApi.reducerPath]: AuthApi.reducer,
-  root: RootReducer,
+  auth: authReducer,
+  post: postReducer,
+  comment: commentReducer,
+  profile: profileReducer,
 });
 
 const persistConfig = {
@@ -33,7 +45,7 @@ const store = configureStore({
     }).concat(backendBaseApi.middleware, AuthApi.middleware),
 });
 
-const persistor = persistStore(store);
+const persistor = persistStore(store as any);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

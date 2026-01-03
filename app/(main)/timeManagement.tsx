@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import Header from "@/src/components/Header";
-import AnimatedLineChart from "@/src/components/lineChart/AnimatedLineChart";
-import { chartHeight, chartWidth } from "@/src/components/lineChart/data";
-import ScreenWrapper from "@/src/components/ScreenWrapper";
+import Header from "@/src/shared/ui/Header";
+import AnimatedLineChart from "@/src/shared/ui/lineChart/AnimatedLineChart";
+import { chartHeight, chartWidth } from "@/src/shared/ui/lineChart/data";
+import ScreenWrapper from "@/src/shared/ui/ScreenWrapper";
 import { StyleSheet, View, Text } from "react-native";
-import { useGetWeeklyAverageTimeQuery } from "@/src/services/UserRequest/userApi";
-import Loading from "@/src/components/Loading";
+import { useGetWeeklyAverageTimeQuery } from "@/src/infrastructure/api/userApi";
+import Loading from "@/src/shared/ui/Loading";
 
 const TimeManagement = () => {
   const { data, isLoading, error } = useGetWeeklyAverageTimeQuery();

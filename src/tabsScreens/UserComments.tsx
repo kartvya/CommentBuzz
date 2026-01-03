@@ -7,23 +7,30 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { TitleText } from "../components/Text";
-import { Colors, DarkColors } from "../constants/Colors";
+import { TitleText } from "../shared/ui/Text";
+import { Colors, DarkColors } from "@/src/shared/constants/colors";
 
 import usePostServices from "../services/postServices";
-import { CommentsData } from "../utility/types";
-import MemoizedCommentView from "../components/MemoizedCommentView";
+import { CommentsData } from "../shared/types";
+import MemoizedCommentView from "../shared/ui/MemoizedCommentView";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Loading from "../components/Loading";
+import Loading from "../shared/ui/Loading";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import Spacer from "../components/Spacer";
+import Spacer from "../shared/ui/Spacer";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/Store";
+import { UserInfo } from "../modules/auth";
 
 let limit = 10;
 const UserComments = () => {
-  const { fetchOnlyUserComments } = usePostServices();
+  const { fetchOnlyUserComments, deleteComment } = usePostServices();
+
+  const UserInfo = useSelector(
+    (state: RootState) => state.auth?.userInfo
+  ) as UserInfo;
 
   const insets = useSafeAreaInsets();
   const paddingBottom = insets.bottom + 65;
@@ -96,9 +103,32 @@ const UserComments = () => {
     { viewabilityConfig, onViewableItemsChanged },
   ]);
 
+  const onDeleteComment = useCallback(
+    async (commentId: string) => {
+      try {
+        const res = await deleteComment(commentId);
+        if (res.success) {
+          setAllComments((prevComments) =>
+            prevComments.filter((c) => c._id !== commentId)
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [deleteComment]
+  );
+
   const renderItem: ListRenderItem<CommentsData> = useCallback(
-    ({ item, index }) => <MemoizedCommentView item={item} />,
-    [comments, isFocused]
+    ({ item, index }) => (
+      <MemoizedCommentView
+        item={item}
+        isUserComment={item?.user?._id === UserInfo?._id}
+        postId={item.post}
+        onDeleteComment={() => onDeleteComment(item._id)}
+      />
+    ),
+    [comments, isFocused, UserInfo, onDeleteComment]
   );
 
   return (
