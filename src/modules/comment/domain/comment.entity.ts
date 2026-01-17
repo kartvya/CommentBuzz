@@ -49,7 +49,7 @@ export interface GetCommentsResponse {
     downvotes: string[];
     views: number;
     buzzCoinsEarned: number;
-    comments: any[];
+    comments: Comment[];
     createdAt: string;
     updatedAt: string;
     commentCount: number;
@@ -69,10 +69,16 @@ export interface ToggleCommentVoteRequest {
   voteType: "upvote" | "downvote";
 }
 
+export interface ToggleCommentVoteResponseData {
+  upvotes: string[];
+  downvotes: string[];
+  buzzCoins: number;
+}
+
 export interface ToggleCommentVoteResponse {
   success: boolean;
   message?: string;
-  data?: any;
+  data?: ToggleCommentVoteResponseData;
 }
 
 export interface GetOnlyUserCommentsResponse {
@@ -80,4 +86,3 @@ export interface GetOnlyUserCommentsResponse {
   comments?: Comment[];
   message?: string;
 }
-

@@ -20,8 +20,9 @@ export interface IProfileRepository {
 
   /**
    * Edit user profile details
+   * @param formData - FormData containing profile information (username, bio, profilePic, gender)
    */
-  editProfile(profileData: EditProfileRequest): Promise<EditProfileResponse>;
+  editProfile(formData: FormData): Promise<EditProfileResponse>;
 
   /**
    * Track session time

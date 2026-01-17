@@ -10,12 +10,11 @@ import {
   useThemeColors,
 } from "@/src/shared/constants/colors";
 import { hp, wp } from "@/src/shared/utils/comman";
-import { USERINFO } from "@/src/redux/actions/ActionType";
-import { useLoginMutation } from "@/src/infrastructure/api/authApi";
-import { useLazyGetUserProfileDetailsQuery } from "@/src/infrastructure/api/userApi";
-import { tokenStorage } from "@/src/infrastructure/storage/tokenStorage";
+import { setUserInfo } from "@/src/modules/auth/ui/auth.slice";
+import { useLogin } from "@/src/modules/auth/hooks/useLogin";
+import { useGetProfile } from "@/src/modules/profile/hooks/useGetProfile";
 import { Href, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -24,8 +23,13 @@ import { useDispatch } from "react-redux";
 const Login = () => {
   const dispatch = useDispatch();
 
-  const [login] = useLoginMutation();
-  const [GetUserDetails] = useLazyGetUserProfileDetailsQuery();
+  const {
+    login,
+    isLoading: isLoginLoading,
+    error: loginError,
+    validationErrors,
+  } = useLogin();
+  const { getProfile, isLoading: isProfileLoading } = useGetProfile();
 
   const navigation = useRouter();
   const themeColors = useThemeColors();
@@ -33,50 +37,56 @@ const Login = () => {
   const passwordRef = useRef<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, serPasswordErrorr] = useState<string>("");
-  const [isLoading, setLoading] = useState<boolean>(false);
   const [showPass, sehShowPass] = useState<boolean>(false);
   const [globalError, setGlobalError] = useState<string>("");
 
-  const onLogin = async () => {
-    try {
-      let isValid = false;
-      // let email = emailRef.current.trim();
-      // let password = passwordRef.current.trim();
-      let email = "vishal@gmail.com";
-      let password = "Abc@1234";
-      if (!email) {
-        setEmailError("This field is required.");
-        isValid = false;
+  const isLoading = isLoginLoading || isProfileLoading;
+
+  // Update error states from validation errors
+  useEffect(() => {
+    if (validationErrors) {
+      if (validationErrors.email) {
+        setEmailError(validationErrors.email[0] || "");
       } else {
         setEmailError("");
-        isValid = true;
       }
-      if (!password) {
-        serPasswordErrorr("This field is required.");
-        isValid = false;
+      if (validationErrors.password) {
+        serPasswordErrorr(validationErrors.password[0] || "");
       } else {
         serPasswordErrorr("");
-        isValid = true;
       }
-      if (isValid) {
-        setLoading(true);
-        let loginCred = { email: email, password: password };
-        const loginResponse = await login(loginCred).unwrap();
-        await tokenStorage.setAccessToken(loginResponse?.data?.accessToken);
-        await tokenStorage.setRefreshToken(loginResponse?.data?.refreshToken);
-        let userProfileDetails = await GetUserDetails().unwrap();
-        dispatch({
-          type: USERINFO,
-          payload: userProfileDetails?.user,
-        });
-        navigation.navigate("/(drawer)/(tabs)/feedScreen" as Href);
-        setLoading(false);
+    } else {
+      setEmailError("");
+      serPasswordErrorr("");
+    }
+  }, [validationErrors]);
+
+  const onLogin = async () => {
+    try {
+
+      await login({
+        email: __DEV__ ? "kartvya@gmail.com" : emailRef.current,
+        password: __DEV__ ? "Abc@1234" : passwordRef.current,
+      });
+
+      // Get user profile details after successful login
+      const userProfileDetails = await getProfile();
+
+      // Update Redux store with user info
+      if (userProfileDetails?.user) {
+        dispatch(setUserInfo(userProfileDetails.user));
       }
+
+      // Navigate to feed screen
+      navigation.navigate("/(drawer)/(tabs)/feedScreen" as Href);
     } catch (error) {
-      console.log(error);
-      setLoading(false);
+      // Error handling is done by the hook
+      if (loginError) {
+        setGlobalError(loginError.message || "Login failed. Please try again.");
+      }
     }
   };
+
   return (
     <ScreenWrapper
       conatinerStyle={{ paddingHorizontal: wp(4) }}
@@ -144,7 +154,7 @@ const Login = () => {
         <Button
           title="Login"
           btnStyle={{ alignItems: "center" }}
-          onPress={() => onLogin()}
+          onPress={onLogin}
           isLoading={isLoading}
           textStyle={{
             color: DarkColors.white,

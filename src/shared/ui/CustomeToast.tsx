@@ -9,15 +9,7 @@ const getRandomMessage = () => {
 
 const Message = (props: {
   onHide: () => void;
-  message:
-    | string
-    | number
-    | boolean
-    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-    | Iterable<React.ReactNode>
-    | React.ReactPortal
-    | null
-    | undefined;
+  message: React.ReactNode;
 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
 

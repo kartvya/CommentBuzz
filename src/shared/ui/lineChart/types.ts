@@ -1,7 +1,12 @@
+export interface WeeklyChartData {
+  dailyBreakdown?: Record<string, number>;
+  averageMinutes?: number;
+}
+
 export type TProps = {
   width: number;
   height: number;
-  data: any;
+  data?: WeeklyChartData;
 };
 
 export type ChartRef = {

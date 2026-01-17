@@ -51,7 +51,7 @@ const getIcon = (type: IconType) => {
 };
 
 export const MXicon: React.FC<IconProps> = ({ type, ...props }) => {
-  const FontIcon: React.ComponentType<any> = getIcon(type);
+  const FontIcon: React.ComponentType<IconProps> = getIcon(type);
 
   return <FontIcon {...props} />;
 };

@@ -10,8 +10,9 @@ import {
 import { TitleText } from "../shared/ui/Text";
 import { Colors, DarkColors } from "@/src/shared/constants/colors";
 
-import usePostServices from "../services/postServices";
-import { CommentsData } from "../shared/types";
+import { useGetOnlyUserComments } from "../modules/comment/hooks/useGetOnlyUserComments";
+import { useDeleteComment } from "../modules/comment/hooks/useDeleteComment";
+import { CommentsData } from "../modules/comment";
 import MemoizedCommentView from "../shared/ui/MemoizedCommentView";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,7 +27,8 @@ import { UserInfo } from "../modules/auth";
 
 let limit = 10;
 const UserComments = () => {
-  const { fetchOnlyUserComments, deleteComment } = usePostServices();
+  const { getOnlyUserComments } = useGetOnlyUserComments();
+  const { deleteComment } = useDeleteComment();
 
   const UserInfo = useSelector(
     (state: RootState) => state.auth?.userInfo
@@ -48,10 +50,10 @@ const UserComments = () => {
   const getAllComments = async () => {
     try {
       limit = limit + 10;
-      const res = await fetchOnlyUserComments(limit);
+      const res = await getOnlyUserComments(limit);
       if (res?.success) {
-        // Ensure res.data is defined before checking its length
-        const commentsData = res.data ?? [];
+        // Ensure res.comments is defined before checking its length
+        const commentsData = res.comments ?? [];
 
         if (commentsData.length > 0 && commentsData.length <= 10) {
           setHasMore(false);
@@ -81,9 +83,9 @@ const UserComments = () => {
 
   const refreshPulled = async () => {
     limit = 10;
-    const res = await fetchOnlyUserComments(limit);
+    const res = await getOnlyUserComments(limit);
     if (res?.success) {
-      setAllComments(res.data ?? []);
+      setAllComments(res.comments ?? []);
     }
   };
 

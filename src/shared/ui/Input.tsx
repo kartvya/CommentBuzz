@@ -14,7 +14,7 @@ import { NormalText } from "./Text";
 interface Iprops extends TextInputProps {
   icon?: React.ReactNode;
   containerStyle?: ViewStyle;
-  inputRef?: React.RefObject<TextInput>;
+  inputRef?: React.RefObject<TextInput | null>;
   placeholderText?: string;
   error?: string;
   rightIcon?: React.ReactNode;

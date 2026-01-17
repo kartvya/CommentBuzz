@@ -5,10 +5,17 @@ import MemoizedPostView from "@/src/shared/ui/MemoizedPostView";
 import { TitleText } from "@/src/shared/ui/Text";
 import { useThemeColors } from "@/src/shared/constants/colors";
 import { wp } from "@/src/shared/utils/comman";
-import usePostServices from "@/src/services/postServices";
-import { PostData } from "@/src/shared/types";
+import { useGetPosts } from "@/src/modules/post/hooks/useGetPosts";
+import { PostData } from "@/src/modules/post";
 import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { shallowEqual, useSelector } from "react-redux";
+import { RootState } from "@/src/redux/Store";
+import { UserInfo } from "@/src/modules/auth";
+import {
+  AuthenticationError,
+  LogoutRequiredError,
+} from "@/src/shared/errors/domain.errors";
 import {
   Animated,
   FlatListProps,
@@ -28,9 +35,10 @@ const AnimatedFlatList =
     React.ComponentType<FlatListProps<PostData>>
   >(RNFlatList);
 
-let limit = 0;
+const POSTS_PER_PAGE = 10;
+
 const FeedScreen = () => {
-  const { fetchPost } = usePostServices();
+  const { getPosts, isLoading } = useGetPosts();
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
   const themeColors = useThemeColors();
@@ -40,65 +48,40 @@ const FeedScreen = () => {
   const [scrollY] = useState(new Animated.Value(0));
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentLimit, setCurrentLimit] = useState(POSTS_PER_PAGE);
   const [hasMore, setHasMore] = useState(true);
   const [Posts, setPosts] = useState<PostData[]>([]);
 
-  // Track app session time
+  // Check if user is authenticated
+  const userInfo = useSelector(
+    (state: RootState) => state.auth?.userInfo,
+    shallowEqual
+  ) as UserInfo | null;
+
   useAppSessionTracker();
 
-  // const appState = useRef(AppState.currentState);
-  // const [startTime, setStartTime] = useState<Date | null>(null);
+  interface PostPayload {
+    eventType: "INSERT" | "UPDATE" | "DELETE";
+    new?: PostData & { id?: string };
+    old?: PostData & { id?: string };
+  }
 
-  // const UserInfo = useSelector(
-  //   (state: RootState) => state.auth?.userInfo
-  // ) as Users;
-
-  // useEffect(() => {
-  //   const subscription = AppState.addEventListener("change", (nextAppState) => {
-  //     if (
-  //       appState.current.match(/inactive|background/) &&
-  //       nextAppState === "active"
-  //     ) {
-  //       setStartTime(new Date());
-  //     } else if (appState.current.match(/inactive|background/)) {
-  //       if (startTime) {
-  //         const endTime = new Date();
-  //         const timeSpent =
-  //           (endTime.getTime() - startTime.getTime()) / 1000 / 60;
-  //         saveTimeSpentToSupabase(timeSpent);
-  //         setStartTime(null);
-  //       }
-  //     }
-  //     console.log(appState.current);
-  //     appState.current = nextAppState;
-  //   });
-
-  //   return () => {
-  //     subscription.remove();
-  //   };
-  // }, [startTime]);
-
-  const handlePost = async (payload: any) => {
+  const handlePost = useCallback(async (payload: PostPayload) => {
     try {
       console.log("Payload received:", payload);
 
       if (payload.eventType === "INSERT" && payload?.new?.id) {
-        let newPost = { ...payload?.new };
-
-        // Fetch user data
-        // let res = await getUserData(newPost.userId);
-        // newPost.user = res.success ? res?.data : {};
+        let newPost = { ...payload.new };
 
         // Check and update state
         setPosts((prevPosts) => {
           const postExists = prevPosts.some((post) => post._id === newPost.id);
 
           if (postExists) {
-            // Post already exists, check if update is required
-            const updatedPosts = prevPosts.map((post) =>
+            // Post already exists, update it
+            return prevPosts.map((post) =>
               post._id === newPost.id ? newPost : post
             );
-            return updatedPosts;
           }
 
           // Add new post to state
@@ -108,44 +91,116 @@ const FeedScreen = () => {
     } catch (error) {
       console.error("Error in handlePost:", error);
     }
-  };
+  }, []);
 
-  const getAllPost = async () => {
-    limit = limit + 10;
-    const res = await fetchPost(limit);
-    if (res.success) {
-      const postsData = res.data.posts ?? [];
-
-      if (postsData.length > 0 && postsData.length <= 10) {
-        setHasMore(false);
-        setPosts((prevPosts) => {
-          const uniquePosts = [
-            ...new Map(
-              [...postsData, ...prevPosts].map((post) => [post._id, post])
-            ).values(),
-          ];
-          return uniquePosts;
-        });
-      } else {
-        if (postsData.length === Posts.length) {
-          setHasMore(false);
-        }
-        setPosts(postsData);
+  const loadPosts = useCallback(
+    async (limit: number, append: boolean = false) => {
+      // Don't make API call if user is not authenticated
+      if (!userInfo) {
+        console.log("[FeedScreen] User not authenticated, skipping post fetch");
+        return;
       }
-    }
-  };
+
+      try {
+        console.log(
+          "[FeedScreen] Loading posts, limit:",
+          limit,
+          "append:",
+          append
+        );
+        const res = await getPosts(limit);
+        console.log("[FeedScreen] getPosts response:", {
+          success: res.success,
+          dataLength: res.data?.length ?? 0,
+          message: res.message,
+        });
+
+        if (res.success) {
+          const postsData = res.data ?? [];
+          console.log("[FeedScreen] Posts data:", {
+            count: postsData.length,
+            firstPostId: postsData[0]?._id,
+          });
+
+          if (append) {
+            // Append new posts, avoiding duplicates
+            setPosts((prevPosts) => {
+              const existingIds = new Set(prevPosts.map((p) => p._id));
+              const newPosts = postsData.filter((p) => !existingIds.has(p._id));
+              console.log("[FeedScreen] Appending posts:", {
+                prevCount: prevPosts.length,
+                newCount: newPosts.length,
+                totalAfter: prevPosts.length + newPosts.length,
+              });
+              return [...prevPosts, ...newPosts];
+            });
+          } else {
+            // Replace posts (for refresh)
+            console.log(
+              "[FeedScreen] Replacing posts with",
+              postsData.length,
+              "posts"
+            );
+            setPosts(postsData);
+          }
+
+          // Determine if there are more posts to load
+          setHasMore(postsData.length === limit);
+          console.log(
+            "[FeedScreen] Has more posts:",
+            postsData.length === limit
+          );
+        } else {
+          console.warn(
+            "[FeedScreen] getPosts returned success: false",
+            res.message
+          );
+        }
+      } catch (error) {
+        // Silently handle authentication errors (user might be logging out or not authenticated)
+        if (
+          error instanceof AuthenticationError ||
+          error instanceof LogoutRequiredError
+        ) {
+          console.log(
+            "[FeedScreen] User not authenticated, skipping post fetch"
+          );
+          return;
+        }
+
+        console.error("[FeedScreen] Error loading posts:", error);
+        if (error instanceof Error) {
+          console.error("[FeedScreen] Error details:", {
+            message: error.message,
+            name: error.name,
+            stack: error.stack,
+          });
+        }
+      }
+    },
+    [getPosts, userInfo]
+  );
+
+  const getAllPost = useCallback(async () => {
+    const newLimit = currentLimit + POSTS_PER_PAGE;
+    setCurrentLimit(newLimit);
+    await loadPosts(newLimit, true);
+  }, [currentLimit, loadPosts]);
 
   useEffect(() => {
-    getAllPost();
-  }, [isFocused]);
-
-  const refreshPulled = async () => {
-    limit = 10;
-    const res = await fetchPost(limit);
-    if (res.success) {
-      setPosts(res.data?.posts ?? []);
+    // Only fetch posts if user is authenticated and screen is focused
+    if (userInfo && isFocused) {
+      setCurrentLimit(POSTS_PER_PAGE);
+      loadPosts(POSTS_PER_PAGE, false);
     }
-  };
+  }, [isFocused, loadPosts, userInfo]);
+
+  const refreshPulled = useCallback(async () => {
+    setRefreshing(true);
+    setCurrentLimit(POSTS_PER_PAGE);
+    await loadPosts(POSTS_PER_PAGE, false);
+    setRefreshing(false);
+  }, [loadPosts]);
 
   const onViewableItemsChanged = ({
     viewableItems,
@@ -187,11 +242,11 @@ const FeedScreen = () => {
         <MemoizedPostView
           item={item}
           isVisible={index === visibleIndex}
-          fetchAllPost={() => refreshPulled()}
+          fetchAllPost={refreshPulled}
         />
       </>
     ),
-    [visibleIndex, Posts, isFocused]
+    [visibleIndex, refreshPulled]
   );
 
   return (

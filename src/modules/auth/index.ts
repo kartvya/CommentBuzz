@@ -6,4 +6,5 @@
 export { UserInfo, AuthState } from "./domain/auth.entity";
 export { default as authReducer } from "./ui/auth.slice";
 export * from "./ui/auth.slice";
+export * from "./hooks";
 

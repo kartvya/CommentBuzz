@@ -15,7 +15,7 @@ import GlobalCenterModal from "./GlobalCenterModal";
 import PostActionModal from "./PostActionModal";
 import Spacer from "./Spacer";
 import { NormalText, TitleText } from "./Text";
-import { useToggleCommentVoteMutation } from "../../infrastructure/api/postApi";
+import { useToggleCommentVoteMutation } from "../../infrastructure/api/commentApi";
 
 interface Iprops {
   item: CommentsData;

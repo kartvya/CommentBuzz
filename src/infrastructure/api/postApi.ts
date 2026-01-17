@@ -1,10 +1,21 @@
 import backendBaseApi from "./baseApi";
 import { endPoints } from "./endPoints";
+import {
+  CreatePostRequestDto,
+  CreatePostResponseDto,
+  GetPostsResponseDto,
+  GetPostByIdResponseDto,
+  ToggleVotePostRequestDto,
+  ToggleVotePostResponseDto,
+  DeletePostRequestDto,
+  DeletePostResponseDto,
+  GetOnlyUserPostResponseDto,
+} from "./dtos";
 
 const PostService = backendBaseApi.injectEndpoints({
   overrideExisting: true,
   endpoints: (build) => ({
-    createPost: build.mutation<any, any>({
+    createPost: build.mutation<CreatePostResponseDto, CreatePostRequestDto>({
       query: (body) => {
         return {
           url: endPoints.CreatePost,
@@ -14,7 +25,7 @@ const PostService = backendBaseApi.injectEndpoints({
       },
     }),
 
-    getPost: build.query<any, number>({
+    getPost: build.query<GetPostsResponseDto, number>({
       query: (limit) => ({
         url: endPoints.GetAllPost + `?page=1&limit=${limit}`,
         method: "GET",
@@ -22,7 +33,10 @@ const PostService = backendBaseApi.injectEndpoints({
       keepUnusedDataFor: 0,
     }),
 
-    toggleVotePost: build.mutation<any, any>({
+    toggleVotePost: build.mutation<
+      ToggleVotePostResponseDto,
+      ToggleVotePostRequestDto
+    >({
       query: (body) => {
         return {
           url: endPoints.ToggleVote,
@@ -32,7 +46,7 @@ const PostService = backendBaseApi.injectEndpoints({
       },
     }),
 
-    deletePost: build.mutation<any, any>({
+    deletePost: build.mutation<DeletePostResponseDto, DeletePostRequestDto>({
       query: (postID) => {
         return {
           url: `${endPoints.DeletePost}/${postID}`,
@@ -41,7 +55,7 @@ const PostService = backendBaseApi.injectEndpoints({
       },
     }),
 
-    getOnlyUserPost: build.query<any, number>({
+    getOnlyUserPost: build.query<GetOnlyUserPostResponseDto, number>({
       query: (limit) => ({
         url: endPoints.GetOnlyUserPost + `?page=1&limit=${limit}`,
         method: "GET",
@@ -49,54 +63,9 @@ const PostService = backendBaseApi.injectEndpoints({
       keepUnusedDataFor: 0,
     }),
 
-    getPostById: build.query<any, string>({
+    getPostById: build.query<GetPostByIdResponseDto, string>({
       query: (postId) => ({
         url: endPoints.GetAllPost + "/" + postId,
-        method: "GET",
-      }),
-      keepUnusedDataFor: 0,
-    }),
-
-    getPostComments: build.query<any, string>({
-      query: (postId) => ({
-        url: endPoints.GetPostComments + "/" + postId,
-        method: "GET",
-      }),
-      keepUnusedDataFor: 0,
-    }),
-
-    uploadComment: build.mutation<any, any>({
-      query: (body) => {
-        return {
-          url: endPoints.CreateComment,
-          method: "POST",
-          body,
-        };
-      },
-    }),
-
-    deleteComment: build.mutation<any, any>({
-      query: (commentID) => {
-        return {
-          url: `${endPoints.DeleteComment}/${commentID}`,
-          method: "DELETE",
-        };
-      },
-    }),
-
-    toggleCommentVote: build.mutation<any, any>({
-      query: (body) => {
-        return {
-          url: endPoints.ToggleCommentVote,
-          method: "PATCH",
-          body,
-        };
-      },
-    }),
-
-    getOnlyUsersComments: build.query<any, number>({
-      query: (limit) => ({
-        url: endPoints.GetOnlyUserComments + `?page=1&limit=${limit}`,
         method: "GET",
       }),
       keepUnusedDataFor: 0,
@@ -111,11 +80,6 @@ export const {
   useDeletePostMutation,
   useLazyGetOnlyUserPostQuery,
   useLazyGetPostByIdQuery,
-  useLazyGetPostCommentsQuery,
-  useUploadCommentMutation,
-  useDeleteCommentMutation,
-  useToggleCommentVoteMutation,
-  useLazyGetOnlyUsersCommentsQuery,
 } = PostService;
 
 // Export the service for use in repository implementations

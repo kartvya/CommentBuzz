@@ -1,63 +1,74 @@
 /**
  * Profile Repository Implementation
- * Implements IProfileRepository using RTK Query APIs
+ * Implements IProfileRepository using API client abstraction
  */
 
 import { IProfileRepository } from "../domain/profile.repository";
 import {
   GetProfileResponse,
-  EditProfileRequest,
   EditProfileResponse,
   TrackSessionTimeRequest,
   TrackSessionTimeResponse,
   GetWeeklyAverageTimeResponse,
 } from "../domain/profile.entity";
-import UserApi from "../../../infrastructure/api/userApi";
-import { store } from "../../../redux/Store";
+import { IApiClient } from "../../../infrastructure/api/IApiClient";
+import { endPoints } from "../../../infrastructure/api/endPoints";
+import { mapToDomainError } from "../../../shared/errors";
+import {
+  GetUserProfileDetailsResponseDto,
+  EditUserProfileDetailsResponseDto,
+  TrackSessionTimeResponseDto,
+  GetWeeklyAverageTimeResponseDto,
+} from "../../../infrastructure/api/dtos";
 
 export class ProfileRepositoryImpl implements IProfileRepository {
+  constructor(private apiClient: IApiClient) {}
+
   async getProfile(): Promise<GetProfileResponse> {
-    const result = await store.dispatch(
-      UserApi.endpoints.getUserProfileDetails.initiate(undefined)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.get<GetUserProfileDetailsResponseDto>(
+        endPoints.GetUserProfileDetails
+      );
+      return response.data as GetProfileResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as GetProfileResponse;
   }
 
-  async editProfile(
-    profileData: EditProfileRequest
-  ): Promise<EditProfileResponse> {
-    const result = await store.dispatch(
-      UserApi.endpoints.editUserProfileDetails.initiate(profileData)
-    );
-    if ("error" in result) {
-      throw result.error;
+  async editProfile(formData: FormData): Promise<EditProfileResponse> {
+    try {
+      const response = await this.apiClient.put<EditUserProfileDetailsResponseDto>(
+        endPoints.EditProfile,
+        formData
+      );
+      return response.data as EditProfileResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as EditProfileResponse;
   }
 
   async trackSessionTime(
     sessionData: TrackSessionTimeRequest
   ): Promise<TrackSessionTimeResponse> {
-    const result = await store.dispatch(
-      UserApi.endpoints.trackSessionTime.initiate(sessionData)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.post<TrackSessionTimeResponseDto>(
+        endPoints.TrackSessionTime,
+        sessionData
+      );
+      return response.data as TrackSessionTimeResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as TrackSessionTimeResponse;
   }
 
   async getWeeklyAverageTime(): Promise<GetWeeklyAverageTimeResponse> {
-    const result = await store.dispatch(
-      UserApi.endpoints.getWeeklyAverageTime.initiate(undefined)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.get<GetWeeklyAverageTimeResponseDto>(
+        endPoints.GetWeeklyAverageTime
+      );
+      return response.data as GetWeeklyAverageTimeResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as GetWeeklyAverageTimeResponse;
   }
 }
-

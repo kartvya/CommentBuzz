@@ -14,7 +14,7 @@ import {
 import { replaceMentionValues } from "react-native-controlled-mentions";
 import ParsedText from "react-native-parsed-text";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import SvgIcon from "../../assets/icons";
 import { hp } from "../utils/comman";
 import { UserInfo } from "../../modules/auth";
@@ -24,9 +24,9 @@ import {
   getSupaBaseFileUrl,
   getUserImage,
 } from "../utils/imageServices";
-import { useToggleVotePostMutation } from "../../infrastructure/api/postApi";
-import usePostServices from "../../services/postServices";
-import { PostData } from "../types";
+import { useToggleVote } from "../../modules/post/hooks/useToggleVote";
+import { useDeletePost } from "../../modules/post/hooks/useDeletePost";
+import { PostData } from "../../modules/post";
 import Avatar from "./Avatar";
 import Button from "./Button";
 import GlobalCenterModal from "./GlobalCenterModal";
@@ -43,14 +43,14 @@ interface Iprops {
 
 const MemoizedPostView: React.FC<Iprops> = React.memo(
   ({ item, isVisible, fetchAllPost, isCommentScreen }) => {
-    const { deletePost } = usePostServices();
-
-    const [toggleVotes] = useToggleVotePostMutation();
+    const { deletePost } = useDeletePost();
+    const { toggleVote } = useToggleVote();
     const navigation = useNavigation();
     const router = useRouter();
     const themeColors = useThemeColors();
     const UserInfo = useSelector(
-      (state: RootState) => state.auth?.userInfo
+      (state: RootState) => state.auth?.userInfo,
+      shallowEqual
     ) as UserInfo;
     const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
     const [isPause, setIsPause] = useState<boolean>(isVisible);
@@ -193,17 +193,21 @@ const MemoizedPostView: React.FC<Iprops> = React.memo(
     const updateVotesInBE = async (
       voteType: "upvote" | "downvote" | "none"
     ) => {
+      // Skip if voteType is "none" (unvote) - API expects upvote or downvote
+      if (voteType === "none") {
+        return;
+      }
+      
       const votePayload = {
-        type: voteType,
-        userId: UserInfo._id,
         postId: item?._id,
+        voteType: voteType,
       };
-      await toggleVotes(votePayload).unwrap();
+      await toggleVote(votePayload);
     };
 
     const onDeletePost = async () => {
       try {
-        let res = await deletePost(item?._id);
+        const res = await deletePost(item?._id);
         if (res?.success) {
           setShowDeleteModal(false);
           if (fetchAllPost) {

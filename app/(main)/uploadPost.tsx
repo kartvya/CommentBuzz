@@ -29,7 +29,9 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { MentionInput } from "react-native-controlled-mentions";
 import { UserInfo } from "@/src/modules/auth";
-import { useCreatePostMutation } from "@/src/infrastructure/api/postApi";
+import { useCreatePost } from "@/src/modules/post/hooks/useCreatePost";
+import { CreatePostRequest } from "@/src/modules/post/domain/post.entity";
+import { ValidationError } from "@/src/shared/errors/domain.errors";
 
 export interface Person {
   id: number;
@@ -54,7 +56,7 @@ interface PostData {
 }
 
 const UploadPost = () => {
-  const [createPost] = useCreatePostMutation();
+  const { createPost, isLoading: isCreatingPost } = useCreatePost();
 
   const navigation = useRouter();
   const themeColors = useThemeColors();
@@ -64,11 +66,15 @@ const UploadPost = () => {
 
   const [value, setValue] = useState<string>("");
   const [usedTags, setUsedTags] = useState<Person[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<PostData | null | undefined>();
 
+  const loading = isCreatingPost;
+
   const renderSuggestions = useCallback(
-    (props: { keyword: any; onSuggestionPress: any }) => {
+    (props: {
+      keyword?: string;
+      onSuggestionPress: (suggestion: { id: string; name: string }) => void;
+    }) => {
       const { keyword, onSuggestionPress } = props;
 
       if (keyword == null) {
@@ -139,41 +145,38 @@ const UploadPost = () => {
 
   const onPressSubmit = async () => {
     try {
-      if (!value && !files) {
-        Alert.alert("Post", "please share you thoughts or share some memory");
-        return;
-      }
-      setLoading(true);
-      let formData = new FormData();
-      formData.append("description", value);
+      // Pass raw file data - use case will handle type determination, validation, and FormData construction
+      const postData: CreatePostRequest = {
+        description: value || undefined,
+        files: files
+          ? {
+              uri: files.uri,
+              mimeType: files.mimeType,
+              type: files.type, // Pass raw type from image picker
+            }
+          : undefined,
+      };
 
-      if (files) {
-        const file = {
-          uri: files.uri,
-          name: files.uri.split("/").pop() || "profile.jpg",
-          type: files.type || "image/jpeg",
-        };
-
-        formData.append("media", {
-          uri: file.uri,
-          type: file.type,
-          name: file.name,
-        } as any);
-      }
-      const res = await createPost(formData).unwrap();
-      setLoading(false);
+      const res = await createPost(postData);
       if (res.success) {
         setValue("");
         setFiles(null);
         navigation.back();
-        setLoading(false);
       } else {
-        Alert.alert("Post", res.msg);
-        setLoading(false);
+        Alert.alert("Post", res.message || "Failed to create post");
       }
     } catch (error) {
       console.log(error);
-      setLoading(false);
+
+      // Handle validation errors with user-friendly messages
+      if (error instanceof ValidationError) {
+        const errorMessages = error.validationErrors
+          ? Object.values(error.validationErrors).flat()
+          : [error.message];
+        Alert.alert("Post", errorMessages.join("\n"));
+      } else {
+        Alert.alert("Post", "Failed to create post. Please try again.");
+      }
     }
   };
 
@@ -216,45 +219,46 @@ const UploadPost = () => {
     }
   };
 
-  const isLocalFile = (file: any) => {
-    try {
-      if (!file) {
-        return null;
-      }
-      if (typeof file === "object") {
-        return true;
-      }
+  const isLocalFile = (
+    file: PostData | string | null | undefined
+  ): file is PostData => {
+    if (!file) {
       return false;
-    } catch (error) {
-      console.log(error);
     }
+    return typeof file === "object" && "uri" in file;
   };
 
-  const getFileType = (file: any) => {
-    try {
-      if (!file) {
-        return null;
-      }
-      if (isLocalFile(file)) {
-        return file.type;
-      }
-      if (file.includes("postImages")) {
-        return "image";
-      }
-      return "video";
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getFileUrl = (file: any) => {
+  const getFileType = (
+    file: PostData | string | null | undefined
+  ): string | null => {
     if (!file) {
       return null;
     }
     if (isLocalFile(file)) {
+      return file.type;
+    }
+    if (typeof file === "string" && file.includes("postImages")) {
+      return "image";
+    }
+    if (typeof file === "string") {
+      return "video";
+    }
+    return null;
+  };
+
+  const getFileUrl = (
+    file: PostData | string | null | undefined
+  ): string | undefined => {
+    if (!file) {
+      return undefined;
+    }
+    if (isLocalFile(file)) {
       return file.uri;
     }
-    return getSupaBaseFileUrl(file)?.uri;
+    if (typeof file === "string") {
+      return getSupaBaseFileUrl(file)?.uri;
+    }
+    return undefined;
   };
 
   const onPressDelete = () => {
@@ -333,36 +337,43 @@ const UploadPost = () => {
               />
             </Pressable> */}
           </View>
-          {files && (
-            <View style={styles.files}>
-              {getFileType(files) === "video" ? (
-                <Video
-                  source={{ uri: getFileUrl(files) }}
-                  style={{
-                    borderRadius: 10,
-                    aspectRatio: 4 / 5,
-                    width: "100%",
-                  }}
-                  useNativeControls
-                  isLooping
-                  resizeMode={ResizeMode.COVER}
-                />
-              ) : (
-                <Image
-                  source={{ uri: getFileUrl(files) }}
-                  style={{
-                    borderRadius: 10,
-                    aspectRatio: 4 / 5,
-                    width: "100%",
-                  }}
-                  contentFit="cover"
-                />
-              )}
-              <Pressable style={styles.deleteIcon} onPress={onPressDelete}>
-                <SvgIcon name={"delete"} color={themeColors.white} />
-              </Pressable>
-            </View>
-          )}
+          {files &&
+            (() => {
+              const fileUrl = getFileUrl(files);
+              const fileType = getFileType(files);
+              if (!fileUrl) return null;
+
+              return (
+                <View style={styles.files}>
+                  {fileType === "video" ? (
+                    <Video
+                      source={{ uri: fileUrl }}
+                      style={{
+                        borderRadius: 10,
+                        aspectRatio: 4 / 5,
+                        width: "100%",
+                      }}
+                      useNativeControls
+                      isLooping
+                      resizeMode={ResizeMode.COVER}
+                    />
+                  ) : (
+                    <Image
+                      source={{ uri: fileUrl }}
+                      style={{
+                        borderRadius: 10,
+                        aspectRatio: 4 / 5,
+                        width: "100%",
+                      }}
+                      contentFit="cover"
+                    />
+                  )}
+                  <Pressable style={styles.deleteIcon} onPress={onPressDelete}>
+                    <SvgIcon name={"delete"} color={themeColors.white} />
+                  </Pressable>
+                </View>
+              );
+            })()}
         </KeyboardAwareScrollView>
         <Button
           title="Post"

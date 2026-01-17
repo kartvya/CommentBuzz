@@ -1,6 +1,6 @@
 /**
  * Comment Repository Implementation
- * Implements ICommentRepository using RTK Query APIs
+ * Implements ICommentRepository using API client abstraction
  */
 
 import { ICommentRepository } from "../domain/comment.repository";
@@ -14,67 +14,84 @@ import {
   ToggleCommentVoteResponse,
   GetOnlyUserCommentsResponse,
 } from "../domain/comment.entity";
-import PostApi from "../../../infrastructure/api/postApi";
-import { store } from "../../../redux/Store";
+import { IApiClient } from "../../../infrastructure/api/IApiClient";
+import { endPoints } from "../../../infrastructure/api/endPoints";
+import { mapToDomainError } from "../../../shared/errors";
+import {
+  CreateCommentResponseDto,
+  GetPostCommentsResponseDto,
+  DeleteCommentResponseDto,
+  ToggleCommentVoteResponseDto,
+  GetOnlyUserCommentsResponseDto,
+} from "../../../infrastructure/api/dtos";
 
 export class CommentRepositoryImpl implements ICommentRepository {
+  constructor(private apiClient: IApiClient) {}
   async createComment(
     commentData: CreateCommentRequest
   ): Promise<CreateCommentResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.uploadComment.initiate(commentData)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.post<CreateCommentResponseDto>(
+        endPoints.CreateComment,
+        commentData
+      );
+      return response.data as CreateCommentResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as CreateCommentResponse;
   }
 
   async getComments(
     request: GetCommentsRequest
   ): Promise<GetCommentsResponse> {
-    const postId = typeof request === "string" ? request : request.postId;
-    const result = await store.dispatch(
-      PostApi.endpoints.getPostComments.initiate(postId)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const postId = typeof request === "string" ? request : request.postId;
+      const response = await this.apiClient.get<GetPostCommentsResponseDto>(
+        `${endPoints.GetPostComments}/${postId}`
+      );
+      return response.data as GetCommentsResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as GetCommentsResponse;
   }
 
   async deleteComment(commentId: string): Promise<DeleteCommentResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.deleteComment.initiate(commentId)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.delete<DeleteCommentResponseDto>(
+        `${endPoints.DeleteComment}/${commentId}`
+      );
+      return response.data as DeleteCommentResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as DeleteCommentResponse;
   }
 
   async toggleVote(
     voteData: ToggleCommentVoteRequest
   ): Promise<ToggleCommentVoteResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.toggleCommentVote.initiate(voteData)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.patch<ToggleCommentVoteResponseDto>(
+        endPoints.ToggleCommentVote,
+        voteData
+      );
+      return response.data as ToggleCommentVoteResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as ToggleCommentVoteResponse;
   }
 
   async getOnlyUserComments(
     limit: number = 10
   ): Promise<GetOnlyUserCommentsResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.getOnlyUsersComments.initiate(limit)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.get<GetOnlyUserCommentsResponseDto>(
+        endPoints.GetOnlyUserComments,
+        { page: 1, limit }
+      );
+      return response.data as GetOnlyUserCommentsResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as GetOnlyUserCommentsResponse;
   }
 }
 

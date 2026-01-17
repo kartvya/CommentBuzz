@@ -18,7 +18,7 @@ export interface PostData {
   downvotes: string[];
   views: number;
   buzzCoinsEarned: number;
-  comments: any[];
+  comments: string[]; // Array of comment IDs
   createdAt: string;
   updatedAt: string;
   commentCount: number;
@@ -43,8 +43,9 @@ export interface CreatePostRequest {
   description?: string;
   media?: string[];
   files?: {
-    type: "image" | "video";
     uri: string;
+    mimeType?: string; // Raw mime type from image picker (e.g., "image/jpeg", "video/mp4")
+    type?: string; // Raw type from image picker (e.g., "image", "video")
   };
 }
 
@@ -71,10 +72,18 @@ export interface ToggleVoteRequest {
   voteType: "upvote" | "downvote";
 }
 
+export interface ToggleVoteResponseData {
+  post: {
+    _id: string;
+    upvotes: string[];
+    downvotes: string[];
+  };
+}
+
 export interface ToggleVoteResponse {
   success: boolean;
   message?: string;
-  data?: any;
+  data?: ToggleVoteResponseData;
 }
 
 export interface DeletePostResponse {
@@ -87,4 +96,3 @@ export interface GetOnlyUserPostResponse {
   posts?: PostData[];
   message?: string;
 }
-

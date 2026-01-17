@@ -17,7 +17,7 @@ import { Connection } from "../types";
 export const AnimatedFlatList = forwardRef<
   FlatList<Connection>,
   ComponentPropsWithoutRef<typeof Animated.FlatList<Connection>>
->((props, ref) => <Animated.FlatList {...props} ref={ref as any} />);
+>((props, ref) => <Animated.FlatList {...props} ref={ref as React.RefObject<FlatList<Connection>>} />);
 
 type Props = Omit<
   ComponentPropsWithoutRef<typeof Animated.FlatList<Connection>>,
@@ -26,7 +26,7 @@ type Props = Omit<
 
 const ConnectionList = forwardRef<FlatList, Props>((props, ref) => {
   const keyExtractor = useCallback(
-    (_: any, index: { toString: () => any }) => index.toString(),
+    (_item: Connection, index: number) => index.toString(),
     []
   );
 

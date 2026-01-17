@@ -49,14 +49,21 @@ export interface TrackSessionTimeResponse {
 }
 
 export interface WeeklyAverageTime {
-  averageTime: number;
-  weekStart: string;
-  weekEnd: string;
+  totalMinutes: number;
+  averageMinutes: number;
+  totalSessions: number;
+  dailyBreakdown: Record<string, number>;
+  sessions: Array<{
+    timestamp: string;
+    date: string;
+    duration: number;
+    sessionType?: string;
+  }>;
 }
 
 export interface GetWeeklyAverageTimeResponse {
   success: boolean;
-  data?: WeeklyAverageTime[];
+  data?: WeeklyAverageTime;
   message?: string;
 }
 

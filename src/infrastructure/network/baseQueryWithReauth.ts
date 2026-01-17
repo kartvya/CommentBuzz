@@ -5,15 +5,18 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { BaseUrl, endPoints } from "../api/endPoints";
 import type { FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { NavigationContainerRef } from "@react-navigation/native";
-import { navigateTo } from "../../shared/utils/navigation";
 import { tokenStorage } from "../storage/tokenStorage";
 
-let navigationRef: NavigationContainerRef<any> | null = null;
+/**
+ * NOTE: This file contains legacy RTK Query code that may still be used
+ * by some parts of the application. The primary API client is RtkQueryApiClient
+ * which implements IApiClient interface. This baseQuery is kept for
+ * backward compatibility with any remaining RTK Query hooks.
+ */
 
-export const setNavigationRef = (ref: NavigationContainerRef<any>) => {
-  navigationRef = ref;
-};
+interface ExtraOptions {
+  body?: unknown;
+}
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BaseUrl,
@@ -23,7 +26,8 @@ const baseQuery = fetchBaseQuery({
     // Only set Content-Type for JSON, not for FormData
     // FormData will be detected by checking if body is FormData instance
     if (type === "mutation") {
-      const body = (extra as any)?.body;
+      const extraOptions = extra as ExtraOptions | undefined;
+      const body = extraOptions?.body;
       const isFormData = body instanceof FormData;
 
       if (!isFormData && !headers.has("Content-Type")) {
@@ -67,7 +71,11 @@ const baseQueryWithReauth: BaseQueryFn<
       );
 
       if (refreshResult.data) {
-        const newAccessToken = (refreshResult.data as any).accessToken;
+        interface RefreshTokenResponse {
+          accessToken: string;
+        }
+        const refreshData = refreshResult.data as RefreshTokenResponse;
+        const newAccessToken = refreshData.accessToken;
 
         // Store new token
         await tokenStorage.setAccessToken(newAccessToken);
@@ -75,12 +83,18 @@ const baseQueryWithReauth: BaseQueryFn<
         // Retry the original query with new token
         result = await baseQuery(args, api, extraOptions);
       } else {
-        console.log("Refresh token failed. Logging out.");
+        console.log("Refresh token failed. Logout required.");
 
         await tokenStorage.clearAllTokens();
 
-        // Navigate to the welcome screen
-        navigateTo("/welcome");
+        // Return error - UI layer should handle navigation
+        // This is legacy code - new code should use RtkQueryApiClient
+        return {
+          error: {
+            status: 401,
+            data: { message: "Session expired. Please login again" },
+          },
+        };
       }
     }
   }
@@ -91,4 +105,3 @@ const baseQueryWithReauth: BaseQueryFn<
 export const baseQueryWithAutoRefresh = retry(baseQueryWithReauth, {
   maxRetries: 1,
 });
-

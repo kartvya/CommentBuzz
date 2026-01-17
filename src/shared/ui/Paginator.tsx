@@ -9,12 +9,12 @@ import Animated, {
 } from "react-native-reanimated";
 import { RFPercentage } from "react-native-responsive-fontsize";
 
-interface PaginatorProps {
-  data: any[];
+interface PaginatorProps<T = unknown> {
+  data: T[];
   scrollX: SharedValue<number>;
 }
 
-const Paginator: FunctionComponent<PaginatorProps> = ({ data, scrollX }) => {
+const Paginator = <T,>({ data, scrollX }: PaginatorProps<T>) => {
   const { width } = useWindowDimensions();
   const smallDotSize = RFPercentage(1);
   const dotSpacing = RFPercentage(1);

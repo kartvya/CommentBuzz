@@ -1,10 +1,18 @@
 import backendBaseApi from "./baseApi";
 import { endPoints } from "./endPoints";
+import {
+  GetUserProfileDetailsResponseDto,
+  EditUserProfileDetailsRequestDto,
+  EditUserProfileDetailsResponseDto,
+  TrackSessionTimeRequestDto,
+  TrackSessionTimeResponseDto,
+  GetWeeklyAverageTimeResponseDto,
+} from "./dtos";
 
 const UserService = backendBaseApi.injectEndpoints({
   overrideExisting: true,
   endpoints: (build) => ({
-    getUserProfileDetails: build.query<any, void>({
+    getUserProfileDetails: build.query<GetUserProfileDetailsResponseDto, void>({
       query: () => ({
         url: endPoints.GetUserProfileDetails,
         method: "GET",
@@ -12,7 +20,10 @@ const UserService = backendBaseApi.injectEndpoints({
       keepUnusedDataFor: 0,
     }),
 
-    editUserProfileDetails: build.mutation<any, any>({
+    editUserProfileDetails: build.mutation<
+      EditUserProfileDetailsResponseDto,
+      EditUserProfileDetailsRequestDto
+    >({
       query: (body) => {
         return {
           url: endPoints.EditProfile,
@@ -23,8 +34,8 @@ const UserService = backendBaseApi.injectEndpoints({
     }),
 
     trackSessionTime: build.mutation<
-      any,
-      { duration: number; sessionType?: "login" | "app_open" }
+      TrackSessionTimeResponseDto,
+      TrackSessionTimeRequestDto
     >({
       query: (body) => {
         return {
@@ -35,7 +46,7 @@ const UserService = backendBaseApi.injectEndpoints({
       },
     }),
 
-    getWeeklyAverageTime: build.query<any, void>({
+    getWeeklyAverageTime: build.query<GetWeeklyAverageTimeResponseDto, void>({
       query: () => ({
         url: endPoints.GetWeeklyAverageTime,
         method: "GET",

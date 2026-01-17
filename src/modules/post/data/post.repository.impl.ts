@@ -1,11 +1,10 @@
 /**
  * Post Repository Implementation
- * Implements IPostRepository using RTK Query APIs
+ * Implements IPostRepository using API client abstraction
  */
 
 import { IPostRepository } from "../domain/post.repository";
 import {
-  CreatePostRequest,
   CreatePostResponse,
   GetPostsResponse,
   GetPostByIdResponse,
@@ -14,67 +13,117 @@ import {
   DeletePostResponse,
   GetOnlyUserPostResponse,
 } from "../domain/post.entity";
-import PostApi from "../../../infrastructure/api/postApi";
-import { store } from "../../../redux/Store";
+import { IApiClient } from "../../../infrastructure/api/IApiClient";
+import { endPoints } from "../../../infrastructure/api/endPoints";
+import { mapToDomainError } from "../../../shared/errors";
+import {
+  CreatePostResponseDto,
+  GetPostsResponseDto,
+  GetPostByIdResponseDto,
+  ToggleVotePostResponseDto,
+  DeletePostResponseDto,
+  GetOnlyUserPostResponseDto,
+} from "../../../infrastructure/api/dtos";
 
 export class PostRepositoryImpl implements IPostRepository {
-  async createPost(postData: CreatePostRequest): Promise<CreatePostResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.createPost.initiate(postData)
-    );
-    if ("error" in result) {
-      throw result.error;
+  constructor(private apiClient: IApiClient) {}
+
+  async createPost(formData: FormData): Promise<CreatePostResponse> {
+    try {
+      const response = await this.apiClient.post<CreatePostResponseDto>(
+        endPoints.CreatePost,
+        formData
+      );
+      return response.data as CreatePostResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as CreatePostResponse;
   }
 
   async getPosts(limit: number = 10): Promise<GetPostsResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.getPost.initiate(limit)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      console.log("[PostRepository] Fetching posts with limit:", limit);
+      const response = await this.apiClient.get<GetPostsResponseDto>(
+        endPoints.GetAllPost,
+        { page: 1, limit }
+      );
+      console.log("[PostRepository] Raw API response:", JSON.stringify(response, null, 2));
+      
+      // response.data is GetPostsResponseDto (the DTO from the API)
+      const responseDto = response.data;
+      
+      if (responseDto?.data?.posts) {
+        // Server returns { success: true, data: { posts: [...], total, page, totalPages } }
+        const mappedResponse: GetPostsResponse = {
+          success: responseDto.success ?? true,
+          data: responseDto.data.posts,
+          message: responseDto.message,
+        };
+        console.log("[PostRepository] Mapped response:", {
+          success: mappedResponse.success,
+          postCount: mappedResponse.data?.length ?? 0,
+        });
+        return mappedResponse;
+      } else if (Array.isArray(responseDto?.data)) {
+        // Fallback: if data is already an array (backward compatibility)
+        return responseDto as GetPostsResponse;
+      } else {
+        console.warn("[PostRepository] Unexpected response structure:", responseDto);
+        return {
+          success: responseDto?.success ?? false,
+          data: [],
+          message: responseDto?.message ?? "No posts found",
+        };
+      }
+    } catch (error) {
+      console.error("[PostRepository] Error fetching posts:", error);
+      throw mapToDomainError(error);
     }
-    return result.data as GetPostsResponse;
   }
 
   async getPostById(postId: string): Promise<GetPostByIdResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.getPostById.initiate(postId)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.get<GetPostByIdResponseDto>(
+        `${endPoints.GetAllPost}/${postId}`
+      );
+      return response.data as GetPostByIdResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as GetPostByIdResponse;
   }
 
   async toggleVote(voteData: ToggleVoteRequest): Promise<ToggleVoteResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.toggleVotePost.initiate(voteData)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.patch<ToggleVotePostResponseDto>(
+        endPoints.ToggleVote,
+        voteData
+      );
+      return response.data as ToggleVoteResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as ToggleVoteResponse;
   }
 
   async deletePost(postId: string): Promise<DeletePostResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.deletePost.initiate(postId)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.delete<DeletePostResponseDto>(
+        `${endPoints.DeletePost}/${postId}`
+      );
+      return response.data as DeletePostResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as DeletePostResponse;
   }
 
   async getOnlyUserPost(limit: number = 10): Promise<GetOnlyUserPostResponse> {
-    const result = await store.dispatch(
-      PostApi.endpoints.getOnlyUserPost.initiate(limit)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.get<GetOnlyUserPostResponseDto>(
+        endPoints.GetOnlyUserPost,
+        { page: 1, limit }
+      );
+      return response.data as GetOnlyUserPostResponse;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as GetOnlyUserPostResponse;
   }
 }

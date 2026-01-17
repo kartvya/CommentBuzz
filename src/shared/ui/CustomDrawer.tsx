@@ -8,7 +8,7 @@ import SvgIcon from "../../assets/icons";
 import { DarkColors, useThemeColors } from "@/src/shared/constants/colors";
 import { hp } from "../utils/comman";
 import { RootState } from "../../redux/Store";
-import { ISDARKMODE, LOGOUT } from "../../redux/actions/ActionType";
+import { logout, setIsDarkMode } from "../../modules/auth/ui/auth.slice";
 import { UserInfo } from "../../modules/auth";
 import { tokenStorage } from "../../infrastructure/storage/tokenStorage";
 import Button from "./Button";
@@ -18,7 +18,12 @@ import Spacer from "./Spacer";
 import Switch from "./Switch";
 import { NormalText, TitleText } from "./Text";
 
-const CustomDrawer = (props: any) => {
+interface CustomDrawerProps {
+  // Props from expo-router DrawerContentComponent
+  // Currently unused but kept for type safety
+}
+
+const CustomDrawer: React.FC<CustomDrawerProps> = (_props) => {
   const dispatch = useDispatch();
   const navigation = useRouter();
   const themeColors = useThemeColors();
@@ -31,10 +36,7 @@ const CustomDrawer = (props: any) => {
   const [logoutModal, setLogoutModal] = useState(false);
 
   const toggleSwitch = () => {
-    dispatch({
-      type: ISDARKMODE,
-      payload: !isDarkMode,
-    });
+    dispatch(setIsDarkMode(!isDarkMode));
   };
 
   const formatedDate = (time: string) => {
@@ -60,14 +62,19 @@ const CustomDrawer = (props: any) => {
 
   const onLogoutYesBTN = async () => {
     try {
+      // Clear tokens first
       await tokenStorage.clearAllTokens();
-      dispatch({
-        type: LOGOUT,
-      });
+      // Clear Redux state
+      dispatch(logout());
+      // Navigate to welcome screen
       navigation.navigate("/welcome" as Href);
       setLogoutModal(false);
     } catch (error) {
-      console.log(error);
+      console.log("Logout error:", error);
+      // Even if there's an error, try to navigate away
+      dispatch(logout());
+      navigation.navigate("/welcome" as Href);
+      setLogoutModal(false);
     }
   };
 

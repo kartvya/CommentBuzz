@@ -43,19 +43,13 @@ const Profile = () => {
     (state: RootState) => state.auth?.userInfo
   ) as UserInfo;
 
+  console.log("UserInfo", UserInfo);
+
   const [index, setIndex] = useState<number>(0);
   const [routes] = useState<Routes[]>([
     { key: "first", title: "Posts" },
     { key: "second", title: "Comments" },
   ]);
-
-  const onLogoutYesBTN = async () => {
-    try {
-      Alert.alert("Sign out", "Something went wrong. Please try again. leater");
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const onPressDrawer = () => {
     try {

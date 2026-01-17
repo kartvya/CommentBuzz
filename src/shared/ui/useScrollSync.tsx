@@ -11,11 +11,11 @@ export type ScrollPair = {
   position: SharedValue<number>;
 };
 
-const useScrollSync = (
+const useScrollSync = <T,>(
   scrollPairs: ScrollPair[],
   headerConfig: HeaderConfig
 ) => {
-  const sync: NonNullable<FlatListProps<any>["onMomentumScrollEnd"]> = (
+  const sync: NonNullable<FlatListProps<T>["onMomentumScrollEnd"]> = (
     event
   ) => {
     const { y } = event.nativeEvent.contentOffset;

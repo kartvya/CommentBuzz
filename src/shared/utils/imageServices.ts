@@ -59,6 +59,6 @@ export const downloadImage = async (url: string): Promise<string | null> => {
 export const getLocalFilePath = (filePath: string): string => {
   let fileName = filePath.split("/").pop() || "file";
   // Use FileSystem.documentDirectory if available, otherwise fallback
-  const docDir = (FileSystem as any).documentDirectory || "";
+  const docDir = FileSystem.documentDirectory || "";
   return `${docDir}${fileName}`;
 };

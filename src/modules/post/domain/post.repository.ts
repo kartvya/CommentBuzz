@@ -17,8 +17,9 @@ import {
 export interface IPostRepository {
   /**
    * Create a new post
+   * @param formData - FormData containing post information (description and/or media)
    */
-  createPost(postData: CreatePostRequest): Promise<CreatePostResponse>;
+  createPost(formData: FormData): Promise<CreatePostResponse>;
 
   /**
    * Get all posts with pagination

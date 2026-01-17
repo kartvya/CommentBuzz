@@ -10,81 +10,76 @@ import {
   useThemeColors,
 } from "@/src/shared/constants/colors";
 import { hp, wp } from "@/src/shared/utils/comman";
-import { isEmailValid, isPasswordValid } from "@/src/shared/utils/validation";
-import { useRegisterMutation } from "@/src/infrastructure/api/authApi";
+import { useSignup } from "@/src/modules/auth/hooks/useSignup";
 import { Href, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const Signup = () => {
-  const [Register] = useRegisterMutation();
+  const {
+    signup,
+    isLoading,
+    error: signupError,
+    validationErrors,
+  } = useSignup();
 
   const navigation = useRouter();
   const themeColors = useThemeColors();
   const emailRef = useRef<string>("");
   const userNameRef = useRef<string>("");
   const passwordRef = useRef<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string>("");
   const [userNameError, setUserNameError] = useState<string>("");
   const [passwordError, serPasswordErrorr] = useState<string>("");
   const [showPass, sehShowPass] = useState<boolean>(false);
   const [globalError, setGlobalError] = useState<string>("");
 
-  const onSignUp = async () => {
-    try {
-      let isValid = false;
-      let email = emailRef.current.trim();
-      let userName = userNameRef.current.trim();
-      let password = passwordRef.current.trim();
-      if (!email) {
-        isValid = false;
-        setEmailError("This field is required.");
-      } else if (!isEmailValid(email)) {
-        isValid = false;
-        setEmailError("Invalid email format.");
+  // Update error states from validation errors
+  useEffect(() => {
+    if (validationErrors) {
+      if (validationErrors.email) {
+        setEmailError(validationErrors.email[0] || "");
       } else {
-        isValid = true;
         setEmailError("");
       }
-      if (!userName) {
-        isValid = false;
-        setUserNameError("This field is required.");
+      if (validationErrors.username) {
+        setUserNameError(validationErrors.username[0] || "");
       } else {
-        isValid = true;
         setUserNameError("");
       }
-      if (!password) {
-        isValid = false;
-        serPasswordErrorr("This field is required.");
-      } else if (!isPasswordValid(password)) {
-        isValid = false;
-        serPasswordErrorr("Please select strong password!");
+      if (validationErrors.password) {
+        serPasswordErrorr(validationErrors.password[0] || "");
       } else {
-        isValid = true;
         serPasswordErrorr("");
       }
-      setIsLoading(true);
-      if (isValid) {
-        const userInfo = {
-          username: userName,
-          email: email,
-          password: password,
-        };
-        let res = await Register(userInfo).unwrap();
-        if (res.success) {
-          navigation.navigate("/login" as Href);
-          setIsLoading(false);
-          return;
-        }
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
+    } else {
+      setEmailError("");
+      setUserNameError("");
+      serPasswordErrorr("");
+    }
+  }, [validationErrors]);
+
+  const onSignUp = async () => {
+    try {
+      // Signup use case handles validation and trimming
+      const result = await signup({
+        username: userNameRef.current,
+        email: emailRef.current,
+        password: passwordRef.current,
+      });
+
+      if (result.success) {
+        navigation.navigate("/login" as Href);
       }
     } catch (error) {
-      console.log(error);
+      // Error handling is done by the hook
+      if (signupError) {
+        setGlobalError(
+          signupError.message || "Signup failed. Please try again."
+        );
+      }
     }
   };
 

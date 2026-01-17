@@ -1,6 +1,14 @@
 /**
  * Root Store Configuration
  * Consolidates all modules and maintains backward compatibility.
+ *
+ * NOTE: The RTK Query APIs (backendBaseApi, AuthApi, postApi, userApi) are
+ * legacy code that may still be used by some parts of the application.
+ * The primary API client is RtkQueryApiClient which implements IApiClient
+ * interface and is used by repository implementations.
+ *
+ * These RTK Query APIs are kept for backward compatibility. New code should
+ * use the repository pattern via DI container instead of RTK Query hooks directly.
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { configureStore } from "@reduxjs/toolkit";
@@ -45,7 +53,7 @@ const store = configureStore({
     }).concat(backendBaseApi.middleware, AuthApi.middleware),
 });
 
-const persistor = persistStore(store as any);
+const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

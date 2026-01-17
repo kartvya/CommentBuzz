@@ -4,9 +4,8 @@
  * Migrated from redux/reducers/CommunityReducer.tsx
  */
 
-import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { PostData } from "../domain/post.entity";
-import { ALLPOST, DISLIKEPOST, LIKEPOST, LOGOUT } from "../../../redux/actions/ActionType";
 
 export interface PostState {
   posts: PostData[];
@@ -62,46 +61,6 @@ const postSlice = createSlice({
     clearPosts: (state) => {
       state.posts = [];
     },
-  },
-  extraReducers: (builder) => {
-    // Handle legacy string-based actions for backward compatibility
-    builder
-      .addMatcher(
-        (action: Action) => action.type === ALLPOST,
-        (state, action: PayloadAction<PostData[]>) => {
-          state.posts = action.payload;
-        }
-      )
-      .addMatcher(
-        (action: Action) => action.type === LIKEPOST,
-        (state, action: PayloadAction<string>) => {
-          const post = state.posts.find((p) => p._id === action.payload);
-          if (post) {
-            post.upvotes = post.upvotes || [];
-            if (!post.upvotes.includes(action.payload)) {
-              post.upvotes.push(action.payload);
-            }
-          }
-        }
-      )
-      .addMatcher(
-        (action: Action) => action.type === DISLIKEPOST,
-        (state, action: PayloadAction<string>) => {
-          const post = state.posts.find((p) => p._id === action.payload);
-          if (post) {
-            post.downvotes = post.downvotes || [];
-            if (!post.downvotes.includes(action.payload)) {
-              post.downvotes.push(action.payload);
-            }
-          }
-        }
-      )
-      .addMatcher(
-        (action: Action) => action.type === LOGOUT,
-        (state) => {
-          state.posts = [];
-        }
-      );
   },
 });
 

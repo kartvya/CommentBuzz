@@ -1,17 +1,63 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import Header from "@/src/shared/ui/Header";
 import AnimatedLineChart from "@/src/shared/ui/lineChart/AnimatedLineChart";
 import { chartHeight, chartWidth } from "@/src/shared/ui/lineChart/data";
 import ScreenWrapper from "@/src/shared/ui/ScreenWrapper";
 import { StyleSheet, View, Text } from "react-native";
-import { useGetWeeklyAverageTimeQuery } from "@/src/infrastructure/api/userApi";
+import { useGetWeeklyAverageTime } from "@/src/modules/profile/hooks/useGetWeeklyAverageTime";
 import Loading from "@/src/shared/ui/Loading";
 
-const TimeManagement = () => {
-  const { data, isLoading, error } = useGetWeeklyAverageTimeQuery();
+interface WeeklyData {
+  dailyBreakdown?: Record<string, number>;
+  averageMinutes?: number;
+}
 
-  // Use actual API data
-  const weeklyData = data?.data || {};
+const TimeManagement = () => {
+  const { getWeeklyAverageTime, isLoading } = useGetWeeklyAverageTime();
+  const [weeklyData, setWeeklyData] = useState<WeeklyData>({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("[TimeManagement] Fetching weekly average time...");
+        const result = await getWeeklyAverageTime();
+        console.log(
+          "[TimeManagement] API Response:",
+          JSON.stringify(result, null, 2)
+        );
+
+        if (result.success && result.data) {
+          const { dailyBreakdown, averageMinutes } = result.data;
+          console.log("[TimeManagement] Setting data:", {
+            averageMinutes,
+            dailyBreakdownKeys: Object.keys(dailyBreakdown || {}),
+            dailyBreakdownValues: Object.values(dailyBreakdown || {}),
+          });
+
+          setWeeklyData({
+            dailyBreakdown: dailyBreakdown || {},
+            averageMinutes: averageMinutes || 0,
+          });
+        } else {
+          console.warn("[TimeManagement] No data in response:", result);
+          setWeeklyData({
+            dailyBreakdown: {},
+            averageMinutes: 0,
+          });
+        }
+      } catch (error) {
+        console.error(
+          "[TimeManagement] Error fetching weekly average time:",
+          error
+        );
+        setWeeklyData({
+          dailyBreakdown: {},
+          averageMinutes: 0,
+        });
+      }
+    };
+    fetchData();
+  }, [getWeeklyAverageTime]);
 
   // Calculate dynamic chart height based on data (supports more than 8 hours)
   const dynamicChartHeight = useMemo(() => {

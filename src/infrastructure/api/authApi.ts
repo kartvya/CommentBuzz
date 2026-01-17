@@ -1,23 +1,15 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery, FetchBaseQueryMeta } from "@reduxjs/toolkit/query/react";
 import { BaseUrl, endPoints } from "./endPoints";
 import { tokenStorage } from "../storage/tokenStorage";
-
-interface LoginResponse {
-  success: boolean;
-  message: string;
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    username: string;
-    email: string;
-  };
-}
-
-interface LoginApiResponse {
-  data: LoginResponse;
-  authHeader: string;
-}
+import {
+  LoginRequestDto,
+  LoginApiResponseDto,
+  LoginResponseDto,
+  SignupRequestDto,
+  SignupResponseDto,
+  RefreshTokenRequestDto,
+  RefreshTokenResponseDto,
+} from "./dtos";
 
 const AuthApi = createApi({
   reducerPath: "authApi",
@@ -32,13 +24,13 @@ const AuthApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    login: builder.mutation<LoginApiResponse, Record<string, any>>({
+    login: builder.mutation<LoginApiResponseDto, LoginRequestDto>({
       query: (body) => ({
         url: endPoints.Login,
         method: "POST",
         body,
       }),
-      transformResponse: (response: LoginResponse, meta) => {
+      transformResponse: (response: LoginResponseDto, meta: FetchBaseQueryMeta | undefined) => {
         const authHeader = meta?.response?.headers.get("Authorization") || "";
         return {
           data: response,
@@ -48,20 +40,20 @@ const AuthApi = createApi({
     }),
 
     refreshToken: builder.mutation<
-      { accessToken: string },
-      { refreshToken: string }
+      RefreshTokenResponseDto,
+      RefreshTokenRequestDto
     >({
       query: ({ refreshToken }) => ({
         url: endPoints.RefreshToken,
         method: "POST",
         body: { refreshToken },
       }),
-      transformResponse: (response: { accessToken: string }) => {
+      transformResponse: (response: RefreshTokenResponseDto) => {
         return { accessToken: response.accessToken };
       },
     }),
 
-    register: builder.mutation<any, any>({
+    register: builder.mutation<SignupResponseDto, SignupRequestDto>({
       query: (body) => ({
         url: endPoints.Register,
         method: "POST",

@@ -1,6 +1,7 @@
 import { setNavigate } from "@/src/shared/utils/navigation";
 import { persistor, store } from "@/src/redux/Store";
 import { tokenStorage } from "@/src/infrastructure/storage/tokenStorage";
+import { setupContainer } from "@/src/infrastructure/di";
 import { useFonts } from "expo-font";
 import { Href, SplashScreen, Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -9,6 +10,9 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 SplashScreen.preventAutoHideAsync();
+
+// Initialize DI container
+setupContainer();
 
 const MainLayout = () => {
   const navigation = useRouter();

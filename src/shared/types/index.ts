@@ -27,49 +27,15 @@ export type IconProps = {
   onPress?: () => void;
 };
 
-export interface CommentsData {
-  _id: string;
-  post: string;
-  user: {
-    _id: string;
-    username: string;
-    profilePic: string;
-  };
-  text: string;
-  parentComment: string | null;
-  upvotes: any[];
-  downvotes: any[];
-  buzzCoins: number;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
-
-export interface PostData {
-  _id: string;
-  user: {
-    _id: string;
-    username: string;
-    profilePic: string;
-  };
-  description: string;
-  media: string[];
-  upvotes: any[];
-  downvotes: any[];
-  views: number;
-  buzzCoinsEarned: number;
-  comments: any[];
-  createdAt: string;
-  updatedAt: string;
-  commentCount: number;
-  __v: number;
-}
-
-export interface CommentsPostData {
-  success: boolean;
-  post: PostData;
-  comments: CommentsData[];
-}
+/**
+ * NOTE: Domain-specific types (PostData, CommentsData, CommentsPostData) 
+ * have been moved to their respective domain modules.
+ * Import them from:
+ * - PostData: @/src/modules/post
+ * - CommentsData, CommentsPostData: @/src/modules/comment
+ * 
+ * This file now only contains truly shared/generic types.
+ */
 
 export type Connection = {
   photo: string;

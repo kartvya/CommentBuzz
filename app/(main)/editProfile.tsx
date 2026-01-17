@@ -10,9 +10,10 @@ import { RootState } from "@/src/redux/Store";
 import { getUserImage } from "@/src/shared/utils/imageServices";
 import * as ImagePicker from "expo-image-picker";
 
-import { USERINFO } from "@/src/redux/actions/ActionType";
+import { setUserInfo } from "@/src/modules/auth/ui/auth.slice";
 import { UserInfo } from "@/src/modules/auth";
-import { useEditUserProfileDetailsMutation } from "@/src/infrastructure/api/userApi";
+import { useEditProfile } from "@/src/modules/profile/hooks/useEditProfile";
+import { EditProfileRequest } from "@/src/modules/profile/domain/profile.entity";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -24,11 +25,15 @@ import { useDispatch, useSelector } from "react-redux";
 interface UpdatedUsersData {
   email: string;
   name: string;
-  image: Partial<any>;
+  image: ImagePicker.ImagePickerAsset | Record<string, never>;
   bio: string;
 }
 const EditProfile = () => {
-  const [editUserProfileDetails] = useEditUserProfileDetailsMutation();
+  const {
+    editProfile,
+    isLoading: isEditingProfile,
+    validationErrors,
+  } = useEditProfile();
   const navigation = useRouter();
   const dispatch = useDispatch();
   const themeColors = useThemeColors();
@@ -36,7 +41,6 @@ const EditProfile = () => {
     (state: RootState) => state.auth?.userInfo
   ) as UserInfo;
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<UpdatedUsersData>({
     email: "",
     name: "",
@@ -47,6 +51,8 @@ const EditProfile = () => {
     name: "",
     bio: "",
   });
+
+  const isLoading = isEditingProfile;
 
   useEffect(() => {
     if (UserInfo) {
@@ -59,6 +65,27 @@ const EditProfile = () => {
       });
     }
   }, [UserInfo]);
+
+  // Update error states from validation errors
+  useEffect(() => {
+    if (validationErrors) {
+      if (validationErrors.username) {
+        setErrors((prev) => ({
+          ...prev,
+          name: validationErrors.username[0] || "",
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, name: "" }));
+      }
+      if (validationErrors.bio) {
+        setErrors((prev) => ({ ...prev, bio: validationErrors.bio[0] || "" }));
+      } else {
+        setErrors((prev) => ({ ...prev, bio: "" }));
+      }
+    } else {
+      setErrors({ name: "", bio: "" });
+    }
+  }, [validationErrors]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -73,70 +100,35 @@ const EditProfile = () => {
     }
   };
 
-  const validateUserData = () => {
-    let isValid = true;
-    let newErrors = { name: "", phonNumber: "", bio: "" };
-
-    if (!user.name.trim()) {
-      newErrors.name = "Name is required";
-      isValid = false;
-    }
-
-    if (user.bio.length > 200) {
-      newErrors.bio = "Bio must be less than 200 characters";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
   const onUpdateUserData = async () => {
-    if (!validateUserData()) {
-      return;
-    }
-
     if (isLoading) {
       return;
     }
 
     try {
-      setIsLoading(true);
-      let formData = new FormData();
-      formData.append("username", user.name);
-      formData.append("bio", user.bio);
+      // Prepare profile data - use case will handle validation and FormData construction
+      const profileData: EditProfileRequest = {
+        username: user.name || undefined,
+        bio: user.bio || undefined,
+        profilePic:
+          user.image && "uri" in user.image ? user.image.uri : undefined,
+      };
 
-      if (user.image?.uri) {
-        const file = {
-          uri: user.image.uri,
-          name: user.image.uri.split("/").pop() || "profile.jpg",
-          type: user.image.type || "image/jpeg",
-        };
-
-        formData.append("profilePic", {
-          uri: file.uri,
-          type: file.type,
-          name: file.name,
-        } as any);
-      }
-      let res = await editUserProfileDetails(formData).unwrap();
-      console.log("res", res);
-      if (res.success) {
-        dispatch({
-          type: USERINFO,
-          payload: res?.user,
-        });
+      const res = await editProfile(profileData);
+      if (res.success && res.user) {
+        dispatch(setUserInfo(res.user));
       }
       navigation.back();
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
       console.log("Error", error);
     }
   };
 
-  const checkObj = (obj: any, key: string) => {
-    return obj && typeof obj === "object" && key in obj;
+  const checkObj = (
+    obj: Record<string, unknown> | null | undefined,
+    key: string
+  ): boolean => {
+    return !!(obj && typeof obj === "object" && key in obj);
   };
 
   const imageSource = checkObj(user.image, "uri")

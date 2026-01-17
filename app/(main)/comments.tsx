@@ -11,10 +11,15 @@ import { useThemeColors } from "@/src/shared/constants/colors";
 import { hp } from "@/src/shared/utils/comman";
 import { UserInfo } from "@/src/modules/auth";
 import { RootState } from "@/src/redux/Store";
-import usePostServices from "@/src/services/postServices";
-import { CommentsData, CommentsPostData } from "@/src/shared/types";
+import {
+  useCreateComment,
+  useGetComments,
+  useDeleteComment,
+} from "@/src/modules/comment/hooks";
+import { CommentsData, CommentsPostData } from "@/src/modules/comment";
+import { PostData } from "@/src/modules/post";
 import { useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -22,27 +27,31 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  TextInput,
   View,
 } from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
+import { Comment } from "@/src/modules/comment";
 
 const Comments = () => {
   const { postId } = useLocalSearchParams();
-  const { createComment, fetchPostComments, deleteComment } = usePostServices();
+  const { createComment, isLoading: isCreatingComment } = useCreateComment();
+  const { getComments, isLoading: isFetchingComments } = useGetComments();
+  const { deleteComment } = useDeleteComment();
 
   const themeColors = useThemeColors();
   const commentRef = useRef<string>("");
   const flatListRef = useRef<FlatList>(null);
-  const inputRef = useRef<any>(null);
+  const inputRef = useRef<TextInput | null>(null);
   const insets = useSafeAreaInsets();
   const paddingBottom = insets.bottom + 20;
   const [refreshing, setRefreshing] = useState(false);
   const [postDetails, setPostDetails] = useState<CommentsPostData>();
-  const [startLoading, setStartLoging] = useState<boolean>(true);
-  const [sendCommentLoad, setSendCommentLoad] = useState<boolean>(false);
+  const startLoading = isFetchingComments;
+  const sendCommentLoad = isCreatingComment;
 
   const UserInfo = useSelector(
     (state: RootState) => state.auth?.userInfo
@@ -52,84 +61,179 @@ const Comments = () => {
     if (postDetails?.comments?.length) {
       flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     }
-  }, [postDetails?.comments]);
+  }, [postDetails?.comments?.length]);
 
   useEffect(() => {
     getPostDetails();
   }, []);
 
-  const getPostDetails = async () => {
+  const getPostDetails = useCallback(async () => {
     try {
-      const res = await fetchPostComments(postId);
-      if (res.success) {
-        setPostDetails(res.data);
+      const res = await getComments({ postId: postId as string });
+      
+      if (res.success && res.post && res.comments !== undefined) {
+        setPostDetails({
+          success: res.success,
+          post: {
+            ...res.post,
+            comments: res.comments.map((comment) => comment._id),
+          } as PostData,
+          comments: res.comments,
+        });
         inputRef.current?.focus();
       }
-      setStartLoging(false);
     } catch (error) {
-      setStartLoging(false);
       console.log(error);
     }
-  };
+  }, [getComments, postId]);
 
-  const onCommentUpload = async () => {
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await getPostDetails();
+    setRefreshing(false);
+  }, [getPostDetails]);
+
+  const onCommentUpload = useCallback(async () => {
     try {
       if (!commentRef.current) {
         return null;
       }
+      if (!postDetails?.post?._id || !UserInfo) {
+        return null;
+      }
       let data = {
-        postId: postDetails?.post?._id,
-        description: commentRef?.current,
+        postId: postDetails.post._id,
+        description: commentRef.current,
       };
-      setSendCommentLoad(true);
       const res = await createComment(data);
-      if (res.success) {
+      if (res.success && res.comment) {
         inputRef.current?.clear();
         commentRef.current = "";
-        getPostDetails();
-        setSendCommentLoad(false);
-      } else {
-        setSendCommentLoad(false);
+        
+        // Construct a properly formatted comment object with user info
+        const newComment: Comment = {
+          _id: res.comment._id,
+          post: res.comment.post,
+          user: {
+            _id: UserInfo._id,
+            username: UserInfo.username,
+            profilePic: UserInfo.profilePic,
+          },
+          text: res.comment.text,
+          parentComment: res.comment.parentComment,
+          upvotes: res.comment.upvotes || [],
+          downvotes: res.comment.downvotes || [],
+          buzzCoins: res.comment.buzzCoins || 0,
+          createdAt: res.comment.createdAt,
+          updatedAt: res.comment.updatedAt,
+          __v: res.comment.__v || 0,
+        };
+        
+        // Optimistically add the new comment to state
+        setPostDetails((prevPost) => {
+          if (!prevPost) return prevPost;
+          
+          const newCommentCount = (prevPost.post.commentCount || 0) + 1;
+          const postNeedsUpdate = prevPost.post.commentCount !== newCommentCount;
+          
+          return {
+            ...prevPost,
+            comments: [newComment, ...prevPost.comments],
+            post: postNeedsUpdate ? {
+              ...prevPost.post,
+              commentCount: newCommentCount,
+              comments: [newComment._id, ...(prevPost.post.comments || [])],
+            } : prevPost.post,
+          };
+        });
+        
+        // Scroll to top to show the new comment
+        setTimeout(() => {
+          flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+        }, 100);
       }
     } catch (error) {
-      setSendCommentLoad(false);
       console.log(error);
     }
-  };
+  }, [createComment, postDetails?.post?._id, UserInfo]);
 
-  const onDeleteComment = async (commentId: string) => {
+  const onDeleteComment = useCallback(async (commentId: string) => {
     try {
       let res = await deleteComment(commentId);
       if (res.success) {
         setPostDetails((prevPost) => {
-          if (prevPost) {
-            let updatedPost = { ...prevPost };
-            updatedPost.comments = updatedPost.comments?.filter(
-              (c) => c._id != commentId
-            );
-            return updatedPost;
-          }
-          return prevPost;
+          if (!prevPost) return prevPost;
+          
+          const filteredComments = prevPost.comments?.filter(
+            (c) => c._id != commentId
+          );
+          const newCommentCount = Math.max(0, (prevPost.post.commentCount || 0) - 1);
+          const postNeedsUpdate = prevPost.post.commentCount !== newCommentCount;
+          
+          return {
+            ...prevPost,
+            comments: filteredComments,
+            post: postNeedsUpdate ? {
+              ...prevPost.post,
+              commentCount: newCommentCount,
+            } : prevPost.post,
+          };
         });
       }
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [deleteComment]);
+
+  const handleDeleteComment = useCallback((commentId: string) => {
+    onDeleteComment(commentId);
+  }, [onDeleteComment]);
 
   const renderItem: ListRenderItem<CommentsData> = useCallback(
-    ({ item, index }) => (
-      <>
-        <MemoizedCommentView
-          item={item}
-          isUserComment={item?.user?._id == UserInfo?._id}
-          postId={postId as string}
-          onDeleteComment={() => onDeleteComment(item?._id)}
-        />
-      </>
+    ({ item }) => (
+      <MemoizedCommentView
+        item={item}
+        isUserComment={item?.user?._id == UserInfo?._id}
+        postId={postId as string}
+        onDeleteComment={() => handleDeleteComment(item?._id)}
+      />
     ),
-    [postDetails]
+    [UserInfo?._id, postId, handleDeleteComment]
   );
+
+  // Memoize the ListHeaderComponent to prevent MemoizedPostView from re-rendering
+  const listHeaderComponent = useMemo(() => {
+    if (!postDetails?.post) return null;
+    
+    return (
+      <MemoizedPostView
+        //@ts-ignore
+        item={postDetails.post}
+        isVisible={true}
+        isCommentScreen={true}
+      />
+    );
+  }, [postDetails?.post?._id, postDetails?.post?.commentCount]);
+
+  const listEmptyComponent = useMemo(() => (
+    <View
+      style={{
+        backgroundColor: themeColors?.backGround,
+        marginVertical: RFPercentage(2),
+        alignItems: "center",
+      }}
+    >
+      <TitleText>No comments yet...</TitleText>
+    </View>
+  ), [themeColors?.backGround]);
+
+  const refreshControl = useMemo(() => (
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      tintColor={themeColors.primaryColor}
+    />
+  ), [refreshing, onRefresh, themeColors.primaryColor]);
 
   if (startLoading) {
     return (
@@ -147,37 +251,14 @@ const Comments = () => {
           <FlatList
             ref={flatListRef}
             data={postDetails?.comments ?? []}
-            ListHeaderComponent={() => (
-              <MemoizedPostView
-                //@ts-ignore
-                item={postDetails?.post}
-                isVisible={true}
-                isCommentScreen={true}
-              />
-            )}
+            ListHeaderComponent={listHeaderComponent}
             keyExtractor={(item) => item._id.toString()}
             renderItem={renderItem}
             contentContainerStyle={{
               paddingBottom: paddingBottom,
             }}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={() => getPostDetails()}
-                tintColor={themeColors.primaryColor}
-              />
-            }
-            ListEmptyComponent={() => (
-              <View
-                style={{
-                  backgroundColor: themeColors?.backGround,
-                  marginVertical: RFPercentage(2),
-                  alignItems: "center",
-                }}
-              >
-                <TitleText>No comments yet...</TitleText>
-              </View>
-            )}
+            refreshControl={refreshControl}
+            ListEmptyComponent={listEmptyComponent}
           />
 
           <View

@@ -17,15 +17,19 @@ import Loading from "../shared/ui/Loading";
 import MemoizedPostView from "../shared/ui/MemoizedPostView";
 import Spacer from "../shared/ui/Spacer";
 import { TitleText } from "../shared/ui/Text";
-import usePostServices from "../services/postServices";
-import { PostData } from "../shared/types";
+import { useGetOnlyUserPost } from "../modules/post/hooks/useGetOnlyUserPost";
+import { PostData } from "../modules/post";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/Store";
+import { AuthenticationError } from "../shared/errors/domain.errors";
 
 type Props = {};
 
 let limit = 10;
 
 const UserPost = forwardRef<Props>((props, ref) => {
-  const { fetchOnlyUserPost } = usePostServices();
+  const { getOnlyUserPost } = useGetOnlyUserPost();
+  const userInfo = useSelector((state: RootState) => state.auth?.userInfo);
 
   const navigation = useRouter();
   const isFocused = useIsFocused();
@@ -37,39 +41,72 @@ const UserPost = forwardRef<Props>((props, ref) => {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    getAllPost();
-  }, [isFocused]);
+    // Only fetch posts if user is authenticated
+    if (userInfo && isFocused) {
+      getAllPost();
+    }
+  }, [isFocused, userInfo]);
 
   const getAllPost = async () => {
-    limit = limit + 10;
-    const res = await fetchOnlyUserPost(limit);
-    if (res.success) {
-      const postsData = res.data ?? [];
+    // Don't make API call if user is not authenticated
+    if (!userInfo) {
+      return;
+    }
 
-      if (postsData.length > 0 && postsData.length <= 10) {
-        setHasMore(false);
-        setPosts((prevPosts) => {
-          const uniquePosts = [
-            ...new Map(
-              [...postsData, ...prevPosts].map((post) => [post._id, post])
-            ).values(),
-          ];
-          return uniquePosts;
-        });
-      } else {
-        if (postsData.length === Posts.length) {
+    try {
+      limit = limit + 10;
+      const res = await getOnlyUserPost(limit);
+      if (res.success) {
+        const postsData = res.posts ?? [];
+
+        if (postsData.length > 0 && postsData.length <= 10) {
           setHasMore(false);
+          setPosts((prevPosts) => {
+            const uniquePosts = [
+              ...new Map(
+                [...postsData, ...prevPosts].map((post) => [post._id, post])
+              ).values(),
+            ];
+            return uniquePosts;
+          });
+        } else {
+          if (postsData.length === Posts.length) {
+            setHasMore(false);
+          }
+          setPosts(postsData);
         }
-        setPosts(postsData);
       }
+    } catch (error) {
+      // Silently handle authentication errors (user might be logging out)
+      if (error instanceof AuthenticationError) {
+        console.log("User not authenticated, skipping post fetch");
+        return;
+      }
+      console.error("Error fetching user posts:", error);
     }
   };
 
   const refreshPulled = async () => {
-    limit = 10;
-    const res = await fetchOnlyUserPost(limit);
-    if (res.success) {
-      setPosts(res.data ?? []);
+    // Don't make API call if user is not authenticated
+    if (!userInfo) {
+      return;
+    }
+
+    try {
+      limit = 10;
+      const res = await getOnlyUserPost(limit);
+      if (res.success) {
+        setPosts(res.posts ?? []);
+      }
+    } catch (error) {
+      // Silently handle authentication errors (user might be logging out)
+      if (error instanceof AuthenticationError) {
+        console.log("User not authenticated, skipping post refresh");
+        return;
+      }
+      console.error("Error refreshing user posts:", error);
+    } finally {
+      setRefreshing(false);
     }
   };
 

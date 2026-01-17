@@ -1,6 +1,6 @@
 /**
  * Auth Repository Implementation
- * Implements IAuthRepository using RTK Query APIs
+ * Implements IAuthRepository using API client abstraction
  */
 
 import { IAuthRepository } from "../domain/auth.repository";
@@ -12,45 +12,78 @@ import {
   RefreshTokenRequest,
   RefreshTokenResponse,
 } from "../domain/auth.entity";
-import AuthApi from "../../../infrastructure/api/authApi";
-import { tokenStorage } from "../../../infrastructure/storage/tokenStorage";
-import { store } from "../../../redux/Store";
+import { IApiClient } from "../../../infrastructure/api/IApiClient";
+import { ITokenStorage } from "../../../infrastructure/storage/ITokenStorage";
+import { endPoints } from "../../../infrastructure/api/endPoints";
+import { mapToDomainError } from "../../../shared/errors";
+import {
+  LoginResponseDto,
+  SignupResponseDto,
+  RefreshTokenResponseDto,
+} from "../../../infrastructure/api/dtos";
 
 export class AuthRepositoryImpl implements IAuthRepository {
+  constructor(
+    private apiClient: IApiClient,
+    private tokenStorage: ITokenStorage
+  ) {}
+
   async login(credentials: LoginRequest): Promise<LoginApiResponse> {
-    const result = await store.dispatch(
-      AuthApi.endpoints.login.initiate(credentials)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.post<LoginResponseDto>(
+        endPoints.Login,
+        credentials
+      );
+
+      // Extract auth header from response headers
+      const authHeader =
+        response.headers?.["authorization"] ||
+        response.headers?.["Authorization"] ||
+        "";
+
+      // Transform to domain response format
+      return {
+        data: response.data,
+        authHeader,
+      };
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as LoginApiResponse;
   }
 
   async signup(userData: SignupRequest): Promise<SignupResponse> {
-    const result = await store.dispatch(
-      AuthApi.endpoints.register.initiate(userData)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.post<SignupResponseDto>(
+        endPoints.Register,
+        userData
+      );
+
+      return response.data;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as SignupResponse;
   }
 
   async refreshToken(
     refreshToken: RefreshTokenRequest
   ): Promise<RefreshTokenResponse> {
-    const result = await store.dispatch(
-      AuthApi.endpoints.refreshToken.initiate(refreshToken)
-    );
-    if ("error" in result) {
-      throw result.error;
+    try {
+      const response = await this.apiClient.post<RefreshTokenResponseDto>(
+        endPoints.RefreshToken,
+        refreshToken
+      );
+
+      return response.data;
+    } catch (error) {
+      throw mapToDomainError(error);
     }
-    return result.data as RefreshTokenResponse;
   }
 
   async logout(): Promise<void> {
-    await tokenStorage.clearAllTokens();
+    try {
+      await this.tokenStorage.clearAllTokens();
+    } catch (error) {
+      throw mapToDomainError(error);
+    }
   }
 }
-
